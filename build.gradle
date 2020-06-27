@@ -21,9 +21,8 @@ application {
     mainClassName = javaMainClass
 }
 
-
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+
 }
 
 jar {
@@ -32,7 +31,7 @@ jar {
     }
 
     from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
@@ -40,7 +39,7 @@ task fatJar(type: Jar) {
     manifest {
         attributes 'Main-Class': javaMainClass
     }
-    baseName = 'all-in-one-jar'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    archiveBaseName = 'all-in-one-jar'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
