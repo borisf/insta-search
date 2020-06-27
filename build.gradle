@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.borisfarber'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin : "java"
+
+ext {
+    def mainClass = "com.borisfarber.Console"
+    javaMainClass = mainClass
+}
+
+application {
+    mainClassName = javaMainClass
+}
+
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": javaMainClass
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': javaMainClass
+    }
+    baseName = 'all-in-one-jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
