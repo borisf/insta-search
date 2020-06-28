@@ -1,15 +1,19 @@
 package com.borisfarber;
 
-import javax.swing.text.*;
-import java.awt.*;
-import javax.swing.event.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.net.*;
-import java.nio.file.*;
-import java.io.*;
+import javax.swing.text.Utilities;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
-public final class ClassySharkInstaSearch extends JFrame implements ActionListener, MouseListener, KeyListener {
+public final class ClassySharkInstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
     private JTextArea resultTextArea;
@@ -36,13 +40,9 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         super("ClassyShark Insta Search");
         this.textFont = new Font("Monospaced", 0, 23);
         this.buildUI();
-        final Controller controller = this.controller;
-        if (controller == null) {
-
-        }
         controller.crawl(file);
     }
-    
+
     public final void fileDragged(final File file) {
 
         final JTextArea showFileArea = this.showFileArea;
@@ -54,7 +54,7 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         if (resultTextArea == null) {
 
         }
-        resultTextArea.setText("    ,|\n     / ;\n    /  \\\n   : ,'(\n   |( `.\\\n   : \\  `\\       \\.\n    \\ `.         | `.\n     \\  `-._     ;   \\\n      \\     ``-.'.. _ `._\n       `. `-.            ```-...__\n        .'`.        --..          ``-..____\n      ,'.-'`,_-._            ((((   <o.   ,'\n           `' `-.)``-._-...__````  ____.-'\n        SSt    ,'    _,'.--,---------'\n           _.-' _..-'   ),'\n          ``--''        `  ");
+        resultTextArea.setText(Background.SHARK_BG);
         this.setTitle("ClassySearch - " + file.getName());
         final Controller controller = this.controller;
         if (controller == null) {
@@ -62,7 +62,7 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         }
         controller.crawl(file);
     }
-    
+
     private final void buildUI() {
         this.occurrencesLabel = new JLabel("");
         this.resultTextArea = this.buildResultTextArea();
@@ -119,11 +119,28 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         menuBar.add(Box.createHorizontalGlue());
         final JMenuItem openFolderItem = new JMenuItem("Open Folder/File");
         openFolderItem.setFont(f);
-        openFolderItem.addActionListener(this);
+        openFolderItem.addActionListener(actionEvent -> {
+
+            try {
+                File currentFile = open();
+
+                resultTextArea.setText(Background.SHARK_BG);
+                showFileArea.setText("");
+                searchField.setText("");
+
+                controller.crawl(currentFile);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         menu.add(openFolderItem);
         final JMenuItem closeItem = new JMenuItem("Exit");
         closeItem.setFont(f);
-        closeItem.addActionListener(this);
+        closeItem.addActionListener(actionEvent -> {
+            System.exit(0);
+        });
         menu.add(closeItem);
         this.setJMenuBar(menuBar);
         final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
@@ -133,7 +150,7 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         this.pack();
         this.setVisible(true);
     }
-    
+
     private final JTextField buildSearchField() {
         final JTextField result = new JTextField();
         result.getDocument().addDocumentListener(this.controller);
@@ -141,23 +158,91 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
         result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
 
-        // TODO fix here to controller
-        result.addKeyListener(this);
+        result.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                if (keyEvent.getKeyCode() == 39) {
+                    result.setText("");
+                    try {
+                        controller.crawl(open());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+
+            }
+        });
         return result;
     }
-    
+
     private final JTextArea buildResultTextArea() {
         final JTextArea result = new JTextArea(10, 80);
         result.setFont(this.textFont);
         result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
         result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
-        result.setText("    ,|\n     / ;\n    /  \\\n   : ,'(\n   |( `.\\\n   : \\  `\\       \\.\n    \\ `.         | `.\n     \\  `-._     ;   \\\n      \\     ``-.'.. _ `._\n       `. `-.            ```-...__\n        .'`.        --..          ``-..____\n      ,'.-'`,_-._            ((((   <o.   ,'\n           `' `-.)``-._-...__````  ____.-'\n        SSt    ,'    _,'.--,---------'\n           _.-' _..-'   ),'\n          ``--''        `  ");
+        result.setText(Background.SHARK_BG);
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransferHandler(this));
-        result.addMouseListener(this);
+        result.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+
+                // TODO not sure I need it, can do with arrows
+
+                if (mouseEvent.getButton() != MouseEvent.BUTTON1) {
+                    return;
+                }
+
+                if (mouseEvent.getClickCount() != 2) {
+                    return;
+                }
+
+                try {
+                    int offset = resultTextArea.viewToModel(mouseEvent.getPoint());
+                    int rowStart = Utilities.getRowStart(resultTextArea, offset);
+                    int rowEnd = Utilities.getRowEnd(resultTextArea, offset);
+                    String selectedLine = resultTextArea.getText().substring(rowStart, rowEnd);
+
+                    controller.updateShowFileArea(selectedLine);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+
+            }
+        });
         return result;
     }
-    
+
     private final JTextArea buildShowFileArea() {
         this.showFileArea = new JTextArea(30, 80);
         final JTextArea showFileArea = this.showFileArea;
@@ -181,7 +266,7 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         }
         return showFileArea4;
     }
-    
+
     private final File open() throws Exception {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -195,7 +280,7 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         }
         return this.downloadedTempTextFile();
     }
-    
+
     private final File downloadedTempTextFile() throws Exception {
         final URL website = new URL("http://www.gutenberg.org/cache/epub/18362/pg18362.txt");
         final File target = File.createTempFile("tempDict", ".txt");
@@ -203,60 +288,13 @@ public final class ClassySharkInstaSearch extends JFrame implements ActionListen
         Files.copy(ll, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         return target;
     }
-    
+
     private final void setFileChooserFont(final Component[] comp) {
         // TODO fill in
     }
 
-
-
-        public static void main(final String[] args) {
-            final ClassySharkInstaSearch classySearch = (args.length != 0) ? new ClassySharkInstaSearch(new File(args[1])) : new ClassySharkInstaSearch();
-            classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        }
-
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-
+    public static void main(final String[] args) {
+        final ClassySharkInstaSearch classySearch = (args.length != 0) ? new ClassySharkInstaSearch(new File(args[1])) : new ClassySharkInstaSearch();
+        classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
