@@ -20,6 +20,13 @@ public final class Controller implements DocumentListener
     private final JLabel occurrencesLabel;
     private final JTextArea showFileArea;
 
+    public Controller(final JTextComponent resultTextArea, final JLabel occurrencesLabel, final JTextArea showFileArea) {
+        this.resultTextArea = resultTextArea;
+        this.occurrencesLabel = occurrencesLabel;
+        this.showFileArea = showFileArea;
+    }
+
+
     private final boolean isDirectory() {
         if (this.currentFile != null) {
 
@@ -163,11 +170,5 @@ public final class Controller implements DocumentListener
 
     public final JTextArea getShowFileArea() {
         return this.showFileArea;
-    }
-
-    public Controller(final JTextComponent resultTextArea, final JLabel occurrencesLabel, final JTextArea showFileArea) {
-        this.resultTextArea = resultTextArea;
-        this.occurrencesLabel = occurrencesLabel;
-        this.showFileArea = showFileArea;
     }
 }

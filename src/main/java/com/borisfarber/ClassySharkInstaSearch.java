@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+// todo convert this class to builder
 public final class ClassySharkInstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
@@ -46,14 +47,10 @@ public final class ClassySharkInstaSearch extends JFrame {
     public final void fileDragged(final File file) {
 
         final JTextArea showFileArea = this.showFileArea;
-        if (showFileArea == null) {
 
-        }
         showFileArea.setText("");
         final JTextArea resultTextArea = this.resultTextArea;
-        if (resultTextArea == null) {
 
-        }
         resultTextArea.setText(Background.SHARK_BG);
         this.setTitle("ClassySearch - " + file.getName());
         final Controller controller = this.controller;
@@ -75,13 +72,9 @@ public final class ClassySharkInstaSearch extends JFrame {
         }
         final JTextArea resultTextArea2 = resultTextArea;
         final JLabel occurrencesLabel = this.occurrencesLabel;
-        if (occurrencesLabel == null) {
 
-        }
         final JTextArea showFileArea = this.showFileArea;
-        if (showFileArea == null) {
-
-        }
+       
         this.controller = new Controller(resultTextArea2, occurrencesLabel, showFileArea);
         this.searchField = this.buildSearchField();
         final JPanel statusPanel = new JPanel();
