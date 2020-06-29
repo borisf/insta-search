@@ -8,18 +8,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 // todo convert this class to builder
 public final class ClassySharkInstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
     private JTextArea resultTextArea;
-    private JTextArea showFileArea;
-    private JLabel occurrencesLabel;
+    private JTextArea previewArea;
+    private JLabel resultCountLabel;
     private Controller controller;
 
     private static final Color BACKGROUND_COLOR = new Color(7, 54, 66);
@@ -27,26 +23,17 @@ public final class ClassySharkInstaSearch extends JFrame {
 
     public ClassySharkInstaSearch() {
         super("ClassyShark Insta Search");
-        this.textFont = new Font("Monospaced", 0, 23);
-        this.buildUI();
-        final File file = new File(System.getProperty("user.dir"));
-        final Controller controller = this.controller;
-        if (controller == null) {
+        textFont = new Font("JetBrains Mono", 0, 23);
+        buildUI();
+        controller = new Controller(resultTextArea, previewArea, resultCountLabel);
+        searchField.getDocument().addDocumentListener(this.controller);
+        controller.testCrawl();
 
-        }
-        controller.crawl(file);
-    }
-
-    public ClassySharkInstaSearch(final File file) {
-        super("ClassyShark Insta Search");
-        this.textFont = new Font("Monospaced", 0, 23);
-        this.buildUI();
-        controller.crawl(file);
     }
 
     public final void fileDragged(final File file) {
 
-        final JTextArea showFileArea = this.showFileArea;
+        final JTextArea showFileArea = this.previewArea;
 
         showFileArea.setText("");
         final JTextArea resultTextArea = this.resultTextArea;
@@ -57,35 +44,32 @@ public final class ClassySharkInstaSearch extends JFrame {
         if (controller == null) {
 
         }
-        controller.crawl(file);
+        controller.testCrawl(file);
     }
 
     private final void buildUI() {
-        this.occurrencesLabel = new JLabel("");
+        this.resultCountLabel = new JLabel("");
         this.resultTextArea = this.buildResultTextArea();
         final JScrollPane showResultsScrolled = new JScrollPane(this.resultTextArea);
-        this.showFileArea = this.buildShowFileArea();
-        final JScrollPane showFileScrolled = new JScrollPane(this.showFileArea);
+        this.previewArea = this.buildShowFileArea();
+        final JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
         final JTextArea resultTextArea = this.resultTextArea;
         if (resultTextArea == null) {
 
         }
         final JTextArea resultTextArea2 = resultTextArea;
-        final JLabel occurrencesLabel = this.occurrencesLabel;
+        final JLabel occurrencesLabel = this.resultCountLabel;
 
-        final JTextArea showFileArea = this.showFileArea;
-       
-        this.controller = new Controller(resultTextArea2, occurrencesLabel, showFileArea);
         this.searchField = this.buildSearchField();
         final JPanel statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, 0));
-        final JLabel occurrencesLabel2 = this.occurrencesLabel;
+        final JLabel occurrencesLabel2 = this.resultCountLabel;
 
         if (occurrencesLabel2 == null) {
 
         }
         occurrencesLabel2.setAlignmentX(0.5f);
-        statusPanel.add(this.occurrencesLabel);
+        statusPanel.add(this.resultCountLabel);
         final JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setResizeWeight(0.5);
         splitPane.setOneTouchExpandable(true);
@@ -118,10 +102,10 @@ public final class ClassySharkInstaSearch extends JFrame {
                 File currentFile = open();
 
                 resultTextArea.setText(Background.SHARK_BG);
-                showFileArea.setText("");
+                previewArea.setText("");
                 searchField.setText("");
 
-                controller.crawl(currentFile);
+                controller.testCrawl(currentFile);
 
 
             } catch (Exception e) {
@@ -146,7 +130,7 @@ public final class ClassySharkInstaSearch extends JFrame {
 
     private final JTextField buildSearchField() {
         final JTextField result = new JTextField();
-        result.getDocument().addDocumentListener(this.controller);
+        //result.getDocument().addDocumentListener(this.controller);
         result.setFont(this.textFont);
         result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
         result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
@@ -159,15 +143,18 @@ public final class ClassySharkInstaSearch extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
+                // todo maybe put to controller
                 if (keyEvent.getKeyCode() == 39) {
                     result.setText("");
                     try {
-                        controller.crawl(open());
+                        controller.testCrawl(open());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     return;
                 }
+
+                // todo add up/down errors for preview
             }
 
             @Override
@@ -237,23 +224,23 @@ public final class ClassySharkInstaSearch extends JFrame {
     }
 
     private final JTextArea buildShowFileArea() {
-        this.showFileArea = new JTextArea(30, 80);
-        final JTextArea showFileArea = this.showFileArea;
+        this.previewArea = new JTextArea(30, 80);
+        final JTextArea showFileArea = this.previewArea;
         if (showFileArea == null) {
 
         }
         showFileArea.setFont(this.textFont);
-        final JTextArea showFileArea2 = this.showFileArea;
+        final JTextArea showFileArea2 = this.previewArea;
         if (showFileArea2 == null) {
 
         }
         showFileArea2.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
-        final JTextArea showFileArea3 = this.showFileArea;
+        final JTextArea showFileArea3 = this.previewArea;
         if (showFileArea3 == null) {
 
         }
         showFileArea3.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
-        final JTextArea showFileArea4 = this.showFileArea;
+        final JTextArea showFileArea4 = this.previewArea;
         if (showFileArea4 == null) {
 
         }
@@ -266,28 +253,18 @@ public final class ClassySharkInstaSearch extends JFrame {
         fileChooser.setCurrentDirectory(new File("."));
         final Component[] components = fileChooser.getComponents();
 
-        this.setFileChooserFont(components);
+        //this.setFileChooserFont(components);
         final int returnVal = fileChooser.showDialog(this, "Open");
         if (returnVal == 0) {
             return fileChooser.getSelectedFile();
         }
-        return this.downloadedTempTextFile();
-    }
+        //return this.downloadedTempTextFile();
 
-    private final File downloadedTempTextFile() throws Exception {
-        final URL website = new URL("http://www.gutenberg.org/cache/epub/18362/pg18362.txt");
-        final File target = File.createTempFile("tempDict", ".txt");
-        final InputStream ll = website.openStream();
-        Files.copy(ll, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        return target;
-    }
-
-    private final void setFileChooserFont(final Component[] comp) {
-        // TODO fill in
+        return null;
     }
 
     public static void main(final String[] args) {
-        final ClassySharkInstaSearch classySearch = (args.length != 0) ? new ClassySharkInstaSearch(new File(args[1])) : new ClassySharkInstaSearch();
+        final ClassySharkInstaSearch classySearch = new ClassySharkInstaSearch();
         classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
