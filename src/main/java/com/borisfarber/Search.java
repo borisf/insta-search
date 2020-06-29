@@ -65,21 +65,29 @@ public class Search {
 
         int allLinesIndex = preview.get(resultSet.get(resultIndex).getString());
 
-        System.out.println("result index: " + resultIndex +" allLines index: " + allLinesIndex);
+        //System.out.println("result index: " + resultIndex +" allLines index: " + allLinesIndex);
 
         if(allLinesIndex <= 3 || (allLines.size() - allLinesIndex) <=3) {
-            return allLines.toString();
+
+            StringBuilder builder = new StringBuilder();
+
+            for(String res : allLines) {
+                builder.append(res + "\n");
+            }
+
+            // TODO fix the tail of the arrays if it is too long
+
+            return builder.toString();
         }
 
         StringBuilder builder = new StringBuilder();
-        builder.append(allLines.get(allLinesIndex - 2) + "/n");
-        builder.append(allLines.get(allLinesIndex - 1) + "/n");
-        builder.append(allLines.get(allLinesIndex) + "/n");
-        builder.append(allLines.get(allLinesIndex + 1) + "/n");
-        builder.append(allLines.get(allLinesIndex + 2) + "/n");
-        builder.append(allLines.get(allLinesIndex + 3) + "/n");
-
-
+        builder.append(allLines.get(allLinesIndex - 2) + "\n");
+        builder.append(allLines.get(allLinesIndex - 1) + "\n");
+        builder.append(allLines.get(allLinesIndex) + "\n");
+        builder.append(allLines.get(allLinesIndex + 1) + "\n");
+        builder.append(allLines.get(allLinesIndex + 2) + "\n");
+        builder.append(allLines.get(allLinesIndex + 3) + "\n");
+        
         return builder.toString();
     }
 
