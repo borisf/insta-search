@@ -30,7 +30,7 @@ public final class Controller implements DocumentListener {
         search.crawl(testLoad());
     }
 
-    public void search(String query) {
+    private void search(String query) {
         search.search(query);
     }
 

@@ -65,29 +65,23 @@ public class Search {
 
         int allLinesIndex = preview.get(resultSet.get(resultIndex).getString());
 
-        //System.out.println("result index: " + resultIndex +" allLines index: " + allLinesIndex);
+        int lower = allLinesIndex - 5;
+        int upper = allLinesIndex + 5;
 
-        if(allLinesIndex <= 3 || (allLines.size() - allLinesIndex) <=3) {
+        if (lower < 0) {
+            lower = 0;
+        }
 
-            StringBuilder builder = new StringBuilder();
-
-            for(String res : allLines) {
-                builder.append(res + "\n");
-            }
-
-            // TODO fix the tail of the arrays if it is too long
-
-            return builder.toString();
+        if (upper >= allLines.size()) {
+            upper = allLines.size()-1;
         }
 
         StringBuilder builder = new StringBuilder();
-        builder.append(allLines.get(allLinesIndex - 2) + "\n");
-        builder.append(allLines.get(allLinesIndex - 1) + "\n");
-        builder.append(allLines.get(allLinesIndex) + "\n");
-        builder.append(allLines.get(allLinesIndex + 1) + "\n");
-        builder.append(allLines.get(allLinesIndex + 2) + "\n");
-        builder.append(allLines.get(allLinesIndex + 3) + "\n");
-        
+
+        for(int i = lower; i < upper; i++) {
+            builder.append(allLines.get(i) + "\n");
+        }
+
         return builder.toString();
     }
 

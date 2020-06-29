@@ -22,7 +22,7 @@ public final class ClassySharkInstaSearch extends JFrame {
     private Controller controller;
 
     private static final Color BACKGROUND_COLOR = new Color(7, 54, 66);
-    private static final Color FOREGROUND_COLOR = new Color(147, 161, 161);;
+    private static final Color FOREGROUND_COLOR = new Color(147, 161, 161);
 
     public ClassySharkInstaSearch() {
         super("ClassyShark Insta Search");
@@ -133,7 +133,6 @@ public final class ClassySharkInstaSearch extends JFrame {
 
     private final JTextField buildSearchField() {
         final JTextField result = new JTextField();
-        //result.getDocument().addDocumentListener(this.controller);
         result.setFont(this.textFont);
         result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
         result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
@@ -167,9 +166,6 @@ public final class ClassySharkInstaSearch extends JFrame {
                     controller.downPressed();
                     return;
                 }
-
-
-
             }
 
             @Override
