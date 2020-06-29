@@ -1,19 +1,21 @@
 package com.borisfarber;
 
-import javax.swing.*;
-import java.util.*;
-
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
+
 public class Search {
-    private final Controller controller;
     private ArrayList<String> allLines;
     private TreeMap<String, Integer> preview;
-    private List<ExtractedResult> resultSet;
 
-    public Search(Controller controller) {
-        this.controller = controller;
+    // todo encapsulate
+    public List<ExtractedResult> resultSet;
+
+    public Search() {
         allLines = new ArrayList<>();
         preview = new TreeMap<>();
         resultSet = new LinkedList<>();
@@ -32,7 +34,7 @@ public class Search {
 
     public void search(String query) {
         // todo template or strategy pattern for different search types
-        resultSet = FuzzySearch.extractTop(query, allLines, 4);
+        resultSet = FuzzySearch.extractTop(query, allLines, 10);
     }
 
     public String getResults() {
@@ -46,20 +48,47 @@ public class Search {
         return builder.toString();
     }
 
-    public String getPreview() {
-       // TODO work with the preview map
-       return allLines.get(0);
+
+    private static boolean isBetween(int x, int lower, int upper) {
+        return lower <= x && x <= upper;
+    }
+
+    /**
+     * 5 lines
+     * result
+     * 5 more lines
+     *
+     * @param resultIndex
+     * @return
+     */
+    public String getPreview(int resultIndex) {
+
+        int allLinesIndex = preview.get(resultSet.get(resultIndex).getString());
+
+        System.out.println("result index: " + resultIndex +" allLines index: " + allLinesIndex);
+
+        if(allLinesIndex <= 3 || (allLines.size() - allLinesIndex) <=3) {
+            return allLines.toString();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(allLines.get(allLinesIndex - 2) + "/n");
+        builder.append(allLines.get(allLinesIndex - 1) + "/n");
+        builder.append(allLines.get(allLinesIndex) + "/n");
+        builder.append(allLines.get(allLinesIndex + 1) + "/n");
+        builder.append(allLines.get(allLinesIndex + 2) + "/n");
+        builder.append(allLines.get(allLinesIndex + 3) + "/n");
+
+
+        return builder.toString();
     }
 
     public String getResultCount() {
         return Integer.toString(resultSet.size());
     }
-    // todo not sure why needed
-    public void removeUpdate() {
-    }
 
-    public Map<String, String> filenamesToPaths() {
-        return new TreeMap<>();
+    public void removeUpdate() {
+        // escape pressed, maybe do optimization
     }
 
     public String toString() {
@@ -67,7 +96,6 @@ public class Search {
         for(ExtractedResult res : resultSet) {
             System.out.println(res.getString());
         }
-
         return "";
     }
 
@@ -86,11 +114,11 @@ public class Search {
 
     public static void main(String[] args) {
         System.out.println("Search");
-        Search search = new Search(new Controller(new JTextArea(), new JTextArea(), new JLabel()));
+        Search search = new Search();
         search.crawl(testLoad());
         search.search("set");
         System.out.println(search.getResults());
-        System.out.println(search.getPreview());
+        System.out.println(search.getPreview(0));
         System.out.println(search.getResultCount());
     }
 }

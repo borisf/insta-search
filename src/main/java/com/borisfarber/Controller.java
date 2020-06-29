@@ -23,7 +23,7 @@ public final class Controller implements DocumentListener {
         this.previewTextArea = previewArea;
         this.occurrencesLabel = occurrencesLabel;
 
-        search = new Search(this);
+        search = new Search();
     }
 
     public void testCrawl() {
@@ -36,7 +36,7 @@ public final class Controller implements DocumentListener {
 
     public String dump() {
         System.out.println(search.getResults());
-        System.out.println(search.getPreview());
+        System.out.println(search.getPreview(0));
         System.out.println(search.getResultCount());
 
         return "";
@@ -96,7 +96,7 @@ public final class Controller implements DocumentListener {
 
     private void updateGUI() {
         resultTextArea.setText(search.getResults());
-        previewTextArea.setText(search.getPreview());
+        previewTextArea.setText(search.getPreview(0));
         occurrencesLabel.setText(search.getResultCount());
     }
 
@@ -106,7 +106,7 @@ public final class Controller implements DocumentListener {
         }
 
         // TODO create here different search types
-        this.search = new Search(this);
+        this.search = new Search();
 
         this.currentFile = file;
         if (this.currentFile != null) {
@@ -165,5 +165,26 @@ public final class Controller implements DocumentListener {
 
     public static void main(String[] args) {
        repl();
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // todo refactor, make i zero on a new crawl
+    int i = 0;
+
+    public void upPressed() {
+
+        if(i>0) {
+            i--;
+        }
+
+        previewTextArea.setText(search.getPreview(i));
+    }
+
+    public void downPressed() {
+
+        if(i < search.resultSet.size()-1) {
+            i++;
+        }
+        previewTextArea.setText(search.getPreview(i));
     }
 }

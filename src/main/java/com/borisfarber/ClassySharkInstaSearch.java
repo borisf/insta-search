@@ -9,6 +9,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_UP;
+
 // todo convert this class to builder
 public final class ClassySharkInstaSearch extends JFrame {
     private final Font textFont;
@@ -135,6 +138,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
         result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
 
+        // // todo maybe put to controller, same as with doc update, in constructor
         result.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent keyEvent) {
@@ -143,7 +147,7 @@ public final class ClassySharkInstaSearch extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                // todo maybe put to controller
+
                 if (keyEvent.getKeyCode() == 39) {
                     result.setText("");
                     try {
@@ -154,7 +158,18 @@ public final class ClassySharkInstaSearch extends JFrame {
                     return;
                 }
 
-                // todo add up/down errors for preview
+                if (keyEvent.getKeyCode() == VK_UP) {
+                    controller.upPressed();
+                    return;
+                }
+
+                if (keyEvent.getKeyCode() == VK_DOWN) {
+                    controller.downPressed();
+                    return;
+                }
+
+
+
             }
 
             @Override
@@ -247,7 +262,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         return showFileArea4;
     }
 
-    private final File open() throws Exception {
+    public final File open() throws Exception {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setCurrentDirectory(new File("."));
