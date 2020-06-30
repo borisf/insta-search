@@ -6,6 +6,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import java.io.*;
+import java.util.ArrayList;
 
 import static com.borisfarber.Search.testLoad;
 
@@ -17,6 +18,7 @@ public final class Controller implements DocumentListener {
 
     private File currentFile;
     private Search search;
+    int selectedGuiIndex = 0;
 
     public Controller(final JTextComponent resultTextArea, final JTextArea previewArea, final JLabel occurrencesLabel) {
         this.resultTextArea = resultTextArea;
@@ -30,7 +32,29 @@ public final class Controller implements DocumentListener {
         search.crawl(testLoad());
     }
 
+    public final void crawl(final File file) {
+        if (file == null) {
+            return;
+        }
+
+        if (file.exists()) {
+            // TODO add optimization for search if needed
+            search = new Search();
+            try {
+                ArrayList<String> a = Search.folderToLines(file);
+                search.crawl(a);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // TODO bug with
+
+        System.out.print("here");
+    }
+
     private void search(String query) {
+        selectedGuiIndex = 0;
         search.search(query);
     }
 
@@ -42,7 +66,7 @@ public final class Controller implements DocumentListener {
         return "";
     }
 
-    // TODO event loop
+    // TODO the following methods are event loop, maybe refactor
     @Override
     public void insertUpdate(final DocumentEvent evt) {
         // letter
@@ -66,6 +90,27 @@ public final class Controller implements DocumentListener {
     public void changedUpdate(final DocumentEvent evt) {
         Document document = evt.getDocument();
         runNewSearch(document);
+    }
+
+    public void upPressed() {
+
+        if(selectedGuiIndex >0) {
+            selectedGuiIndex--;
+        }
+
+        previewTextArea.setText(search.getPreview(selectedGuiIndex));
+    }
+
+    public void downPressed() {
+
+        if(selectedGuiIndex < search.getResultSet().size()-1) {
+            selectedGuiIndex++;
+        }
+        previewTextArea.setText(search.getPreview(selectedGuiIndex));
+    }
+
+    public void updateShowFileArea(String selectedLine) {
+        // TODO implement if needed on selected mouse line
     }
 
     private final void runNewSearch(final Document searchQueryDoc) {
@@ -96,50 +141,8 @@ public final class Controller implements DocumentListener {
 
     private void updateGUI() {
         resultTextArea.setText(search.getResults());
-        previewTextArea.setText(search.getPreview(0));
+        previewTextArea.setText(search.getPreview(selectedGuiIndex));
         occurrencesLabel.setText(search.getResultCount());
-    }
-
-    public final void testCrawl(final File file) {
-        if (file == null) {
-            return;
-        }
-
-        // TODO create here different search types
-        this.search = new Search();
-
-        this.currentFile = file;
-        if (this.currentFile != null) {
-            final File currentFile = this.currentFile;
-
-            if (currentFile.exists()) {
-                final Search search = this.search;
-
-                final File currentFile2 = this.currentFile;
-
-                //search.load(currentFile2);
-            }
-        }
-    }
-
-    public final void updateShowFileArea(final String selectedLine) {
-       // TODO implement
-    }
-
-    public final JTextComponent getResultTextArea() {
-        return this.resultTextArea;
-    }
-
-    public final void setResultTextArea(final JTextComponent jt) {
-        this.resultTextArea = jt;
-    }
-
-    public final JLabel getOccurrencesLabel() {
-        return this.occurrencesLabel;
-    }
-
-    public final JTextArea getPreviewTextArea() {
-        return this.previewTextArea;
     }
 
     public static void repl() {
@@ -165,26 +168,5 @@ public final class Controller implements DocumentListener {
 
     public static void main(String[] args) {
        repl();
-    }
-
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // todo refactor, make i zero on a new crawl
-    int i = 0;
-
-    public void upPressed() {
-
-        if(i>0) {
-            i--;
-        }
-
-        previewTextArea.setText(search.getPreview(i));
-    }
-
-    public void downPressed() {
-
-        if(i < search.resultSet.size()-1) {
-            i++;
-        }
-        previewTextArea.setText(search.getPreview(i));
     }
 }

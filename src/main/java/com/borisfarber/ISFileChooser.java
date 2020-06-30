@@ -19,7 +19,7 @@ public class ISFileChooser {
         if (controller == null) {
 
         }
-        controller.testCrawl(file);
+        controller.crawl(file);
     }
 
     private final boolean isDirectory() {

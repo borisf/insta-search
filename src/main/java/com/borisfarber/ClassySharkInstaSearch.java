@@ -47,7 +47,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         if (controller == null) {
 
         }
-        controller.testCrawl(file);
+        controller.crawl(file);
     }
 
     private final void buildUI() {
@@ -103,14 +103,10 @@ public final class ClassySharkInstaSearch extends JFrame {
 
             try {
                 File currentFile = open();
-
                 resultTextArea.setText(Background.SHARK_BG);
                 previewArea.setText("");
                 searchField.setText("");
-
-                controller.testCrawl(currentFile);
-
-
+                controller.crawl(currentFile);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -150,7 +146,7 @@ public final class ClassySharkInstaSearch extends JFrame {
                 if (keyEvent.getKeyCode() == 39) {
                     result.setText("");
                     try {
-                        controller.testCrawl(open());
+                        controller.crawl(open());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -262,9 +258,10 @@ public final class ClassySharkInstaSearch extends JFrame {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setCurrentDirectory(new File("."));
-        final Component[] components = fileChooser.getComponents();
 
+        //final Component[] components = fileChooser.getComponents();
         //this.setFileChooserFont(components);
+
         final int returnVal = fileChooser.showDialog(this, "Open");
         if (returnVal == 0) {
             return fileChooser.getSelectedFile();
