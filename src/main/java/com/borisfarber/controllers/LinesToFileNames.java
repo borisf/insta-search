@@ -16,7 +16,8 @@ public class LinesToFileNames {
 
         System.out.println("Search");
         FileSearch search = new FileSearch();
-        search.crawl(testLoad());
+        // TODO fix test
+        //search.crawl(testLoad());
         search.search("set");
         System.out.println(search.getResults());
         System.out.println(search.getPreview(0));

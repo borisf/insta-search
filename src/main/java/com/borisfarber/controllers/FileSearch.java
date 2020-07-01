@@ -13,35 +13,26 @@ import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 public class FileSearch {
     private ArrayList<String> allLines;
     private TreeMap<String, Integer> preview;
+    private ArrayList<Pair<Integer, String>> numLinesToFiles;
     private List<ExtractedResult> resultSet;
 
     public FileSearch() {
         allLines = new ArrayList<>();
         preview = new TreeMap<>();
+        numLinesToFiles = new ArrayList<>();
         resultSet = new ArrayList<>();
     }
 
     // think of state changes
-    // TODO merge into folderToLines method
-    public void crawl(ArrayList<String> allLines) {
-        this.allLines = allLines;
-
-        int index = 0;
-
-        for (String line : this.allLines) {
-            preview.put(line, index);
-            index++;
-        }
-    }
-
-    public static Pair<ArrayList<String>, LinkedList<Pair>> folderToLines(File file) throws IOException {
+    // long operation
+    public void crawl(File file) throws IOException {
         if (file == null || !file.exists()) {
-            return new Pair(new ArrayList<>(), new LinkedList<>());
+            return;
         }
 
-        ArrayList<String> lines = new ArrayList<>();
-        LinkedList<Pair<Integer, String>> linesToFiles= new LinkedList<>();
-
+        allLines.clear();
+        numLinesToFiles.clear();
+        preview.clear();
         Path pathString = file.toPath();
 
         PathMatcher matcher =
@@ -52,25 +43,55 @@ public class FileSearch {
             public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                     throws IOException {
 
-                if (matcher.matches(path)) {
-                    List<String> mmm = Files.readAllLines(path);
-                    lines.addAll(mmm);
-                    Pair <Integer, String> pair = new Pair<>(mmm.size(), path.getFileName().toString());
-                    linesToFiles.add(pair);
+                // one thread, check exception by printing path
+                //System.out.println("Thread:" + Thread.currentThread().getName());
+                // path get file name starts with dot, exit
 
+                if (matcher.matches(path)) {
+                    // TODO maybe sync block
+                    List<String> allFileLines = Files.readAllLines(path);
+                    allLines.addAll(allFileLines);
+                    Pair <Integer, String> pair = new Pair<>(allFileLines.size(),
+                            path.getFileName().toString());
+                    numLinesToFiles.add(pair);
                 }
                 return FileVisitResult.CONTINUE;
             }
         });
 
-        Pair result = new Pair(lines, linesToFiles);
-
-        return result;
+        // fill in the preview
+        // TODO concurrency thought, keep out of the file walker, but IO bound
+        // if multithreaded, do producer consumer, in the refactoring month
+        // https://stackoverflow.com/questions/17732819/parallel-version-of-files-walkfiletree-java-or-scala
+        int index = 0;
+        for (String line : this.allLines) {
+            preview.put(line, index);
+            index++;
+        }
     }
 
     // think of state changes
     public void search(String query) {
         resultSet = FuzzySearch.extractTop(query, allLines, 10);
+    }
+
+    public String getFileName(String line) {
+        int index = preview.get(line).intValue();
+
+        //boolean found = false
+        int base = 0;
+
+        for(Pair<Integer, String> pair : numLinesToFiles) {
+
+            if(index > base && index < (base + pair.t.intValue())) {
+                return pair.u;
+            }
+
+            base +=pair.t.intValue();
+
+        }
+
+        return "file.txt";
     }
 
     public String getResults() {
@@ -85,9 +106,9 @@ public class FileSearch {
     }
 
     /**
-     * 5 lines
+     * 15 lines
      * result
-     * 5 more lines
+     * 15 more lines
      *
      * @param resultIndex
      * @return
@@ -155,7 +176,8 @@ public class FileSearch {
     public static void main(String[] args) {
         System.out.println("Search");
         FileSearch search = new FileSearch();
-        search.crawl(testLoad());
+        // TODO fix test
+        //search.crawl(testLoad());
         search.search("set");
         System.out.println(search.getResults());
         System.out.println(search.getPreview(0));
