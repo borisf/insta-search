@@ -1,7 +1,6 @@
-package com.borisfarber;
+package com.borisfarber.controllers;
 
 import com.borisfarber.data.Pair;
-import com.borisfarber.search.FileSearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
 import javax.swing.*;
@@ -13,7 +12,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import static com.borisfarber.search.FileSearch.testLoad;
+import static com.borisfarber.controllers.FileSearch.testLoad;
 
 public final class Controller implements DocumentListener {
 

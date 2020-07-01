@@ -1,14 +1,12 @@
-package com.borisfarber.search;
+package com.borisfarber.controllers;
 
 import com.borisfarber.data.Pair;
 
 import java.util.LinkedList;
 
-import static com.borisfarber.search.FileSearch.testLoad;
+import static com.borisfarber.controllers.FileSearch.testLoad;
 
 public class LinesToFileNames {
-
-
 
 
 
