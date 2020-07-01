@@ -1,4 +1,6 @@
-package com.borisfarber;
+package com.borisfarber.controllers;
+
+import com.borisfarber.ui.ClassySharkInstaSearch;
 
 import javax.swing.*;
 

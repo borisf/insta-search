@@ -1,4 +1,4 @@
-package com.borisfarber;
+package com.borisfarber.ui;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;

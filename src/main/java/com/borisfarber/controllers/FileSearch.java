@@ -1,4 +1,4 @@
-package com.borisfarber.search;
+package com.borisfarber.controllers;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +32,40 @@ public class FileSearch {
             preview.put(line, index);
             index++;
         }
+    }
+
+    public static Pair<ArrayList<String>, LinkedList<Pair>> folderToLines(File file) throws IOException {
+        if (file == null || !file.exists()) {
+            return new Pair(new ArrayList<>(), new LinkedList<>());
+        }
+
+        ArrayList<String> lines = new ArrayList<>();
+        LinkedList<Pair<Integer, String>> linesToFiles= new LinkedList<>();
+
+        Path pathString = file.toPath();
+
+        PathMatcher matcher =
+                FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+
+        Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
+                    throws IOException {
+
+                if (matcher.matches(path)) {
+                    List<String> mmm = Files.readAllLines(path);
+                    lines.addAll(mmm);
+                    Pair <Integer, String> pair = new Pair<>(mmm.size(), path.getFileName().toString());
+                    linesToFiles.add(pair);
+
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        Pair result = new Pair(lines, linesToFiles);
+
+        return result;
     }
 
     // think of state changes
@@ -102,38 +136,6 @@ public class FileSearch {
             System.out.println(res.getString());
         }
         return "";
-    }
-
-
-
-
-    public static Pair<ArrayList<String>, LinkedList<Pair>> folderToLines(File file) throws IOException {
-        if (file == null || !file.exists()) {
-            return new Pair(new ArrayList<>(), new LinkedList<>());
-        }
-
-        ArrayList<String> lines = new ArrayList<>();
-
-        Path pathString = file.toPath();
-
-        PathMatcher matcher =
-                FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
-
-        Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
-                    throws IOException {
-
-                if (matcher.matches(path)) {
-                    lines.addAll(Files.readAllLines(path));
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        Pair result = new Pair(lines, new LinkedList<>());
-
-        return result;
     }
 
     public static ArrayList<String> testLoad() {

@@ -1,4 +1,7 @@
-package com.borisfarber;
+package com.borisfarber.ui;
+
+import com.borisfarber.controllers.Controller;
+import com.borisfarber.controllers.FileTransferHandler;
 
 import javax.swing.*;
 import javax.swing.text.Utilities;
@@ -31,9 +34,9 @@ public final class ClassySharkInstaSearch extends JFrame {
         controller = new Controller(resultTextArea, previewArea, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
         controller.testCrawl();
-
     }
 
+    // TODO move to controller
     public final void fileDragged(final File file) {
 
         final JTextArea showFileArea = this.previewArea;
@@ -57,20 +60,12 @@ public final class ClassySharkInstaSearch extends JFrame {
         this.previewArea = this.buildShowFileArea();
         final JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
         final JTextArea resultTextArea = this.resultTextArea;
-        if (resultTextArea == null) {
-
-        }
-        final JTextArea resultTextArea2 = resultTextArea;
-        final JLabel occurrencesLabel = this.resultCountLabel;
 
         this.searchField = this.buildSearchField();
         final JPanel statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, 0));
         final JLabel occurrencesLabel2 = this.resultCountLabel;
 
-        if (occurrencesLabel2 == null) {
-
-        }
         occurrencesLabel2.setAlignmentX(0.5f);
         statusPanel.add(this.resultCountLabel);
         final JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
@@ -259,14 +254,10 @@ public final class ClassySharkInstaSearch extends JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setCurrentDirectory(new File("."));
 
-        //final Component[] components = fileChooser.getComponents();
-        //this.setFileChooserFont(components);
-
         final int returnVal = fileChooser.showDialog(this, "Open");
         if (returnVal == 0) {
             return fileChooser.getSelectedFile();
         }
-        //return this.downloadedTempTextFile();
 
         return null;
     }

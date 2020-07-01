@@ -1,4 +1,4 @@
-package com.borisfarber;
+package com.borisfarber.ui;
 
 public class Background {
 
