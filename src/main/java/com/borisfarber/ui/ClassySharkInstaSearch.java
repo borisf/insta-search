@@ -57,7 +57,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         this.resultCountLabel = new JLabel("");
         this.resultTextArea = this.buildResultTextArea();
         final JScrollPane showResultsScrolled = new JScrollPane(this.resultTextArea);
-        this.previewArea = this.buildShowFileArea();
+        this.previewArea = this.buildPreviewArea();
         final JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
         final JTextArea resultTextArea = this.resultTextArea;
 
@@ -225,7 +225,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         return result;
     }
 
-    private final JTextArea buildShowFileArea() {
+    private final JTextArea buildPreviewArea() {
         this.previewArea = new JTextArea(30, 80);
         final JTextArea showFileArea = this.previewArea;
         if (showFileArea == null) {

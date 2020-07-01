@@ -1,6 +1,5 @@
 package com.borisfarber.controllers;
 
-import com.borisfarber.data.Pair;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
 import javax.swing.*;
@@ -9,10 +8,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import static com.borisfarber.controllers.FileSearch.testLoad;
 
 public final class Controller implements DocumentListener {
 
@@ -44,11 +39,7 @@ public final class Controller implements DocumentListener {
         if (file.exists()) {
             // TODO add optimization for search if needed
             search = new FileSearch();
-            try {
-                search.crawl(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            search.crawl(file);
         }
     }
 
@@ -127,6 +118,7 @@ public final class Controller implements DocumentListener {
             builder.append("\n");
         }
         resultTextArea.setText(builder.toString());
+        resultTextArea.setCaretPosition(0);
 
         // the usual updates
         previewTextArea.setText(search.getPreview(selectedGuiIndex));

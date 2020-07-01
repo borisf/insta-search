@@ -25,7 +25,7 @@ public class FileSearch {
 
     // think of state changes
     // long operation
-    public void crawl(File file) throws IOException {
+    public void crawl(File file) {
         if (file == null || !file.exists()) {
             return;
         }
@@ -38,26 +38,34 @@ public class FileSearch {
         PathMatcher matcher =
                 FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
 
-        Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
-                    throws IOException {
+        try {
+            Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
+                        throws IOException {
 
-                // one thread, check exception by printing path
-                //System.out.println("Thread:" + Thread.currentThread().getName());
-                // path get file name starts with dot, exit
+                    // one thread, check exception by printing path
+                    //System.out.println("Thread:" + Thread.currentThread().getName());
+                    // path get file name starts with dot, exit
 
-                if (matcher.matches(path)) {
-                    // TODO maybe sync block
-                    List<String> allFileLines = Files.readAllLines(path);
-                    allLines.addAll(allFileLines);
-                    Pair <Integer, String> pair = new Pair<>(allFileLines.size(),
-                            path.getFileName().toString());
-                    numLinesToFiles.add(pair);
+                    if (matcher.matches(path)) {
+                        try {
+                            // TODO maybe a sync block
+                            List<String> allFileLines = Files.readAllLines(path);
+                            allLines.addAll(allFileLines);
+                            Pair <Integer, String> pair = new Pair<>(allFileLines.size(),
+                                    path.getFileName().toString());
+                            numLinesToFiles.add(pair);
+                        } catch (java.nio.charset.MalformedInputException e) {
+                            System.out.println("Bad file format " + path.getFileName().toString());
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-            }
-        });
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // fill in the preview
         // TODO concurrency thought, keep out of the file walker, but IO bound
@@ -68,17 +76,17 @@ public class FileSearch {
             preview.put(line, index);
             index++;
         }
+
+        System.out.println("finished crawling");
     }
 
     // think of state changes
     public void search(String query) {
-        resultSet = FuzzySearch.extractTop(query, allLines, 10);
+        resultSet = FuzzySearch.extractTop(query, allLines, 15);
     }
 
     public String getFileName(String line) {
         int index = preview.get(line).intValue();
-
-        //boolean found = false
         int base = 0;
 
         for(Pair<Integer, String> pair : numLinesToFiles) {
@@ -88,7 +96,6 @@ public class FileSearch {
             }
 
             base +=pair.t.intValue();
-
         }
 
         return "file.txt";
@@ -168,7 +175,6 @@ public class FileSearch {
         allLines.add("Incremental Search with Preview");
         allLines.add("Something .... other than else");
         allLines.add("Something .... clear");
-
 
         return allLines;
     }
