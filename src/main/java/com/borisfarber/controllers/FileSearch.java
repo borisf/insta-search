@@ -1,28 +1,28 @@
-package com.borisfarber;
+package com.borisfarber.search;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
+import com.borisfarber.data.Pair;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
-public class Search {
+public class FileSearch {
     private ArrayList<String> allLines;
     private TreeMap<String, Integer> preview;
     private List<ExtractedResult> resultSet;
 
-    public Search() {
+    public FileSearch() {
         allLines = new ArrayList<>();
         preview = new TreeMap<>();
-        resultSet = new LinkedList<>();
+        resultSet = new ArrayList<>();
     }
 
+    // think of state changes
+    // TODO merge into folderToLines method
     public void crawl(ArrayList<String> allLines) {
         this.allLines = allLines;
 
@@ -34,6 +34,7 @@ public class Search {
         }
     }
 
+    // think of state changes
     public void search(String query) {
         resultSet = FuzzySearch.extractTop(query, allLines, 10);
     }
@@ -58,16 +59,14 @@ public class Search {
      * @return
      */
     public String getPreview(int resultIndex) {
-
-        // TODO stopped here UI doesn't work, empty
         if (resultSet.isEmpty()) {
             return "";
         }
 
         int allLinesIndex = preview.get(getResultSet().get(resultIndex).getString());
 
-        int lower = allLinesIndex - 5;
-        int upper = allLinesIndex + 5;
+        int lower = allLinesIndex - 15;
+        int upper = allLinesIndex + 15;
 
         if (lower < 0) {
             lower = 0;
@@ -105,17 +104,20 @@ public class Search {
         return "";
     }
 
-    public static ArrayList<String> folderToLines(File file) throws IOException {
+
+
+
+    public static Pair<ArrayList<String>, LinkedList<Pair>> folderToLines(File file) throws IOException {
         if (file == null || !file.exists()) {
-            return new ArrayList<>();
+            return new Pair(new ArrayList<>(), new LinkedList<>());
         }
 
-        ArrayList<String> result = new ArrayList<>();
+        ArrayList<String> lines = new ArrayList<>();
 
         Path pathString = file.toPath();
 
         PathMatcher matcher =
-                FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt}");
+                FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
 
         Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
             @Override
@@ -123,11 +125,13 @@ public class Search {
                     throws IOException {
 
                 if (matcher.matches(path)) {
-                    result.addAll(Files.readAllLines(path));
+                    lines.addAll(Files.readAllLines(path));
                 }
                 return FileVisitResult.CONTINUE;
             }
         });
+
+        Pair result = new Pair(lines, new LinkedList<>());
 
         return result;
     }
@@ -142,12 +146,13 @@ public class Search {
         allLines.add("Something .... other than else");
         allLines.add("Something .... clear");
 
+
         return allLines;
     }
 
     public static void main(String[] args) {
         System.out.println("Search");
-        Search search = new Search();
+        FileSearch search = new FileSearch();
         search.crawl(testLoad());
         search.search("set");
         System.out.println(search.getResults());
