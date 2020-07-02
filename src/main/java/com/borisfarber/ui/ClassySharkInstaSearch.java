@@ -64,7 +64,8 @@ public final class ClassySharkInstaSearch extends JFrame {
         resultCountLabel.setAlignmentX(0.5f);
         statusPanel.add(resultCountLabel);
         final JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
-        splitPane.setResizeWeight(0.5);
+        splitPane.setDividerSize(20);
+        splitPane.setDividerLocation(400);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
         final Container contentPane = this.getContentPane();
@@ -108,9 +109,10 @@ public final class ClassySharkInstaSearch extends JFrame {
         final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
 
         final Dimension dim = defaultToolkit.getScreenSize();
-        this.setLocation(dim.width / 4 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
-        this.pack();
-        this.setVisible(true);
+        setPreferredSize(new Dimension(1200, 900));
+        setLocation(dim.width / 4 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
+        pack();
+        setVisible(true);
     }
 
     private final JTextField buildSearchField() {
@@ -155,6 +157,7 @@ public final class ClassySharkInstaSearch extends JFrame {
 
             }
         });
+
         return result;
     }
 
@@ -181,6 +184,7 @@ public final class ClassySharkInstaSearch extends JFrame {
 
     public final File open() {
         final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setPreferredSize(new Dimension(700,500));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setCurrentDirectory(new File("."));
 
@@ -194,7 +198,25 @@ public final class ClassySharkInstaSearch extends JFrame {
     }
 
     public static void main(final String[] args) {
-        final ClassySharkInstaSearch classySearch = new ClassySharkInstaSearch();
+        try {
+            // Set System L&F
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (UnsupportedLookAndFeelException e) {
+            // handle exception
+        }
+        catch (ClassNotFoundException e) {
+            // handle exception
+        }
+        catch (InstantiationException e) {
+            // handle exception
+        }
+        catch (IllegalAccessException e) {
+            // handle exception
+        }
+
+        ClassySharkInstaSearch classySearch = new ClassySharkInstaSearch();
         classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
