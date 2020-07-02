@@ -1,19 +1,15 @@
 package com.borisfarber.ui;
 
 import javax.swing.*;
-import javax.swing.text.Utilities;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
-
-import static java.awt.event.KeyEvent.VK_DOWN;
-import static java.awt.event.KeyEvent.VK_UP;
 
 import com.borisfarber.controllers.Controller;
 import com.borisfarber.controllers.FileTransferHandler;
+
+import static java.awt.event.KeyEvent.*;
 
 public final class ClassySharkInstaSearch extends JFrame {
     private final Font textFont;
@@ -64,10 +60,9 @@ public final class ClassySharkInstaSearch extends JFrame {
         this.searchField = this.buildSearchField();
         final JPanel statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, 0));
-        final JLabel occurrencesLabel2 = this.resultCountLabel;
 
-        occurrencesLabel2.setAlignmentX(0.5f);
-        statusPanel.add(this.resultCountLabel);
+        resultCountLabel.setAlignmentX(0.5f);
+        statusPanel.add(resultCountLabel);
         final JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setResizeWeight(0.5);
         splitPane.setOneTouchExpandable(true);
@@ -79,7 +74,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         searchField.setAlignmentX(0.0f);
         splitPane.setAlignmentX(0.0f);
         statusPanel.setAlignmentX(0.0f);
-        this.getContentPane().add(this.searchField);
+        this.getContentPane().add(searchField);
         this.getContentPane().add(splitPane);
         this.getContentPane().add(statusPanel);
         final JMenuBar menuBar = new JMenuBar();
@@ -134,7 +129,7 @@ public final class ClassySharkInstaSearch extends JFrame {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
 
-                if (keyEvent.getKeyCode() == 39) {
+                if (keyEvent.getKeyCode() == VK_RIGHT) {
                     result.setText("");
                     try {
                         controller.crawl(open());

@@ -80,7 +80,6 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     @Override
     public void removeUpdate(final DocumentEvent evt) {
         // escape
-        search.removeUpdate();
         Document document = evt.getDocument();
         runNewSearch(document);
 

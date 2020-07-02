@@ -95,7 +95,7 @@
          int base = 0;
 
          for (Pair<Integer, String> pair : numLinesToFiles) {
-             if (index > base && index < (base + pair.t.intValue())) {
+             if (index >= base && index < (base + pair.t.intValue())) {
                  return pair.u;
              }
 
@@ -163,10 +163,6 @@
 
      public String getResultSetCount() {
          return Integer.toString(getResultSet().size());
-     }
-
-     public void removeUpdate() {
-         // escape pressed, maybe do optimization
      }
 
      public String toString() {
