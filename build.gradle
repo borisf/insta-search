@@ -40,7 +40,7 @@ task fatJar(type: Jar) {
     manifest {
         attributes 'Main-Class': javaMainClass
     }
-    archiveBaseName = 'all-in-one-jar'
+    archiveBaseName = 'insta-search'
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

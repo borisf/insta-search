@@ -32,7 +32,9 @@ public final class ClassySharkInstaSearch extends JFrame {
         buildUI();
         controller = new Controller(resultTextArea, previewArea, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
-        controller.testCrawl();
+
+        File file = open();
+        controller.crawl(file);
     }
 
     // TODO move to controller
@@ -169,66 +171,20 @@ public final class ClassySharkInstaSearch extends JFrame {
         result.setText(Background.SHARK_BG);
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransferHandler(this));
-        result.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
 
-                // TODO not sure I need it, can do with arrows
-                if (mouseEvent.getButton() != MouseEvent.BUTTON1) {
-                    return;
-                }
-
-                if (mouseEvent.getClickCount() != 2) {
-                    return;
-                }
-
-                try {
-                    int offset = resultTextArea.viewToModel(mouseEvent.getPoint());
-                    int rowStart = Utilities.getRowStart(resultTextArea, offset);
-                    int rowEnd = Utilities.getRowEnd(resultTextArea, offset);
-                    String selectedLine = resultTextArea.getText().substring(rowStart, rowEnd);
-
-                    controller.updateShowFileArea(selectedLine);
-
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-
-            }
-        });
         return result;
     }
 
     private final JTextArea buildPreviewArea() {
-        this.previewArea = new JTextArea(30, 80);
-        final JTextArea showFileArea = this.previewArea;
-        showFileArea.setFont(this.textFont);
-        showFileArea.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
-        showFileArea.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
+        previewArea = new JTextArea(30, 80);
+        previewArea.setFont(this.textFont);
+        previewArea.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
+        previewArea.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
 
-        return showFileArea;
+        return previewArea;
     }
 
-    public final File open() throws Exception {
+    public final File open() {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setCurrentDirectory(new File("."));
@@ -237,6 +193,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         if (returnVal == 0) {
             return fileChooser.getSelectedFile();
         }
+
 
         return null;
     }

@@ -46,15 +46,12 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     }
 
     public final void crawl(final File file) {
-        if (file == null) {
+        if (file == null || !file.exists()) {
             return;
         }
 
-        if (file.exists()) {
-            // TODO add optimization for search if needed
-            search = new FileSearch();
-            search.crawl(file);
-        }
+        search = new FileSearch();
+        search.crawl(file);
     }
 
     private void search(String query) {
@@ -65,7 +62,7 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     public String dump() {
         System.out.println(search.getResults());
         System.out.println(search.getPreview(0));
-        System.out.println(search.getResultCount());
+        System.out.println(search.getResultSetCount());
 
         return "";
     }
@@ -105,7 +102,7 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     }
 
     public void downPressed() {
-        if(selectedGuiIndex < search.getResultSet().size()-1) {
+        if(selectedGuiIndex < Integer.parseInt(search.getResultSetCount()) - 1) {
             selectedGuiIndex++;
         }
 
@@ -116,9 +113,9 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
         // show selector
         int i = 0;
         StringBuilder builder = new StringBuilder();
-        for (ExtractedResult res : search.getResultSet()) {
+        for (String res : search.getResultSet()) {
 
-            String resultLine = search.getFileName(res.getString()) + " " + res.getString();
+            String resultLine = search.getFileName(res) + " " + res;
 
             if(i == selectedGuiIndex) {
                 builder.append("* " + resultLine);
@@ -134,7 +131,7 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
 
         // the usual updates
         previewTextArea.setText(search.getPreview(selectedGuiIndex));
-        occurrencesLabel.setText(search.getResultCount());
+        occurrencesLabel.setText(search.getResultSetCount());
     }
 
     public void updateShowFileArea(String selectedLine) {

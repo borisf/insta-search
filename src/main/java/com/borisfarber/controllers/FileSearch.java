@@ -17,9 +17,7 @@
  import java.io.IOException;
  import java.nio.file.*;
  import java.nio.file.attribute.BasicFileAttributes;
- import java.util.ArrayList;
- import java.util.List;
- import java.util.TreeMap;
+ import java.util.*;
 
  import com.borisfarber.data.Pair;
  import me.xdrop.fuzzywuzzy.FuzzySearch;
@@ -57,11 +55,10 @@
                  public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                          throws IOException {
                      // one thread, check exception by printing path
-                     //System.out.println("Thread:" + Thread.currentThread().getName());
+                     // System.out.println("Thread:" + Thread.currentThread().getName());
                      // path get file name starts with dot, exit
                      if (matcher.matches(path)) {
                          try {
-                             // TODO maybe a sync block
                              List<String> allFileLines = Files.readAllLines(path);
                              allLines.addAll(allFileLines);
                              Pair<Integer, String> pair = new Pair<>(allFileLines.size(),
@@ -83,28 +80,14 @@
              preview.put(line, index);
              index++;
          }
-
          // not a problem, pretty quick on one thread
-         System.out.println("finished crawling ==> " + allLines.size() + " elements");
-     }
-
-     public void testCrawl(ArrayList<String> testLoad) {
-         allLines.clear();
-         allLines.addAll(testLoad);
-         numLinesToFiles.clear();
-         preview.clear();
-
-         int index = 0;
-         for (String line : this.allLines) {
-             preview.put(line, index);
-             index++;
-         }
+         // System.out.println("finished crawling ==> " + allLines.size() + " elements");
      }
 
      public void search(String query) {
          long start = System.currentTimeMillis();
          resultSet = FuzzySearch.extractTop(query, allLines, 15);
-         System.out.println(": " + ( System.currentTimeMillis() - start));
+         //System.out.println(": " + ( System.currentTimeMillis() - start));
      }
 
      public String getFileName(String line) {
@@ -125,7 +108,7 @@
      public String getResults() {
          StringBuilder builder = new StringBuilder();
 
-         for (ExtractedResult res : getResultSet()) {
+         for (ExtractedResult res : resultSet) {
              builder.append(res.getString());
              builder.append("\n");
          }
@@ -134,9 +117,9 @@
      }
 
      /**
-      * 15 lines
+      * 7 lines
       * result
-      * 15 more lines
+      * 7 more lines
       *
       * @param resultIndex
       * @return
@@ -146,10 +129,10 @@
              return "";
          }
 
-         int allLinesIndex = preview.get(getResultSet().get(resultIndex).getString());
+         int allLinesIndex = preview.get(getResultSet().get(resultIndex));
 
-         int lower = allLinesIndex - 15;
-         int upper = allLinesIndex + 15;
+         int lower = allLinesIndex - 7;
+         int upper = allLinesIndex + 7;
 
          if (lower < 0) {
              lower = 0;
@@ -168,11 +151,17 @@
          return builder.toString();
      }
 
-     public List<ExtractedResult> getResultSet() {
-         return resultSet;
+     public List<String> getResultSet() {
+         ArrayList<String> result = new ArrayList<>(resultSet.size());
+
+         for (ExtractedResult er : resultSet) {
+             result.add(er.getString());
+         }
+
+         return result;
      }
 
-     public String getResultCount() {
+     public String getResultSetCount() {
          return Integer.toString(getResultSet().size());
      }
 
@@ -181,10 +170,23 @@
      }
 
      public String toString() {
-         for (ExtractedResult res : getResultSet()) {
-             System.out.println(res.getString());
+         for (String res : getResultSet()) {
+             System.out.println(res);
          }
          return "";
+     }
+
+     public void testCrawl(ArrayList<String> testLoad) {
+         allLines.clear();
+         allLines.addAll(testLoad);
+         numLinesToFiles.clear();
+         preview.clear();
+
+         int index = 0;
+         for (String line : this.allLines) {
+             preview.put(line, index);
+             index++;
+         }
      }
 
      public static ArrayList<String> testLoad() {
@@ -207,6 +209,6 @@
          search.search("set");
          System.out.println(search.getResults());
          System.out.println(search.getPreview(0));
-         System.out.println(search.getResultCount());
+         System.out.println(search.getResultSetCount());
      }
  }
