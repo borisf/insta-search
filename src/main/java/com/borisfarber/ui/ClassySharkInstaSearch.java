@@ -189,7 +189,7 @@ public final class ClassySharkInstaSearch extends JFrame {
             return fileChooser.getSelectedFile();
         }
 
-
+        // TODO need to fix, when no file is chosen go to previous file
         return null;
     }
 

@@ -23,6 +23,9 @@
  import me.xdrop.fuzzywuzzy.FuzzySearch;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
+ import static java.nio.file.FileVisitResult.CONTINUE;
+ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
+
  public class FileSearch {
      private final ArrayList<String> allLines;
      private final TreeMap<String, Integer> preview;
@@ -51,12 +54,21 @@
 
          try {
              Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
+
+                 @Override
+                 public FileVisitResult preVisitDirectory(Path dir,
+                                   BasicFileAttributes attrs) {
+                     if (dir.getFileName().toString().startsWith(".")) {
+                         return SKIP_SUBTREE;
+                     }
+                     return CONTINUE;
+                 }
+
                  @Override
                  public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                          throws IOException {
                      // one thread, check exception by printing path
                      // System.out.println("Thread:" + Thread.currentThread().getName());
-                     // path get file name starts with dot, exit
                      if (matcher.matches(path)) {
                          try {
                              List<String> allFileLines = Files.readAllLines(path);
@@ -68,7 +80,7 @@
                              System.out.println("Bad file format " + path.getFileName().toString());
                          }
                      }
-                     return FileVisitResult.CONTINUE;
+                     return CONTINUE;
                  }
              });
          } catch (IOException e) {
@@ -85,7 +97,7 @@
      }
 
      public void search(String query) {
-         long start = System.currentTimeMillis();
+         //long start = System.currentTimeMillis();
          resultSet = FuzzySearch.extractTop(query, allLines, 15);
          //System.out.println(": " + ( System.currentTimeMillis() - start));
      }

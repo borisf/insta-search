@@ -20,8 +20,6 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import java.io.*;
 
-import me.xdrop.fuzzywuzzy.model.ExtractedResult;
-
 import static com.borisfarber.controllers.FileSearch.testLoad;
 
  public final class Controller implements DocumentListener {
@@ -33,7 +31,9 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     private FileSearch search;
     private int selectedGuiIndex = 0;
 
-    public Controller(final JTextComponent resultTextArea, final JTextArea previewArea, final JLabel occurrencesLabel) {
+    public Controller(final JTextComponent resultTextArea,
+                      final JTextArea previewArea,
+                      final JLabel occurrencesLabel) {
         this.resultTextArea = resultTextArea;
         this.previewTextArea = previewArea;
         this.occurrencesLabel = occurrencesLabel;
@@ -67,7 +67,6 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
         return "";
     }
 
-    // TODO the following methods are event loop, maybe refactor
     @Override
     public void insertUpdate(final DocumentEvent evt) {
         // letter
@@ -93,7 +92,7 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     }
 
     public void upPressed() {
-        if(selectedGuiIndex >0) {
+        if(selectedGuiIndex > 0) {
             selectedGuiIndex--;
         }
 
@@ -113,7 +112,6 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
         int i = 0;
         StringBuilder builder = new StringBuilder();
         for (String res : search.getResultSet()) {
-
             String resultLine = search.getFileName(res) + " " + res;
 
             if(i == selectedGuiIndex) {
@@ -133,29 +131,10 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
         occurrencesLabel.setText(search.getResultSetCount());
     }
 
-    public void updateShowFileArea(String selectedLine) {
-        // TODO implement if needed on selected mouse line
-    }
-
     private final void runNewSearch(final Document searchQueryDoc) {
         try {
-            final String query = searchQueryDoc.getText(0, searchQueryDoc.getLength());
-
-            // TODO 3 chars optimization, not sure if needed for fuzzy
-            /*
-            if (query.length() < 3) {
-
-                if (this.resultTextArea.getText().equals(SHARK_BG)) {
-                    this.resultTextArea.setText(SHARK_BG);
-                    this.occurrencesLabel.setText("");
-                }
-                final JTextArea showFileArea = this.previewTextArea;
-                final Search search = this.search;
-
-                showFileArea.setText(search.getResultCount());
-                return;
-            }*/
-
+            final String query = searchQueryDoc.getText(0,
+                    searchQueryDoc.getLength());
             search(query);
         }
         catch (Exception ex) {
@@ -164,7 +143,8 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
     }
 
     public static void repl() {
-        Controller controller = new Controller(new JTextArea(), new JTextArea(), new JLabel());
+        Controller controller = new Controller(new JTextArea(),
+                new JTextArea(), new JLabel());
         controller.testCrawl();
 
         Reader inreader = new InputStreamReader(System.in);
