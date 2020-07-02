@@ -78,11 +78,7 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
 
     @Override
     public void removeUpdate(final DocumentEvent evt) {
-        // escape
-        Document document = evt.getDocument();
-        runNewSearch(document);
-
-        updateGUI();
+        // when new folder is loaded, this callback gets called
     }
 
     @Override

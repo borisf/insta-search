@@ -30,7 +30,10 @@ public final class ClassySharkInstaSearch extends JFrame {
         searchField.getDocument().addDocumentListener(this.controller);
 
         File file = open();
-        controller.crawl(file);
+
+        if(file != null) {
+            controller.crawl(file);
+        }
     }
 
     // TODO move to controller
@@ -89,11 +92,14 @@ public final class ClassySharkInstaSearch extends JFrame {
         openFolderItem.setFont(f);
         openFolderItem.addActionListener(actionEvent -> {
             try {
-                File currentFile = open();
-                resultTextArea.setText(Background.SHARK_BG);
-                previewArea.setText("");
-                searchField.setText("");
-                controller.crawl(currentFile);
+                File newFile = open();
+                if (newFile != null) {
+                    resultTextArea.setText(Background.SHARK_BG);
+                    previewArea.setText("");
+                    searchField.setText("");
+                    controller.crawl(newFile);
+
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,7 +140,10 @@ public final class ClassySharkInstaSearch extends JFrame {
                 if (keyEvent.getKeyCode() == VK_RIGHT) {
                     result.setText("");
                     try {
-                        controller.crawl(open());
+                        File newFile = open();
+                        if(newFile != null) {
+                            controller.crawl(newFile);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -186,14 +195,13 @@ public final class ClassySharkInstaSearch extends JFrame {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setPreferredSize(new Dimension(700,500));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        fileChooser.setCurrentDirectory(new File("."));
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
         final int returnVal = fileChooser.showDialog(this, "Open");
         if (returnVal == 0) {
             return fileChooser.getSelectedFile();
         }
 
-        // TODO need to fix, when no file is chosen go to previous file
         return null;
     }
 
