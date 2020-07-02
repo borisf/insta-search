@@ -1,6 +1,17 @@
+ /*
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package com.borisfarber.controllers;
-
-import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -9,7 +20,11 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import java.io.*;
 
-public final class Controller implements DocumentListener {
+import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+
+import static com.borisfarber.controllers.FileSearch.testLoad;
+
+ public final class Controller implements DocumentListener {
 
     private JTextComponent resultTextArea;
     private final JTextArea previewTextArea;
@@ -27,8 +42,7 @@ public final class Controller implements DocumentListener {
     }
 
     public void testCrawl() {
-        // TODO fix test
-        //search.crawl(testLoad());
+        search.testCrawl(testLoad());
     }
 
     public final void crawl(final File file) {
@@ -112,8 +126,6 @@ public final class Controller implements DocumentListener {
                 builder.append(resultLine);
             }
             i++;
-
-            // TODO add here file name
 
             builder.append("\n");
         }

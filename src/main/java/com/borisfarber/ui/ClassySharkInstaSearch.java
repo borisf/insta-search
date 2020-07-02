@@ -1,8 +1,5 @@
 package com.borisfarber.ui;
 
-import com.borisfarber.controllers.Controller;
-import com.borisfarber.controllers.FileTransferHandler;
-
 import javax.swing.*;
 import javax.swing.text.Utilities;
 import java.awt.*;
@@ -15,7 +12,9 @@ import java.io.File;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_UP;
 
-// todo convert this class to builder
+import com.borisfarber.controllers.Controller;
+import com.borisfarber.controllers.FileTransferHandler;
+
 public final class ClassySharkInstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
@@ -59,7 +58,6 @@ public final class ClassySharkInstaSearch extends JFrame {
         final JScrollPane showResultsScrolled = new JScrollPane(this.resultTextArea);
         this.previewArea = this.buildPreviewArea();
         final JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
-        final JTextArea resultTextArea = this.resultTextArea;
 
         this.searchField = this.buildSearchField();
         final JPanel statusPanel = new JPanel();
@@ -75,10 +73,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         final Container contentPane = this.getContentPane();
 
         contentPane.setLayout(new BoxLayout(this.getContentPane(), 1));
-        final JTextField searchField = this.searchField;
-        if (searchField == null) {
 
-        }
         searchField.setAlignmentX(0.0f);
         splitPane.setAlignmentX(0.0f);
         statusPanel.setAlignmentX(0.0f);
@@ -95,7 +90,6 @@ public final class ClassySharkInstaSearch extends JFrame {
         final JMenuItem openFolderItem = new JMenuItem("Open Folder/File");
         openFolderItem.setFont(f);
         openFolderItem.addActionListener(actionEvent -> {
-
             try {
                 File currentFile = open();
                 resultTextArea.setText(Background.SHARK_BG);
@@ -180,7 +174,6 @@ public final class ClassySharkInstaSearch extends JFrame {
             public void mouseClicked(MouseEvent mouseEvent) {
 
                 // TODO not sure I need it, can do with arrows
-
                 if (mouseEvent.getButton() != MouseEvent.BUTTON1) {
                     return;
                 }
@@ -228,25 +221,11 @@ public final class ClassySharkInstaSearch extends JFrame {
     private final JTextArea buildPreviewArea() {
         this.previewArea = new JTextArea(30, 80);
         final JTextArea showFileArea = this.previewArea;
-        if (showFileArea == null) {
-
-        }
         showFileArea.setFont(this.textFont);
-        final JTextArea showFileArea2 = this.previewArea;
-        if (showFileArea2 == null) {
+        showFileArea.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
+        showFileArea.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
 
-        }
-        showFileArea2.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
-        final JTextArea showFileArea3 = this.previewArea;
-        if (showFileArea3 == null) {
-
-        }
-        showFileArea3.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
-        final JTextArea showFileArea4 = this.previewArea;
-        if (showFileArea4 == null) {
-
-        }
-        return showFileArea4;
+        return showFileArea;
     }
 
     public final File open() throws Exception {
