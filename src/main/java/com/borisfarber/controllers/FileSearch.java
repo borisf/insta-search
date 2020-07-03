@@ -102,19 +102,19 @@
          //System.out.println(": " + ( System.currentTimeMillis() - start));
      }
 
-     public String getFileName(String line) {
+     public Pair<String, Integer> getFileNameAndPosition(String line) {
          int index = preview.get(line).intValue();
          int base = 0;
 
          for (Pair<Integer, String> pair : numLinesToFiles) {
-             if (index >= base && index < (base + pair.t.intValue())) {
-                 return pair.u;
+             if (index >= base && index < (base + pair.t.intValue() - 1)) {
+                 return new Pair<>(pair.u, (index - base));
              }
 
              base += pair.t.intValue();
          }
 
-         return "file.txt";
+         return new Pair<>("file.txt", 0);
      }
 
      public String getResults() {

@@ -1,3 +1,16 @@
+ /*
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package com.borisfarber.ui;
 
 import javax.swing.*;
@@ -19,9 +32,6 @@ public final class ClassySharkInstaSearch extends JFrame {
     private JLabel resultCountLabel;
     private Controller controller;
 
-    private static final Color BACKGROUND_COLOR = new Color(7, 54, 66);
-    private static final Color FOREGROUND_COLOR = new Color(147, 161, 161);
-
     public ClassySharkInstaSearch() {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
@@ -38,7 +48,6 @@ public final class ClassySharkInstaSearch extends JFrame {
 
     // TODO move to controller
     public final void fileDragged(final File file) {
-
         final JTextArea showFileArea = this.previewArea;
 
         showFileArea.setText("");
@@ -54,20 +63,21 @@ public final class ClassySharkInstaSearch extends JFrame {
     }
 
     private final void buildUI() {
-        this.resultCountLabel = new JLabel("");
-        this.resultTextArea = this.buildResultTextArea();
-        final JScrollPane showResultsScrolled = new JScrollPane(this.resultTextArea);
-        this.previewArea = this.buildPreviewArea();
-        final JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
+        resultCountLabel = new JLabel("");
+        resultTextArea = this.buildResultTextArea();
+        JScrollPane showResultsScrolled = new JScrollPane(this.resultTextArea);
+        previewArea = this.buildPreviewArea();
+        JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
 
-        this.searchField = this.buildSearchField();
-        final JPanel statusPanel = new JPanel();
+        searchField = this.buildSearchField();
+        JPanel statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, 0));
 
         resultCountLabel.setAlignmentX(0.5f);
         statusPanel.add(resultCountLabel);
-        final JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
+        JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setDividerSize(20);
+        splitPane.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
         splitPane.setDividerLocation(400);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
@@ -88,7 +98,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         menuBar.add(menu);
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(Box.createHorizontalGlue());
-        final JMenuItem openFolderItem = new JMenuItem("Open Folder/File");
+        final JMenuItem openFolderItem = new JMenuItem("Open...");
         openFolderItem.setFont(f);
         openFolderItem.addActionListener(actionEvent -> {
             try {
@@ -124,8 +134,8 @@ public final class ClassySharkInstaSearch extends JFrame {
     private final JTextField buildSearchField() {
         final JTextField result = new JTextField();
         result.setFont(this.textFont);
-        result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
-        result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
+        result.setBackground(Colors.BACKGROUND_COLOR);
+        result.setForeground(Colors.FOREGROUND_COLOR);
 
         // // todo maybe put to controller, same as with doc update, in constructor
         result.addKeyListener(new KeyListener() {
@@ -173,11 +183,12 @@ public final class ClassySharkInstaSearch extends JFrame {
     private final JTextArea buildResultTextArea() {
         final JTextArea result = new JTextArea(10, 80);
         result.setFont(this.textFont);
-        result.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
-        result.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
+        result.setBackground(Colors.BACKGROUND_COLOR);
+        result.setForeground(Colors.FOREGROUND_COLOR);
         result.setText(Background.SHARK_BG);
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransferHandler(this));
+        result.setEditable(false);
 
         return result;
     }
@@ -185,8 +196,9 @@ public final class ClassySharkInstaSearch extends JFrame {
     private final JTextArea buildPreviewArea() {
         previewArea = new JTextArea(30, 80);
         previewArea.setFont(this.textFont);
-        previewArea.setBackground(ClassySharkInstaSearch.BACKGROUND_COLOR);
-        previewArea.setForeground(ClassySharkInstaSearch.FOREGROUND_COLOR);
+        previewArea.setBackground(Colors.BACKGROUND_COLOR);
+        previewArea.setForeground(Colors.FOREGROUND_COLOR);
+        previewArea.setEditable(false);
 
         return previewArea;
     }

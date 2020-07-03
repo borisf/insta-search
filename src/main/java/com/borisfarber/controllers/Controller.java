@@ -13,6 +13,8 @@
   */
 package com.borisfarber.controllers;
 
+import com.borisfarber.data.Pair;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -108,7 +110,9 @@ import static com.borisfarber.controllers.FileSearch.testLoad;
         int i = 0;
         StringBuilder builder = new StringBuilder();
         for (String res : search.getResultSet()) {
-            String resultLine = search.getFileName(res) + " " + res;
+            Pair nameAndPosition = search.getFileNameAndPosition(res);
+
+            String resultLine = nameAndPosition.t + ":" + nameAndPosition.u + ":" + res;
 
             if(i == selectedGuiIndex) {
                 builder.append("* " + resultLine);

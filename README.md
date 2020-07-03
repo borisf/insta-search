@@ -4,7 +4,7 @@ A lot of your time spent “writing” code is actually spent reading code. And 
 reading code is actually spent searching code. And we all work with a larger codebase and open source 
 libraries (as third party dependencies) .
 
-ClassyShark Insta Search is a fast and incremental search in folders or in large log file.
+ClassyShark Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) search in folders or in large log file.
 
 With ClassyShark Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
