@@ -27,7 +27,7 @@ import static java.awt.event.KeyEvent.*;
 public final class InstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
-    private JTextArea resultTextArea;
+    private JTextPane resultTextArea;
     private JTextArea previewArea;
     private JLabel resultCountLabel;
     private Controller controller;
@@ -51,7 +51,7 @@ public final class InstaSearch extends JFrame {
         final JTextArea showFileArea = this.previewArea;
 
         showFileArea.setText("");
-        final JTextArea resultTextArea = this.resultTextArea;
+        final JTextPane resultTextArea = this.resultTextArea;
 
         resultTextArea.setText(Background.SHARK_BG);
         this.setTitle("ClassySearch - " + file.getName());
@@ -77,7 +77,7 @@ public final class InstaSearch extends JFrame {
         statusPanel.add(resultCountLabel);
         JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setDividerSize(20);
-        splitPane.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+        splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         splitPane.setDividerLocation(400);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
@@ -171,6 +171,11 @@ public final class InstaSearch extends JFrame {
                     controller.downPressed();
                     return;
                 }
+
+                if (keyEvent.getKeyCode() == VK_ENTER) {
+                    controller.enterPressed();
+                    return;
+                }
             }
 
             @Override
@@ -182,8 +187,8 @@ public final class InstaSearch extends JFrame {
         return result;
     }
 
-    private final JTextArea buildResultTextArea() {
-        final JTextArea result = new JTextArea(10, 80);
+    private final JTextPane buildResultTextArea() {
+        final JTextPane result = new JTextPane();
         result.setFont(this.textFont);
         result.setBackground(Colors.BACKGROUND_COLOR);
         result.setForeground(Colors.FOREGROUND_COLOR);
@@ -201,6 +206,7 @@ public final class InstaSearch extends JFrame {
         previewArea.setBackground(Colors.BACKGROUND_COLOR);
         previewArea.setForeground(Colors.FOREGROUND_COLOR);
         previewArea.setEditable(false);
+        previewArea.setWrapStyleWord(true);
 
         return previewArea;
     }

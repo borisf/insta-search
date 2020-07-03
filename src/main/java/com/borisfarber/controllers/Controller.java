@@ -11,160 +11,203 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.controllers;
+ package com.borisfarber.controllers;
 
-import com.borisfarber.data.Pair;
+ import com.borisfarber.data.Pair;
+ import com.borisfarber.ui.Highlighter;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
-import java.io.*;
+ import javax.swing.*;
+ import javax.swing.event.DocumentEvent;
+ import javax.swing.event.DocumentListener;
+ import javax.swing.text.*;
+ import java.io.*;
 
-import static com.borisfarber.controllers.FileSearch.testLoad;
+ import static com.borisfarber.controllers.FileSearch.testLoad;
 
  public final class Controller implements DocumentListener {
 
-    private JTextComponent resultTextArea;
-    private final JTextArea previewTextArea;
-    private final JLabel occurrencesLabel;
+     private JTextPane resultTextPane;
+     private final JTextArea previewTextArea;
+     private final JLabel resultCountLabel;
 
-    private FileSearch search;
-    private int selectedGuiIndex = 0;
+     private String query;
+     private FileSearch search;
+     private Pair<String, Integer> filenameAndPosition =
+             new Pair<>("test.txt",0);
+     private int selectedGuiIndex = 0;
 
-    public Controller(final JTextComponent resultTextArea,
-                      final JTextArea previewArea,
-                      final JLabel occurrencesLabel) {
-        this.resultTextArea = resultTextArea;
-        this.previewTextArea = previewArea;
-        this.occurrencesLabel = occurrencesLabel;
+     public Controller(final JTextPane resultTextPane,
+                       final JTextArea previewArea,
+                       final JLabel resultCountLabel) {
+         this.resultTextPane = resultTextPane;
+         this.previewTextArea = previewArea;
+         this.resultCountLabel = resultCountLabel;
 
-        search = new FileSearch();
-    }
+         search = new FileSearch();
+     }
 
-    public void testCrawl() {
-        search.testCrawl(testLoad());
-    }
+     public final void crawl(final File file) {
+         if (file == null || !file.exists()) {
+             return;
+         }
 
-    public final void crawl(final File file) {
-        if (file == null || !file.exists()) {
-            return;
-        }
+         search = new FileSearch();
+         search.crawl(file);
+     }
 
-        search = new FileSearch();
-        search.crawl(file);
-    }
+     public void testCrawl() {
+         search.testCrawl(testLoad());
+     }
 
-    private void search(String query) {
-        selectedGuiIndex = 0;
-        search.search(query);
-    }
+     public String dump() {
+         System.out.println(search.getResults());
+         System.out.println(search.getPreview(0));
+         System.out.println(search.getResultSetCount());
 
-    public String dump() {
-        System.out.println(search.getResults());
-        System.out.println(search.getPreview(0));
-        System.out.println(search.getResultSetCount());
+         return "";
+     }
 
-        return "";
-    }
+     @Override
+     public void insertUpdate(final DocumentEvent evt) {
+         // letter
+         Document document = evt.getDocument();
+         runNewSearch(document);
 
-    @Override
-    public void insertUpdate(final DocumentEvent evt) {
-        // letter
-        Document document = evt.getDocument();
-        runNewSearch(document);
+         updateGUI();
+     }
 
-        updateGUI();
-    }
+     @Override
+     public void removeUpdate(final DocumentEvent evt) {
+         // when new folder is loaded, this callback gets called
+         Document document = evt.getDocument();
 
-    @Override
-    public void removeUpdate(final DocumentEvent evt) {
-        // when new folder is loaded, this callback gets called
-    }
+         try {
+             final String query = document.getText(0,
+                     document.getLength());
 
-    @Override
-    public void changedUpdate(final DocumentEvent evt) {
-        Document document = evt.getDocument();
-        runNewSearch(document);
-    }
+             if(query.length() > 1) {
+                 search(query);
+                 updateGUI();
+             } else {
+                 resultTextPane.setText("");
+                 previewTextArea.setText("");
+                 resultCountLabel.setText("");
+             }
 
-    public void upPressed() {
-        if(selectedGuiIndex > 0) {
-            selectedGuiIndex--;
-        }
+         } catch (BadLocationException e) {
+             e.printStackTrace();
+         }
+     }
 
-        updateGUI();
-    }
+     @Override
+     public void changedUpdate(final DocumentEvent evt) {
+         Document document = evt.getDocument();
+         runNewSearch(document);
+     }
 
-    public void downPressed() {
-        if(selectedGuiIndex < Integer.parseInt(search.getResultSetCount()) - 1) {
-            selectedGuiIndex++;
-        }
+     public void upPressed() {
+         if(selectedGuiIndex > 0) {
+             selectedGuiIndex--;
+         }
 
-        updateGUI();
-    }
+         updateGUI();
+     }
 
-    private void updateGUI() {
-        // show selector
-        int i = 0;
-        StringBuilder builder = new StringBuilder();
-        for (String res : search.getResultSet()) {
-            Pair nameAndPosition = search.getFileNameAndPosition(res);
+     public void downPressed() {
+         if(selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1)) {
+             selectedGuiIndex++;
+         }
 
-            String resultLine = nameAndPosition.t + ":" + nameAndPosition.u + ":" + res;
+         updateGUI();
+     }
 
-            if(i == selectedGuiIndex) {
-                builder.append("* " + resultLine);
-            } else {
-                builder.append(resultLine);
-            }
-            i++;
+     public void enterPressed() {
+         try {
+             String fullPath = search.nameToPaths.get(filenameAndPosition.t).toString();
+             String command = "nvim +" + Integer.parseInt(String.valueOf(filenameAndPosition.u)) +
+                     " " + fullPath;
 
-            builder.append("\n");
-        }
-        resultTextArea.setText(builder.toString());
-        resultTextArea.setCaretPosition(0);
+             Terminal.executeInTerminal(command);
+             //pr = Runtime.getRuntime().exec("vim /tmp/tmpfile");
+             //int exitVal = pr.waitFor();
+         } catch (Exception e) {
+             e.printStackTrace();
+             // TODO workaround for no vim
+             //Desktop desktop = Desktop.getDesktop();
+             //desktop.open(filenameAndPosition.u);
 
-        // the usual updates
-        previewTextArea.setText(search.getPreview(selectedGuiIndex));
-        occurrencesLabel.setText(search.getResultSetCount());
-    }
+         }
+     }
 
-    private final void runNewSearch(final Document searchQueryDoc) {
-        try {
-            final String query = searchQueryDoc.getText(0,
-                    searchQueryDoc.getLength());
-            search(query);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+     private final void runNewSearch(final Document searchQueryDoc) {
+         try {
+             final String query = searchQueryDoc.getText(0,
+                     searchQueryDoc.getLength());
+             search(query);
+         }
+         catch (Exception ex) {
+             ex.printStackTrace();
+         }
+     }
 
-    public static void repl() {
-        Controller controller = new Controller(new JTextArea(),
-                new JTextArea(), new JLabel());
-        controller.testCrawl();
+     private void search(String query) {
+         selectedGuiIndex = 0;
+         search.search(query);
+         this.query = query;
+     }
 
-        Reader inreader = new InputStreamReader(System.in);
+     private void updateGUI() {
+         // show selector
+         int i = 0;
+         Highlighter hl = new Highlighter();
+         StringBuilder builder = new StringBuilder();
+         for (String res : search.getResultSet()) {
+             filenameAndPosition = search.getFileNameAndPosition(res);
 
-        try {
-            BufferedReader in = new BufferedReader(inreader);
-            String str;
-            System.out.print(">>>");
-            while ((str = in.readLine()) != null) {
-                controller.search(str);
-                controller.dump();
+             String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + res;
 
-                System.out.print(">>>");
-            }
-            in.close();
-        } catch (Exception e) {
-        }
-    }
+             if(i == selectedGuiIndex) {
+                 builder.append("==> " + resultLine);
+             } else {
+                 builder.append(resultLine);
+             }
+             i++;
 
-    public static void main(String[] args) {
-       repl();
-    }
-}
+             builder.append("\n");
+         }
+         resultTextPane.setText(builder.toString());
+         resultTextPane.setCaretPosition(0);
+
+         hl.highlight(resultTextPane, query);
+
+         // the usual updates
+         previewTextArea.setText(search.getPreview(selectedGuiIndex));
+         resultCountLabel.setText(search.getResultSetCount());
+     }
+
+     public static void repl() {
+         Controller controller = new Controller(new JTextPane(),
+                 new JTextArea(), new JLabel());
+         controller.testCrawl();
+
+         Reader inreader = new InputStreamReader(System.in);
+
+         try {
+             BufferedReader in = new BufferedReader(inreader);
+             String str;
+             System.out.print(">>>");
+             while ((str = in.readLine()) != null) {
+                 controller.search(str);
+                 controller.dump();
+
+                 System.out.print(">>>");
+             }
+             in.close();
+         } catch (Exception e) {
+         }
+     }
+
+     public static void main(String[] args) {
+         repl();
+     }
+ }

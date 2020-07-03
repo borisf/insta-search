@@ -29,12 +29,14 @@
  public class FileSearch {
      private final ArrayList<String> allLines;
      private final TreeMap<String, Integer> preview;
+     public TreeMap<String, Path> nameToPaths;
      private final ArrayList<Pair<Integer, String>> numLinesToFiles;
      private List<ExtractedResult> resultSet;
 
      public FileSearch() {
          allLines = new ArrayList<>();
          preview = new TreeMap<>();
+         nameToPaths = new TreeMap<>();
          numLinesToFiles = new ArrayList<>();
          resultSet = new ArrayList<>();
      }
@@ -46,6 +48,7 @@
 
          allLines.clear();
          numLinesToFiles.clear();
+         nameToPaths.clear();
          preview.clear();
          Path pathString = file.toPath();
 
@@ -76,6 +79,7 @@
                              Pair<Integer, String> pair = new Pair<>(allFileLines.size(),
                                      path.getFileName().toString());
                              numLinesToFiles.add(pair);
+                             nameToPaths.put(path.getFileName().toString(), path);
                          } catch (java.nio.charset.MalformedInputException e) {
                              System.out.println("Bad file format " + path.getFileName().toString());
                          }
