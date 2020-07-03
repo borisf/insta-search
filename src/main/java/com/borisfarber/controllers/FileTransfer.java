@@ -13,12 +13,12 @@
   */
 package com.borisfarber.controllers;
 
-import com.borisfarber.ui.ClassySharkInstaSearch;
+import com.borisfarber.ui.InstaSearch;
 
 import javax.swing.*;
 
-public class FileTransferHandler extends TransferHandler {
-    public FileTransferHandler(ClassySharkInstaSearch classySharkInstaSearch) {
+public class FileTransfer extends TransferHandler {
+    public FileTransfer(InstaSearch instaSearch) {
         
     }
 }

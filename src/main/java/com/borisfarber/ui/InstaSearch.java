@@ -20,11 +20,11 @@ import java.awt.event.KeyListener;
 import java.io.File;
 
 import com.borisfarber.controllers.Controller;
-import com.borisfarber.controllers.FileTransferHandler;
+import com.borisfarber.controllers.FileTransfer;
 
 import static java.awt.event.KeyEvent.*;
 
-public final class ClassySharkInstaSearch extends JFrame {
+public final class InstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
     private JTextArea resultTextArea;
@@ -32,7 +32,7 @@ public final class ClassySharkInstaSearch extends JFrame {
     private JLabel resultCountLabel;
     private Controller controller;
 
-    public ClassySharkInstaSearch() {
+    public InstaSearch() {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
         buildUI();
@@ -136,6 +136,8 @@ public final class ClassySharkInstaSearch extends JFrame {
         result.setFont(this.textFont);
         result.setBackground(Colors.BACKGROUND_COLOR);
         result.setForeground(Colors.FOREGROUND_COLOR);
+        result.setCaretColor(Colors.FOREGROUND_COLOR);
+        result.getCaret().setBlinkRate(0);
 
         // // todo maybe put to controller, same as with doc update, in constructor
         result.addKeyListener(new KeyListener() {
@@ -187,7 +189,7 @@ public final class ClassySharkInstaSearch extends JFrame {
         result.setForeground(Colors.FOREGROUND_COLOR);
         result.setText(Background.SHARK_BG);
         result.setDragEnabled(true);
-        result.setTransferHandler(new FileTransferHandler(this));
+        result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
 
         return result;
@@ -236,7 +238,7 @@ public final class ClassySharkInstaSearch extends JFrame {
             // handle exception
         }
 
-        ClassySharkInstaSearch classySearch = new ClassySharkInstaSearch();
+        InstaSearch classySearch = new InstaSearch();
         classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
