@@ -38,6 +38,7 @@ public class Terminal {
                 .redirectErrorStream(true)
                 .start();
 
+        // TODO follow up with errors or exception ?
         return process.waitFor();
     }
 }

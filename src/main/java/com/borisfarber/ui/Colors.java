@@ -16,8 +16,8 @@ package com.borisfarber.ui;
 import java.awt.*;
 
 public class Colors {
-    public static final Color BACKGROUND_COLOR = new Color(7, 54, 66);
-    public static final Color FOREGROUND_COLOR = new Color(147, 161, 161);
+    public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
+    public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
 
     // TODO not sure if need
     public static final Color DEFAULT = Color.CYAN;

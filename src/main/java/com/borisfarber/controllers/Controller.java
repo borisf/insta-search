@@ -23,9 +23,9 @@
  import java.io.*;
 
  import static com.borisfarber.controllers.FileSearch.testLoad;
+ import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
-
      private JTextPane resultTextPane;
      private final JTextArea previewTextArea;
      private final JLabel resultCountLabel;
@@ -46,7 +46,7 @@
          search = new FileSearch();
      }
 
-     public final void crawl(final File file) {
+     public void crawl(final File file) {
          if (file == null || !file.exists()) {
              return;
          }
@@ -57,14 +57,6 @@
 
      public void testCrawl() {
          search.testCrawl(testLoad());
-     }
-
-     public String dump() {
-         System.out.println(search.getResults());
-         System.out.println(search.getPreview(0));
-         System.out.println(search.getResultSetCount());
-
-         return "";
      }
 
      @Override
@@ -123,13 +115,11 @@
 
      public void enterPressed() {
          try {
-             String fullPath = search.nameToPaths.get(filenameAndPosition.t).toString();
+             String fullPath = search.getNameToPaths().get(filenameAndPosition.t).toString();
              String command = "nvim +" + Integer.parseInt(String.valueOf(filenameAndPosition.u)) +
                      " " + fullPath;
 
              Terminal.executeInTerminal(command);
-             //pr = Runtime.getRuntime().exec("vim /tmp/tmpfile");
-             //int exitVal = pr.waitFor();
          } catch (Exception e) {
              e.printStackTrace();
              // TODO workaround for no vim
@@ -139,7 +129,21 @@
          }
      }
 
-     private final void runNewSearch(final Document searchQueryDoc) {
+     public void search(String query) {
+         selectedGuiIndex = 0;
+         search.search(query);
+         this.query = query;
+     }
+
+     public String dump() {
+         System.out.println(search.getResults());
+         System.out.println(search.getPreview(0));
+         System.out.println(search.getResultSetCount());
+
+         return "";
+     }
+
+     private void runNewSearch(final Document searchQueryDoc) {
          try {
              final String query = searchQueryDoc.getText(0,
                      searchQueryDoc.getLength());
@@ -148,12 +152,6 @@
          catch (Exception ex) {
              ex.printStackTrace();
          }
-     }
-
-     private void search(String query) {
-         selectedGuiIndex = 0;
-         search.search(query);
-         this.query = query;
      }
 
      private void updateGUI() {
@@ -183,28 +181,6 @@
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));
          resultCountLabel.setText(search.getResultSetCount());
-     }
-
-     public static void repl() {
-         Controller controller = new Controller(new JTextPane(),
-                 new JTextArea(), new JLabel());
-         controller.testCrawl();
-
-         Reader inreader = new InputStreamReader(System.in);
-
-         try {
-             BufferedReader in = new BufferedReader(inreader);
-             String str;
-             System.out.print(">>>");
-             while ((str = in.readLine()) != null) {
-                 controller.search(str);
-                 controller.dump();
-
-                 System.out.print(">>>");
-             }
-             in.close();
-         } catch (Exception e) {
-         }
      }
 
      public static void main(String[] args) {

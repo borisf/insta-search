@@ -108,7 +108,6 @@ public final class InstaSearch extends JFrame {
                     previewArea.setText("");
                     searchField.setText("");
                     controller.crawl(newFile);
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -148,7 +147,6 @@ public final class InstaSearch extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-
                 if (keyEvent.getKeyCode() == VK_RIGHT) {
                     result.setText("");
                     try {
@@ -231,16 +229,7 @@ public final class InstaSearch extends JFrame {
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
         }
-        catch (UnsupportedLookAndFeelException e) {
-            // handle exception
-        }
-        catch (ClassNotFoundException e) {
-            // handle exception
-        }
-        catch (InstantiationException e) {
-            // handle exception
-        }
-        catch (IllegalAccessException e) {
+        catch (Exception e) {
             // handle exception
         }
 

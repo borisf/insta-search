@@ -29,7 +29,7 @@
  public class FileSearch {
      private final ArrayList<String> allLines;
      private final TreeMap<String, Integer> preview;
-     public TreeMap<String, Path> nameToPaths;
+     private TreeMap<String, Path> nameToPaths;
      private final ArrayList<Pair<Integer, String>> numLinesToFiles;
      private List<ExtractedResult> resultSet;
 
@@ -222,5 +222,9 @@
          System.out.println(search.getResults());
          System.out.println(search.getPreview(0));
          System.out.println(search.getResultSetCount());
+     }
+
+     public TreeMap<String, Path> getNameToPaths() {
+         return nameToPaths;
      }
  }
