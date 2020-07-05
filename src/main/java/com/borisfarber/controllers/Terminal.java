@@ -15,30 +15,15 @@ package com.borisfarber.controllers;
 
 import java.io.IOException;
 
-public class Terminal {
-    static int executeInTerminal(String command) throws IOException, InterruptedException {
+ public class Terminal {
+    static int executeInLinux(String command) throws IOException, InterruptedException {
         final String[] wrappedCommand;
-        //if (isWindows) {
-        //    wrappedCommand = new String[]{ "cmd", "/c", "start", "/wait", "cmd.exe", "/K", command };
-        //}
-        //else if (isLinux) {
-        // TODO works
         wrappedCommand = new String[]{ "gnome-terminal", "-e", command};
-        // }
-        //else if (isMac) {
-        //    wrappedCommand = new String[]{"osascript",
-        //            "-e", "tell application \"Terminal\" to activate",
-        //            "-e", "tell application \"Terminal\" to do script \"" + command + ";exit\""};
-        //}
-        //else {
-        //  throw new RuntimeException("Unsupported OS ☹");
-        //}
 
         Process process = new ProcessBuilder(wrappedCommand)
                 .redirectErrorStream(true)
                 .start();
 
-        // TODO follow up with errors or exception ?
         return process.waitFor();
     }
 }

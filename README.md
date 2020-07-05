@@ -10,7 +10,7 @@ With ClassyShark Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
 incrementally.
 
-![Image of ClassySearch](https://github.com/borisf/classysearch/blob/master/images/ClassySharkInstaSearch.png)
+![Image of ClassySearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
 
 ## UI
 * Search line - where you type text that are you looking for

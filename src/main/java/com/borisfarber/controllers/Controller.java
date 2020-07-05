@@ -20,7 +20,11 @@
  import javax.swing.event.DocumentEvent;
  import javax.swing.event.DocumentListener;
  import javax.swing.text.*;
+ import java.awt.*;
  import java.io.*;
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
+ import java.nio.file.Paths;
 
  import static com.borisfarber.controllers.FileSearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
@@ -32,7 +36,7 @@
 
      private String query;
      private FileSearch search;
-     private Pair<String, Integer> filenameAndPosition =
+     private Pair<String, Integer> editorFilenameAndPosition =
              new Pair<>("test.txt",0);
      private int selectedGuiIndex = 0;
 
@@ -114,18 +118,24 @@
      }
 
      public void enterPressed() {
+         String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
          try {
-             String fullPath = search.getNameToPaths().get(filenameAndPosition.t).toString();
-             String command = "nvim +" + Integer.parseInt(String.valueOf(filenameAndPosition.u)) +
+             String command = "nvim +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                      " " + fullPath;
-
-             Terminal.executeInTerminal(command);
+             Terminal.executeInLinux(command);
          } catch (Exception e) {
-             e.printStackTrace();
-             // TODO workaround for no vim
-             //Desktop desktop = Desktop.getDesktop();
-             //desktop.open(filenameAndPosition.u);
-
+             try {
+                 Desktop desktop = Desktop.getDesktop();
+                 desktop.open(new File(fullPath));
+             } catch (IOException ioException) {
+                 try {
+                     String content =
+                             Files.readString(Paths.get(editorFilenameAndPosition.t), StandardCharsets.US_ASCII);
+                     previewTextArea.setText(content);
+                 } catch (IOException exception) {
+                     previewTextArea.setText("Something is wrong with the file " + exception.getMessage());
+                 }
+             }
          }
      }
 
@@ -157,8 +167,10 @@
      private void updateGUI() {
          // show selector
          int i = 0;
-         Highlighter hl = new Highlighter();
+         Highlighter highlighter = new Highlighter();
          StringBuilder builder = new StringBuilder();
+         Pair<String, Integer> filenameAndPosition;
+
          for (String res : search.getResultSet()) {
              filenameAndPosition = search.getFileNameAndPosition(res);
 
@@ -166,6 +178,8 @@
 
              if(i == selectedGuiIndex) {
                  builder.append("==> " + resultLine);
+                 editorFilenameAndPosition.t = filenameAndPosition.t;
+                 editorFilenameAndPosition.u = filenameAndPosition.u;
              } else {
                  builder.append(resultLine);
              }
@@ -176,7 +190,7 @@
          resultTextPane.setText(builder.toString());
          resultTextPane.setCaretPosition(0);
 
-         hl.highlight(resultTextPane, query);
+         highlighter.highlight(resultTextPane, query);
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));

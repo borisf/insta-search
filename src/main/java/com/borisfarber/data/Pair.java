@@ -15,8 +15,8 @@ package com.borisfarber.data;
 
 // value class to represent pairs data structure
 public class Pair<T, U> {
-    public final T t;
-    public final U u;
+    public T t;
+    public U u;
 
     public Pair(T t, U u) {
         this.t= t;
