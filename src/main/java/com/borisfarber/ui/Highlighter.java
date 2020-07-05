@@ -18,7 +18,10 @@ import javax.swing.text.*;
 import java.awt.*;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-public class Highlighter {
+import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
+import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
+
+ public class Highlighter {
 
     // Creates highlights around all occurrences of pattern in textPane
     public void highlight(JTextPane textPane, String pattern) {
@@ -42,9 +45,9 @@ public class Highlighter {
                 hilite.addHighlight(pos, pos + pattern.length(), myHighlightPainter);
 
                 // back
-                StyleConstants.setForeground(attrs, Colors.BACKGROUND_COLOR);
+                StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
                 doc1.setCharacterAttributes(pos, pos + pattern.length(), attrs, false);
-                StyleConstants.setForeground(attrs, Colors.FOREGROUND_COLOR);
+                StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
                 doc1.setCharacterAttributes(pos + pattern.length(), text.length(),attrs, false)  ;
                 // end back
 
@@ -68,7 +71,7 @@ public class Highlighter {
     }
     // An instance of the private subclass of the default highlight painter
     // TODO may be yellow
-   HighlightPainter myHighlightPainter = new MyHighlightPainter(Colors.FOREGROUND_COLOR);
+   HighlightPainter myHighlightPainter = new MyHighlightPainter(FOREGROUND_COLOR);
 
     // A private subclass of the default highlight painter
     private static class MyHighlightPainter

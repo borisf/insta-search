@@ -27,16 +27,19 @@ import static java.awt.event.KeyEvent.*;
 public final class InstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
-    private JTextPane resultTextArea;
+    private JTextPane resultTextPane;
     private JTextArea previewArea;
     private JLabel resultCountLabel;
     private Controller controller;
+
+    public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
+    public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
 
     public InstaSearch() {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
         buildUI();
-        controller = new Controller(resultTextArea, previewArea, resultCountLabel);
+        controller = new Controller(resultTextPane, previewArea, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
 
         File file = open();
@@ -46,26 +49,18 @@ public final class InstaSearch extends JFrame {
         }
     }
 
-    // TODO move to controller
+    // TODO move to controller once implemented
     public final void fileDragged(final File file) {
-        final JTextArea showFileArea = this.previewArea;
-
-        showFileArea.setText("");
-        final JTextPane resultTextArea = this.resultTextArea;
-
-        resultTextArea.setText(Background.SHARK_BG);
+        previewArea.setText("");
+        resultTextPane.setText(Background.SHARK_BG);
         this.setTitle("ClassySearch - " + file.getName());
-        final Controller controller = this.controller;
-        if (controller == null) {
-
-        }
         controller.crawl(file);
     }
 
     private final void buildUI() {
         resultCountLabel = new JLabel("");
-        resultTextArea = this.buildResultTextArea();
-        JScrollPane showResultsScrolled = new JScrollPane(this.resultTextArea);
+        resultTextPane = this.buildResultTextArea();
+        JScrollPane showResultsScrolled = new JScrollPane(this.resultTextPane);
         previewArea = this.buildPreviewArea();
         JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
 
@@ -103,12 +98,7 @@ public final class InstaSearch extends JFrame {
         openFolderItem.addActionListener(actionEvent -> {
             try {
                 File newFile = open();
-                if (newFile != null) {
-                    resultTextArea.setText(Background.SHARK_BG);
-                    previewArea.setText("");
-                    searchField.setText("");
-                    controller.crawl(newFile);
-                }
+                controller.fileOpened(newFile);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -133,12 +123,11 @@ public final class InstaSearch extends JFrame {
     private final JTextField buildSearchField() {
         final JTextField result = new JTextField();
         result.setFont(this.textFont);
-        result.setBackground(Colors.BACKGROUND_COLOR);
-        result.setForeground(Colors.FOREGROUND_COLOR);
-        result.setCaretColor(Colors.FOREGROUND_COLOR);
+        result.setBackground(BACKGROUND_COLOR);
+        result.setForeground(FOREGROUND_COLOR);
+        result.setCaretColor(FOREGROUND_COLOR);
         result.getCaret().setBlinkRate(0);
 
-        // // todo maybe put to controller, same as with doc update, in constructor
         result.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent keyEvent) {
@@ -148,15 +137,8 @@ public final class InstaSearch extends JFrame {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 if (keyEvent.getKeyCode() == VK_RIGHT) {
-                    result.setText("");
-                    try {
-                        File newFile = open();
-                        if(newFile != null) {
-                            controller.crawl(newFile);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    File file = open();
+                    controller.fileOpened(file);
                     return;
                 }
 
@@ -188,8 +170,8 @@ public final class InstaSearch extends JFrame {
     private final JTextPane buildResultTextArea() {
         final JTextPane result = new JTextPane();
         result.setFont(this.textFont);
-        result.setBackground(Colors.BACKGROUND_COLOR);
-        result.setForeground(Colors.FOREGROUND_COLOR);
+        result.setBackground(BACKGROUND_COLOR);
+        result.setForeground(FOREGROUND_COLOR);
         result.setText(Background.SHARK_BG);
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransfer(this));
@@ -201,15 +183,15 @@ public final class InstaSearch extends JFrame {
     private final JTextArea buildPreviewArea() {
         previewArea = new JTextArea(30, 80);
         previewArea.setFont(this.textFont);
-        previewArea.setBackground(Colors.BACKGROUND_COLOR);
-        previewArea.setForeground(Colors.FOREGROUND_COLOR);
+        previewArea.setBackground(BACKGROUND_COLOR);
+        previewArea.setForeground(FOREGROUND_COLOR);
         previewArea.setEditable(false);
         previewArea.setWrapStyleWord(true);
 
         return previewArea;
     }
 
-    public final File open() {
+    private final File open() {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setPreferredSize(new Dimension(700,500));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

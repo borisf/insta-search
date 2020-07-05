@@ -14,6 +14,7 @@
  package com.borisfarber.controllers;
 
  import com.borisfarber.data.Pair;
+ import com.borisfarber.ui.Background;
  import com.borisfarber.ui.Highlighter;
 
  import javax.swing.*;
@@ -101,6 +102,23 @@
          runNewSearch(document);
      }
 
+     public void fileOpened(File newFile) {
+         try {
+             if(newFile != null) {
+
+                 resultTextPane.setText(Background.SHARK_BG);
+                 previewTextArea.setText("");
+                 resultCountLabel.setText("");
+
+                 crawl(newFile);
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return;
+
+     }
+
      public void upPressed() {
          if(selectedGuiIndex > 0) {
              selectedGuiIndex--;
@@ -165,7 +183,6 @@
      }
 
      private void updateGUI() {
-         // show selector
          int i = 0;
          Highlighter highlighter = new Highlighter();
          StringBuilder builder = new StringBuilder();
