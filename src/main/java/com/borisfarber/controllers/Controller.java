@@ -27,16 +27,16 @@
  import java.nio.file.Files;
  import java.nio.file.Paths;
 
- import static com.borisfarber.controllers.FileSearch.testLoad;
+ import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
-     private JTextPane resultTextPane;
+     public JTextPane resultTextPane;
      private final JTextArea previewTextArea;
      private final JLabel resultCountLabel;
 
      private String query;
-     private FileSearch search;
+     private Search search;
      private Pair<String, Integer> editorFilenameAndPosition =
              new Pair<>("test.txt",0);
      private int selectedGuiIndex = 0;
@@ -48,7 +48,8 @@
          this.previewTextArea = previewArea;
          this.resultCountLabel = resultCountLabel;
 
-         search = new FileSearch();
+         search = new GrepSearch(this);
+         //search = new FuzzySearch(this);
      }
 
      public void crawl(final File file) {
@@ -56,7 +57,8 @@
              return;
          }
 
-         search = new FileSearch();
+         search = new GrepSearch(this);
+         //search = new FuzzySearch(this);
          search.crawl(file);
      }
 
@@ -69,8 +71,6 @@
          // letter
          Document document = evt.getDocument();
          runNewSearch(document);
-
-         updateGUI();
      }
 
      @Override
@@ -84,7 +84,6 @@
 
              if(query.length() > 1) {
                  search(query);
-                 updateGUI();
              } else {
                  resultTextPane.setText("");
                  previewTextArea.setText("");
@@ -124,7 +123,7 @@
              selectedGuiIndex--;
          }
 
-         updateGUI();
+         onUpdateGUI();
      }
 
      public void downPressed() {
@@ -132,7 +131,7 @@
              selectedGuiIndex++;
          }
 
-         updateGUI();
+         onUpdateGUI();
      }
 
      public void enterPressed() {
@@ -182,21 +181,26 @@
          }
      }
 
-     private void updateGUI() {
+     public synchronized void onUpdateGUI() {
          int i = 0;
          Highlighter highlighter = new Highlighter();
          StringBuilder builder = new StringBuilder();
          Pair<String, Integer> filenameAndPosition;
 
          for (String res : search.getResultSet()) {
-             filenameAndPosition = search.getFileNameAndPosition(res);
 
-             String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + res;
+             // TODO rewrite for fuzzy search, add inside the fuzzy search
+             //filenameAndPosition = search.getFileNameAndPosition(res);
+             //String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + res;
+
+             String resultLine = res;
 
              if(i == selectedGuiIndex) {
                  builder.append("==> " + resultLine);
-                 editorFilenameAndPosition.t = filenameAndPosition.t;
-                 editorFilenameAndPosition.u = filenameAndPosition.u;
+
+                 // TODO rewrite for fuzzy search
+                 //editorFilenameAndPosition.t = filenameAndPosition.t;
+                 //editorFilenameAndPosition.u = filenameAndPosition.u;
              } else {
                  builder.append(resultLine);
              }
@@ -207,7 +211,12 @@
          resultTextPane.setText(builder.toString());
          resultTextPane.setCaretPosition(0);
 
-         highlighter.highlight(resultTextPane, query);
+         // TODO threading issue stopped, probably do highlighting once the
+         // TODO result data is full filled, another callback to add
+         //if(query != null) {
+         //   // TODO follow up, when there is no first letter
+         //    highlighter.highlight(resultTextPane, query);
+         //}
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));

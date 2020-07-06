@@ -20,27 +20,29 @@
  import java.util.*;
 
  import com.borisfarber.data.Pair;
- import me.xdrop.fuzzywuzzy.FuzzySearch;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
- public class FileSearch {
+ public class FuzzySearch implements Search {
      private final ArrayList<String> allLines;
      private final TreeMap<String, Integer> preview;
+     private final Controller controller;
      private TreeMap<String, Path> nameToPaths;
      private final ArrayList<Pair<Integer, String>> numLinesToFiles;
      private List<ExtractedResult> resultSet;
 
-     public FileSearch() {
+     public FuzzySearch(Controller controller) {
          allLines = new ArrayList<>();
          preview = new TreeMap<>();
          nameToPaths = new TreeMap<>();
          numLinesToFiles = new ArrayList<>();
          resultSet = new ArrayList<>();
+         this.controller = controller;
      }
 
+     @Override
      public void crawl(File file) {
          if (file == null || !file.exists()) {
              return;
@@ -100,12 +102,15 @@
          // System.out.println("finished crawling ==> " + allLines.size() + " elements");
      }
 
+     @Override
      public void search(String query) {
          //long start = System.currentTimeMillis();
-         resultSet = FuzzySearch.extractTop(query, allLines, 15);
+         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 15);
          //System.out.println(": " + ( System.currentTimeMillis() - start));
+         controller.onUpdateGUI();
      }
 
+     @Override
      public Pair<String, Integer> getFileNameAndPosition(String line) {
          int index = preview.get(line).intValue();
          int base = 0;
@@ -121,6 +126,7 @@
          return new Pair<>("file.txt", 0);
      }
 
+     @Override
      public String getResults() {
          StringBuilder builder = new StringBuilder();
 
@@ -140,6 +146,7 @@
       * @param resultIndex
       * @return
       */
+     @Override
      public String getPreview(int resultIndex) {
          if (resultSet.isEmpty()) {
              return "";
@@ -167,6 +174,7 @@
          return builder.toString();
      }
 
+     @Override
      public List<String> getResultSet() {
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
@@ -177,6 +185,7 @@
          return result;
      }
 
+     @Override
      public String getResultSetCount() {
          return Integer.toString(getResultSet().size());
      }
@@ -188,6 +197,7 @@
          return "";
      }
 
+     @Override
      public void testCrawl(ArrayList<String> testLoad) {
          allLines.clear();
          allLines.addAll(testLoad);
@@ -215,15 +225,17 @@
      }
 
      public static void main(String[] args) {
+         /*
          System.out.println("Search");
-         FileSearch search = new FileSearch();
+         FuzzySearch search = new FuzzySearch();
          search.testCrawl(testLoad());
          search.search("set");
          System.out.println(search.getResults());
          System.out.println(search.getPreview(0));
-         System.out.println(search.getResultSetCount());
+         System.out.println(search.getResultSetCount());*/
      }
 
+     @Override
      public TreeMap<String, Path> getNameToPaths() {
          return nameToPaths;
      }
