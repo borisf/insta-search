@@ -70,8 +70,12 @@ public class GrepSearch implements Search {
     private CharBuffer cb3;
     private CharBuffer cb4;
 
+    private TreeMap<String, Path> nameToPaths;
+
+    // TODO disposing the resources
     public GrepSearch(Controller controller) {
         this.controller = controller;
+        nameToPaths = new TreeMap<>();
     }
 
     @Override
@@ -79,6 +83,9 @@ public class GrepSearch implements Search {
         long start = System.currentTimeMillis();
         try {
             this.file = file;
+
+            nameToPaths.clear();
+            nameToPaths.put(file.getName(), Path.of(file.toURI()));
 
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
@@ -186,7 +193,7 @@ public class GrepSearch implements Search {
             result = 0;
         }
 
-        return new Pair<>(file.getAbsolutePath(), result);
+        return new Pair<>(file.getName(), result);
     }
 
     @Override
@@ -215,7 +222,7 @@ public class GrepSearch implements Search {
 
     @Override
     public TreeMap<String, Path> getNameToPaths() {
-        return new TreeMap<>();
+        return nameToPaths;
     }
 
     @Override

@@ -104,18 +104,15 @@
      public void fileOpened(File newFile) {
          try {
              if(newFile != null) {
-
                  resultTextPane.setText(Background.SHARK_BG);
                  previewTextArea.setText("");
                  resultCountLabel.setText("");
-
                  crawl(newFile);
              }
          } catch (Exception e) {
              e.printStackTrace();
          }
          return;
-
      }
 
      public void upPressed() {
@@ -135,8 +132,8 @@
      }
 
      public void enterPressed() {
-         // TODO null with grep
          String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
+
          try {
              String command = "nvim +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                      " " + fullPath;
@@ -200,6 +197,11 @@
              i++;
 
              builder.append("\n");
+
+             if (i >= 50) {
+                 // at most show 50 results
+                 break;
+             }
          }
          resultTextPane.setText(builder.toString());
 

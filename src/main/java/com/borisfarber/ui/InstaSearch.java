@@ -216,6 +216,6 @@ public final class InstaSearch extends JFrame {
         }
 
         InstaSearch classySearch = new InstaSearch();
-        classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        classySearch.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 }
