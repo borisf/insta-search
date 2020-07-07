@@ -135,7 +135,7 @@
          String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
 
          try {
-             String command = "nvim +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
+             String command = "nvim +\"set number\" +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                      " " + fullPath;
              Terminal.executeInLinux(command);
          } catch (Exception e) {
@@ -204,17 +204,15 @@
              }
          }
          resultTextPane.setText(builder.toString());
-
-         // better algorithm count character, till new lines
-         resultTextPane.setCaretPosition(80 * selectedGuiIndex);
+         int selector = builder.toString().indexOf("==> ");
+         resultTextPane.setCaretPosition(selector);
 
          // TODO threading issue stopped, probably do highlighting once the
          // TODO result data is full filled, another callback to add
-         //if(query != null) {
-         //   // TODO follow up, when there is no first letter
-         //      Highlighter highlighter = new Highlighter();
-         //    highlighter.highlight(resultTextPane, query);
-         //}
+         if(query != null) {
+             Highlighter highlighter = new Highlighter();
+             highlighter.highlight(resultTextPane, query);
+         }
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));

@@ -73,13 +73,11 @@ public final class InstaSearch extends JFrame {
         JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setDividerSize(20);
         splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        splitPane.setDividerLocation(400);
+        splitPane.setDividerLocation(600);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
         final Container contentPane = this.getContentPane();
-
         contentPane.setLayout(new BoxLayout(this.getContentPane(), 1));
-
         searchField.setAlignmentX(0.0f);
         splitPane.setAlignmentX(0.0f);
         statusPanel.setAlignmentX(0.0f);

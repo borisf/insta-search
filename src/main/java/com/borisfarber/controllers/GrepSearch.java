@@ -34,7 +34,6 @@ import com.borisfarber.data.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -71,6 +70,7 @@ public class GrepSearch implements Search {
     private CharBuffer cb4;
 
     private TreeMap<String, Path> nameToPaths;
+    private int qq;
 
     // TODO disposing the resources
     public GrepSearch(Controller controller) {
@@ -91,7 +91,7 @@ public class GrepSearch implements Search {
             FileChannel fc = fis.getChannel();
             int sz = (int)fc.size();
 
-            int qq = sz/4;
+            qq = sz/4;
 
             // Open the file and then get a channel from the stream
             FileInputStream fis1 = new FileInputStream(file);
@@ -138,7 +138,7 @@ public class GrepSearch implements Search {
     private void grep() {
         executorService.execute(new Runnable() {
             public void run() {
-                ArrayList<String> mmm = GrepSearch.grep(file, cb1);
+                ArrayList<String> mmm = GrepSearch.grep(file, cb1, 0);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
 
@@ -148,18 +148,7 @@ public class GrepSearch implements Search {
         executorService.execute(new Runnable() {
             public void run() {
                 long start = System.currentTimeMillis();
-                ArrayList<String> mmm = GrepSearch.grep(file, cb2);
-                result.addAll(mmm);
-                controller.onUpdateGUI();
-
-                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
-            }
-        });
-
-        executorService.execute(new Runnable() {
-            public void run() {
-                long start = System.currentTimeMillis();
-                ArrayList<String> mmm = GrepSearch.grep(file, cb3);
+                ArrayList<String> mmm = GrepSearch.grep(file, cb2, qq);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
 
@@ -170,7 +159,18 @@ public class GrepSearch implements Search {
         executorService.execute(new Runnable() {
             public void run() {
                 long start = System.currentTimeMillis();
-                ArrayList<String> mmm = GrepSearch.grep(file, cb4);
+                ArrayList<String> mmm = GrepSearch.grep(file, cb3, 2*qq);
+                result.addAll(mmm);
+                controller.onUpdateGUI();
+
+                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
+            }
+        });
+
+        executorService.execute(new Runnable() {
+            public void run() {
+                long start = System.currentTimeMillis();
+                ArrayList<String> mmm = GrepSearch.grep(file, cb4, 3*qq);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
 
@@ -244,12 +244,12 @@ public class GrepSearch implements Search {
     // Use the linePattern to break the given CharBuffer into lines, applying
     // the input pattern to each line to see if we have a match
     //
-    private static ArrayList<String> grep(File f, CharBuffer cb) {
+    private static ArrayList<String> grep(File f, CharBuffer cb, int i) {
         ArrayList<String> result = new ArrayList<>();
 
         Matcher lm = linePattern.matcher(cb); // Line matcher
         Matcher pm = null;      // Pattern matcher
-        int lines = 0;
+        int lines = i;
         while (lm.find()) {
             lines++;
             CharSequence cs = lm.group();   // The current line
