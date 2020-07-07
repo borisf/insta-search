@@ -62,7 +62,7 @@
 
                  @Override
                  public FileVisitResult preVisitDirectory(Path dir,
-                                   BasicFileAttributes attrs) {
+                                                          BasicFileAttributes attrs) {
                      if (dir.getFileName().toString().startsWith(".")) {
                          return SKIP_SUBTREE;
                      }
@@ -112,18 +112,9 @@
 
      @Override
      public Pair<String, Integer> getFileNameAndPosition(String line) {
-         int index = preview.get(line).intValue();
-         int base = 0;
-
-         for (Pair<Integer, String> pair : numLinesToFiles) {
-             if (index >= base && index < (base + pair.t.intValue() - 1)) {
-                 return new Pair<>(pair.u, (index - base));
-             }
-
-             base += pair.t.intValue();
-         }
-
-         return new Pair<>("file.txt", 0);
+         // TODO parameter checks
+         String[] split = line.split(":");
+         return new Pair<>(split[0], Integer.parseInt(split[1]));
      }
 
      @Override
@@ -152,7 +143,7 @@
              return "";
          }
 
-         int allLinesIndex = preview.get(getResultSet().get(resultIndex));
+         int allLinesIndex = preview.get(getResultSetRawLines().get(resultIndex));
 
          int lower = allLinesIndex - 7;
          int upper = allLinesIndex + 7;
@@ -179,7 +170,12 @@
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
          for (ExtractedResult er : resultSet) {
-             result.add(er.getString());
+
+             Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(er.getString());
+
+             String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + er.getString();
+
+             result.add(resultLine);
          }
 
          return result;
@@ -187,11 +183,11 @@
 
      @Override
      public String getResultSetCount() {
-         return Integer.toString(getResultSet().size());
+         return Integer.toString(getResultSetRawLines().size());
      }
 
      public String toString() {
-         for (String res : getResultSet()) {
+         for (String res : getResultSetRawLines()) {
              System.out.println(res);
          }
          return "";
@@ -209,6 +205,32 @@
              preview.put(line, index);
              index++;
          }
+     }
+
+     private Pair<String, Integer> getFileNameAndPositionFromRawLine(String line) {
+
+         int index = preview.get(line).intValue();
+         int base = 0;
+
+         for (Pair<Integer, String> pair : numLinesToFiles) {
+             if (index >= base && index < (base + pair.t.intValue() - 1)) {
+                 return new Pair<>(pair.u, (index - base));
+             }
+
+             base += pair.t.intValue();
+         }
+
+         return new Pair<>("file.txt", 0);
+     }
+
+     private List<String> getResultSetRawLines() {
+         ArrayList<String> result = new ArrayList<>(resultSet.size());
+
+         for (ExtractedResult er : resultSet) {
+             result.add(er.getString());
+         }
+
+         return result;
      }
 
      public static ArrayList<String> testLoad() {

@@ -41,10 +41,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -180,7 +177,16 @@ public class GrepSearch implements Search {
 
     @Override
     public Pair<String, Integer> getFileNameAndPosition(String line) {
-        return new Pair<>(file.getAbsolutePath(), 5);
+        String[] splitted = line.split(":");
+        int result;
+
+        try {
+            result  = Integer.parseInt(splitted[1]);
+        } catch (Exception e) {
+            result = 0;
+        }
+
+        return new Pair<>(file.getAbsolutePath(), result);
     }
 
     @Override

@@ -135,6 +135,7 @@
      }
 
      public void enterPressed() {
+         // TODO null with grep
          String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
          try {
              String command = "nvim +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
@@ -183,38 +184,33 @@
 
      public synchronized void onUpdateGUI() {
          int i = 0;
-         Highlighter highlighter = new Highlighter();
          StringBuilder builder = new StringBuilder();
          Pair<String, Integer> filenameAndPosition;
 
          for (String res : search.getResultSet()) {
-
-             // TODO rewrite for fuzzy search, add inside the fuzzy search
-             //filenameAndPosition = search.getFileNameAndPosition(res);
-             //String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + res;
-
-             String resultLine = res;
+             filenameAndPosition = search.getFileNameAndPosition(res);
 
              if(i == selectedGuiIndex) {
-                 builder.append("==> " + resultLine);
-
-                 // TODO rewrite for fuzzy search
-                 //editorFilenameAndPosition.t = filenameAndPosition.t;
-                 //editorFilenameAndPosition.u = filenameAndPosition.u;
+                 builder.append("==> " + res);
+                 editorFilenameAndPosition.t = filenameAndPosition.t;
+                 editorFilenameAndPosition.u = filenameAndPosition.u;
              } else {
-                 builder.append(resultLine);
+                 builder.append(res);
              }
              i++;
 
              builder.append("\n");
          }
          resultTextPane.setText(builder.toString());
-         resultTextPane.setCaretPosition(0);
+
+         // better algorithm count character, till new lines
+         resultTextPane.setCaretPosition(80 * selectedGuiIndex);
 
          // TODO threading issue stopped, probably do highlighting once the
          // TODO result data is full filled, another callback to add
          //if(query != null) {
          //   // TODO follow up, when there is no first letter
+         //      Highlighter highlighter = new Highlighter();
          //    highlighter.highlight(resultTextPane, query);
          //}
 
