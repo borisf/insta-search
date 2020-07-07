@@ -52,14 +52,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-/* Search a list of files for lines that match a given regular-expression
- * pattern.  Demonstrates NIO mapped byte buffers, charsets, and regular
- * expressions.
- */
-
 public class GrepSearch implements Search {
 
-    // Charset and decoder for ISO-8859-15
     private static Charset charset = Charset.forName("ISO-8859-15");
     public static CharsetDecoder decoder = charset.newDecoder();
 
@@ -72,9 +66,12 @@ public class GrepSearch implements Search {
 
     // our stuff
     private File file = new File("test.txt");
-    private ConcurrentLinkedQueue<String> result = new ConcurrentLinkedQueue<>();
-    private  CharBuffer cb1;
-    private  CharBuffer cb2;
+    private ConcurrentLinkedQueue<String> result =
+            new ConcurrentLinkedQueue<>();
+    private CharBuffer cb1;
+    private CharBuffer cb2;
+    private CharBuffer cb3;
+    private CharBuffer cb4;
 
     public GrepSearch(Controller controller) {
         this.controller = controller;
@@ -86,31 +83,32 @@ public class GrepSearch implements Search {
         try {
             this.file = file;
 
-            // Open the file and then get a channel from the stream
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
-
-            // Get the file's size and then map it into memory
             int sz = (int)fc.size();
 
-            int half = sz/2;
+            int qq = sz/4;
 
             // Open the file and then get a channel from the stream
             FileInputStream fis1 = new FileInputStream(file);
             FileChannel fc1 = fis1.getChannel();
-
-            MappedByteBuffer bb1 = fc1.map(FileChannel.MapMode.READ_ONLY, 0, half);
-
-            // Decode the file into a char buffer
+            MappedByteBuffer bb1 = fc1.map(FileChannel.MapMode.READ_ONLY, 0, qq);
             cb1 = decoder.decode(bb1);
 
-            // Open the file and then get a channel from the stream
             FileInputStream fis2 = new FileInputStream(file);
             FileChannel fc2 = fis2.getChannel();
-
-            MappedByteBuffer bb2 = fc2.map(FileChannel.MapMode.READ_ONLY, half, half);
-            // Decode the file into a char buffer
+            MappedByteBuffer bb2 = fc2.map(FileChannel.MapMode.READ_ONLY, qq, qq);
             cb2 = decoder.decode(bb2);
+
+            FileInputStream fis3 = new FileInputStream(file);
+            FileChannel fc3 = fis3.getChannel();
+            MappedByteBuffer bb3 = fc3.map(FileChannel.MapMode.READ_ONLY,2* qq, qq);
+            cb3 = decoder.decode(bb3);
+
+            FileInputStream fis4 = new FileInputStream(file);
+            FileChannel fc4 = fis4.getChannel();
+            MappedByteBuffer bb4 = fc4.map(FileChannel.MapMode.READ_ONLY,3* qq, qq);
+            cb4 = decoder.decode(bb4);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,11 +127,11 @@ public class GrepSearch implements Search {
         grep();
     }
 
+    ExecutorService executorService = Executors.newFixedThreadPool(4);
+
     // Search for occurrences of the input pattern in the given file
     //
     private void grep() {
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
-
         executorService.execute(new Runnable() {
             public void run() {
                 ArrayList<String> mmm = GrepSearch.grep(file, cb1);
@@ -145,12 +143,39 @@ public class GrepSearch implements Search {
 
         executorService.execute(new Runnable() {
             public void run() {
+                long start = System.currentTimeMillis();
                 ArrayList<String> mmm = GrepSearch.grep(file, cb2);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
+
+                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
             }
         });
-        executorService.shutdown();
+
+        executorService.execute(new Runnable() {
+            public void run() {
+                long start = System.currentTimeMillis();
+                ArrayList<String> mmm = GrepSearch.grep(file, cb3);
+                result.addAll(mmm);
+                controller.onUpdateGUI();
+
+                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
+            }
+        });
+
+        executorService.execute(new Runnable() {
+            public void run() {
+                long start = System.currentTimeMillis();
+                ArrayList<String> mmm = GrepSearch.grep(file, cb4);
+                result.addAll(mmm);
+                controller.onUpdateGUI();
+
+                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
+            }
+        });
+
+        // TODO find way to tear down
+        //executorService.shutdown();
     }
 
     @Override
