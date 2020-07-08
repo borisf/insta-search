@@ -64,6 +64,7 @@ public class GrepSearch implements Search {
     private File file = new File("test.txt");
     private ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
+
     private CharBuffer cb1;
     private CharBuffer cb2;
     private CharBuffer cb3;
@@ -72,7 +73,6 @@ public class GrepSearch implements Search {
     private TreeMap<String, Path> nameToPaths;
     private int qq;
 
-    // TODO disposing the resources
     public GrepSearch(Controller controller) {
         this.controller = controller;
         nameToPaths = new TreeMap<>();
@@ -90,36 +90,41 @@ public class GrepSearch implements Search {
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
             int sz = (int)fc.size();
-
             qq = sz/4;
 
-            // Open the file and then get a channel from the stream
-            FileInputStream fis1 = new FileInputStream(file);
-            FileChannel fc1 = fis1.getChannel();
-            MappedByteBuffer bb1 = fc1.map(FileChannel.MapMode.READ_ONLY, 0, qq);
-            cb1 = decoder.decode(bb1);
+            fis.close();
+            fc.close();
 
-            FileInputStream fis2 = new FileInputStream(file);
-            FileChannel fc2 = fis2.getChannel();
-            MappedByteBuffer bb2 = fc2.map(FileChannel.MapMode.READ_ONLY, qq, qq);
-            cb2 = decoder.decode(bb2);
-
-            FileInputStream fis3 = new FileInputStream(file);
-            FileChannel fc3 = fis3.getChannel();
-            MappedByteBuffer bb3 = fc3.map(FileChannel.MapMode.READ_ONLY,2* qq, qq);
-            cb3 = decoder.decode(bb3);
-
-            FileInputStream fis4 = new FileInputStream(file);
-            FileChannel fc4 = fis4.getChannel();
-            MappedByteBuffer bb4 = fc4.map(FileChannel.MapMode.READ_ONLY,3* qq, qq);
-            cb4 = decoder.decode(bb4);
+            cb1 = mapToCharBuffer(file, 0, qq);
+            cb2 = mapToCharBuffer(file, qq, qq);
+            cb3 = mapToCharBuffer(file, 2 * qq, qq);
+            cb4 = mapToCharBuffer(file, 3 * qq, qq);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // TODO clean up, close streams and channel and move to mehtod
-
         System.out.println("Crawl " + (System.currentTimeMillis() - start));
+    }
+
+    private CharBuffer mapToCharBuffer(File file, int start, int size) {
+        CharBuffer result = null;
+        try
+        {
+            // Open the file and then get a channel from the stream
+            FileInputStream fis = new FileInputStream(file);
+            FileChannel fc = fis.getChannel();
+            MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, start, size);
+            result = decoder.decode(bb);
+
+            fis.close();
+            fc.close();
+
+            return result;
+
+        } catch (Exception e) {
+        }
+
+        return result;
     }
 
     @Override
@@ -137,49 +142,31 @@ public class GrepSearch implements Search {
 
     // Search for occurrences of the input pattern in the given file
     private void executeGrep() {
-        executorService.execute(new Runnable() {
-            public void run() {
-                ArrayList<String> mmm = grep(file, cb1, 0);
-                result.addAll(mmm);
-                controller.onUpdateGUI();
-
-            }
+        executorService.execute(() -> {
+            ArrayList<String> mmm = grep(file, cb1, 0);
+            result.addAll(mmm);
+            controller.onUpdateGUI();
         });
 
-        executorService.execute(new Runnable() {
-            public void run() {
-                long start = System.currentTimeMillis();
-                ArrayList<String> mmm = grep(file, cb2, qq);
-                result.addAll(mmm);
-                controller.onUpdateGUI();
-
-                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
-            }
+        executorService.execute(() -> {
+            ArrayList<String> mmm = grep(file, cb2, qq);
+            result.addAll(mmm);
+            controller.onUpdateGUI();
         });
 
-        executorService.execute(new Runnable() {
-            public void run() {
-                long start = System.currentTimeMillis();
-                ArrayList<String> mmm = grep(file, cb3, 2*qq);
-                result.addAll(mmm);
-                controller.onUpdateGUI();
-
-                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
-            }
+        executorService.execute(() -> {
+            ArrayList<String> mmm = grep(file, cb3, 2*qq);
+            result.addAll(mmm);
+            controller.onUpdateGUI();
         });
 
-        executorService.execute(new Runnable() {
-            public void run() {
-                long start = System.currentTimeMillis();
-                ArrayList<String> mmm = grep(file, cb4, 3*qq);
-                result.addAll(mmm);
-                controller.onUpdateGUI();
-
-                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
-            }
+        executorService.execute(() -> {
+            ArrayList<String> mmm = grep(file, cb4, 3*qq);
+            result.addAll(mmm);
+            controller.onUpdateGUI();
         });
 
-        // TODO find way to tear down
+        // TODO find way to tear down the executor service
         //executorService.shutdown();
     }
 

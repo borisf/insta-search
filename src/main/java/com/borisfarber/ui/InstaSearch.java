@@ -125,12 +125,6 @@ public final class InstaSearch extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == VK_RIGHT) {
-                    File file = open();
-                    controller.fileOpened(file);
-                    return;
-                }
-
                 if (keyEvent.getKeyCode() == VK_UP) {
                     controller.upPressed();
                     return;

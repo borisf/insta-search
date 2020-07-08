@@ -31,6 +31,7 @@
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
+     public static final String SELECTOR = "==> ";
      public JTextPane resultTextPane;
      private final JTextArea previewTextArea;
      private final JLabel resultCountLabel;
@@ -194,7 +195,7 @@
          for (String res : search.getResultSet()) {
              filenameAndPosition = search.getFileNameAndPosition(res);
              if(i == selectedGuiIndex) {
-                 builder.append("==> " + res);
+                 builder.append(SELECTOR + res);
                  editorFilenameAndPosition.t = filenameAndPosition.t;
                  editorFilenameAndPosition.u = filenameAndPosition.u;
              } else {
@@ -210,7 +211,7 @@
              }
          }
          resultTextPane.setText(builder.toString());
-         int selector = builder.toString().indexOf("==> ");
+         int selector = builder.toString().indexOf(SELECTOR);
 
          // TODO add try catch for threading exceptions/ IllegalArgumentException: bad position: -1
          resultTextPane.setCaretPosition(selector);
