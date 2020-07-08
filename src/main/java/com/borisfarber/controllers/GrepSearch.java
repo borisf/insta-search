@@ -117,6 +117,8 @@ public class GrepSearch implements Search {
             e.printStackTrace();
         }
 
+        // TODO clean up, close streams and channel and move to mehtod
+
         System.out.println("Crawl " + (System.currentTimeMillis() - start));
     }
 
@@ -128,17 +130,16 @@ public class GrepSearch implements Search {
 
         result.clear();
         compile(query);
-        grep();
+        executeGrep();
     }
 
     ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     // Search for occurrences of the input pattern in the given file
-    //
-    private void grep() {
+    private void executeGrep() {
         executorService.execute(new Runnable() {
             public void run() {
-                ArrayList<String> mmm = GrepSearch.grep(file, cb1, 0);
+                ArrayList<String> mmm = grep(file, cb1, 0);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
 
@@ -148,18 +149,7 @@ public class GrepSearch implements Search {
         executorService.execute(new Runnable() {
             public void run() {
                 long start = System.currentTimeMillis();
-                ArrayList<String> mmm = GrepSearch.grep(file, cb2, qq);
-                result.addAll(mmm);
-                controller.onUpdateGUI();
-
-                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
-            }
-        });
-
-        executorService.execute(new Runnable() {
-            public void run() {
-                long start = System.currentTimeMillis();
-                ArrayList<String> mmm = GrepSearch.grep(file, cb3, 2*qq);
+                ArrayList<String> mmm = grep(file, cb2, qq);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
 
@@ -170,7 +160,18 @@ public class GrepSearch implements Search {
         executorService.execute(new Runnable() {
             public void run() {
                 long start = System.currentTimeMillis();
-                ArrayList<String> mmm = GrepSearch.grep(file, cb4, 3*qq);
+                ArrayList<String> mmm = grep(file, cb3, 2*qq);
+                result.addAll(mmm);
+                controller.onUpdateGUI();
+
+                System.out.println("Time to grep " + (System.currentTimeMillis() - start));
+            }
+        });
+
+        executorService.execute(new Runnable() {
+            public void run() {
+                long start = System.currentTimeMillis();
+                ArrayList<String> mmm = grep(file, cb4, 3*qq);
                 result.addAll(mmm);
                 controller.onUpdateGUI();
 
@@ -258,9 +259,7 @@ public class GrepSearch implements Search {
             else
                 pm.reset(cs);
             if (pm.find()) {
-                // TODO stopped here map f.name ==> f
                 String s = f.toPath().getFileName().toString();
-
                 result.add(s + ":" + lines + ":" + cs);
             }
 

@@ -135,7 +135,8 @@
          String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
 
          try {
-             String command = "nvim +\"set number\" +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
+             String command = "nvim +\"set number\" +"
+                     + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                      " " + fullPath;
              Terminal.executeInLinux(command);
          } catch (Exception e) {
@@ -152,6 +153,12 @@
                  }
              }
          }
+     }
+
+     public void onFileDragged(File file) {
+         previewTextArea.setText("");
+         resultTextPane.setText(Background.SHARK_BG);
+         crawl(file);
      }
 
      public void search(String query) {
@@ -186,7 +193,6 @@
 
          for (String res : search.getResultSet()) {
              filenameAndPosition = search.getFileNameAndPosition(res);
-
              if(i == selectedGuiIndex) {
                  builder.append("==> " + res);
                  editorFilenameAndPosition.t = filenameAndPosition.t;
@@ -205,10 +211,10 @@
          }
          resultTextPane.setText(builder.toString());
          int selector = builder.toString().indexOf("==> ");
+
+         // TODO add try catch for threading exceptions/ IllegalArgumentException: bad position: -1
          resultTextPane.setCaretPosition(selector);
 
-         // TODO threading issue stopped, probably do highlighting once the
-         // TODO result data is full filled, another callback to add
          if(query != null) {
              Highlighter highlighter = new Highlighter();
              highlighter.highlight(resultTextPane, query);

@@ -41,20 +41,11 @@ public final class InstaSearch extends JFrame {
         buildUI();
         controller = new Controller(resultTextPane, previewArea, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
-
-        File file = open();
-
-        if(file != null) {
-            controller.crawl(file);
-        }
     }
 
-    // TODO move to controller once implemented
-    public final void fileDragged(final File file) {
-        previewArea.setText("");
-        resultTextPane.setText(Background.SHARK_BG);
+    public final void onFileDragged(final File file) {
         this.setTitle("ClassySearch - " + file.getName());
-        controller.crawl(file);
+        controller.onFileDragged(file);
     }
 
     private final void buildUI() {
