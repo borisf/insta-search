@@ -41,20 +41,11 @@ public final class InstaSearch extends JFrame {
         buildUI();
         controller = new Controller(resultTextPane, previewArea, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
-
-        File file = open();
-
-        if(file != null) {
-            controller.crawl(file);
-        }
     }
 
-    // TODO move to controller once implemented
-    public final void fileDragged(final File file) {
-        previewArea.setText("");
-        resultTextPane.setText(Background.SHARK_BG);
+    public final void onFileDragged(final File file) {
         this.setTitle("ClassySearch - " + file.getName());
-        controller.crawl(file);
+        controller.onFileDragged(file);
     }
 
     private final void buildUI() {
@@ -73,13 +64,11 @@ public final class InstaSearch extends JFrame {
         JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setDividerSize(20);
         splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        splitPane.setDividerLocation(400);
+        splitPane.setDividerLocation(600);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
         final Container contentPane = this.getContentPane();
-
         contentPane.setLayout(new BoxLayout(this.getContentPane(), 1));
-
         searchField.setAlignmentX(0.0f);
         splitPane.setAlignmentX(0.0f);
         statusPanel.setAlignmentX(0.0f);
@@ -136,12 +125,6 @@ public final class InstaSearch extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == VK_RIGHT) {
-                    File file = open();
-                    controller.fileOpened(file);
-                    return;
-                }
-
                 if (keyEvent.getKeyCode() == VK_UP) {
                     controller.upPressed();
                     return;
@@ -216,6 +199,6 @@ public final class InstaSearch extends JFrame {
         }
 
         InstaSearch classySearch = new InstaSearch();
-        classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        classySearch.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 }

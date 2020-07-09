@@ -27,16 +27,17 @@
  import java.nio.file.Files;
  import java.nio.file.Paths;
 
- import static com.borisfarber.controllers.FileSearch.testLoad;
+ import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
-     private JTextPane resultTextPane;
+     public static final String SELECTOR = "==> ";
+     public JTextPane resultTextPane;
      private final JTextArea previewTextArea;
      private final JLabel resultCountLabel;
 
      private String query;
-     private FileSearch search;
+     private Search search;
      private Pair<String, Integer> editorFilenameAndPosition =
              new Pair<>("test.txt",0);
      private int selectedGuiIndex = 0;
@@ -48,7 +49,8 @@
          this.previewTextArea = previewArea;
          this.resultCountLabel = resultCountLabel;
 
-         search = new FileSearch();
+         search = new GrepSearch(this);
+         //search = new FuzzySearch(this);
      }
 
      public void crawl(final File file) {
@@ -56,7 +58,8 @@
              return;
          }
 
-         search = new FileSearch();
+         search = new GrepSearch(this);
+         //search = new FuzzySearch(this);
          search.crawl(file);
      }
 
@@ -69,8 +72,6 @@
          // letter
          Document document = evt.getDocument();
          runNewSearch(document);
-
-         updateGUI();
      }
 
      @Override
@@ -84,7 +85,6 @@
 
              if(query.length() > 1) {
                  search(query);
-                 updateGUI();
              } else {
                  resultTextPane.setText("");
                  previewTextArea.setText("");
@@ -105,18 +105,15 @@
      public void fileOpened(File newFile) {
          try {
              if(newFile != null) {
-
                  resultTextPane.setText(Background.SHARK_BG);
                  previewTextArea.setText("");
                  resultCountLabel.setText("");
-
                  crawl(newFile);
              }
          } catch (Exception e) {
              e.printStackTrace();
          }
          return;
-
      }
 
      public void upPressed() {
@@ -124,7 +121,7 @@
              selectedGuiIndex--;
          }
 
-         updateGUI();
+         onUpdateGUI();
      }
 
      public void downPressed() {
@@ -132,13 +129,15 @@
              selectedGuiIndex++;
          }
 
-         updateGUI();
+         onUpdateGUI();
      }
 
      public void enterPressed() {
          String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
+
          try {
-             String command = "nvim +" + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
+             String command = "nvim +\"set number\" +"
+                     + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                      " " + fullPath;
              Terminal.executeInLinux(command);
          } catch (Exception e) {
@@ -155,6 +154,12 @@
                  }
              }
          }
+     }
+
+     public void onFileDragged(File file) {
+         previewTextArea.setText("");
+         resultTextPane.setText(Background.SHARK_BG);
+         crawl(file);
      }
 
      public void search(String query) {
@@ -182,32 +187,41 @@
          }
      }
 
-     private void updateGUI() {
+     public synchronized void onUpdateGUI() {
          int i = 0;
-         Highlighter highlighter = new Highlighter();
          StringBuilder builder = new StringBuilder();
          Pair<String, Integer> filenameAndPosition;
 
          for (String res : search.getResultSet()) {
              filenameAndPosition = search.getFileNameAndPosition(res);
-
-             String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + res;
-
              if(i == selectedGuiIndex) {
-                 builder.append("==> " + resultLine);
+                 builder.append(SELECTOR + filenameAndPosition.t + ":"
+                         + filenameAndPosition.u +":" + res);
                  editorFilenameAndPosition.t = filenameAndPosition.t;
                  editorFilenameAndPosition.u = filenameAndPosition.u;
              } else {
-                 builder.append(resultLine);
+                 builder.append(filenameAndPosition.t +
+                         ":" + filenameAndPosition.u +":" + res);
              }
              i++;
 
              builder.append("\n");
+
+             if (i >= 50) {
+                 // at most show 50 results
+                 break;
+             }
          }
          resultTextPane.setText(builder.toString());
-         resultTextPane.setCaretPosition(0);
+         int selector = builder.toString().indexOf(SELECTOR);
 
-         highlighter.highlight(resultTextPane, query);
+         // TODO add try catch for threading exceptions/ IllegalArgumentException: bad position: -1
+         resultTextPane.setCaretPosition(selector);
+
+         if(query != null) {
+             Highlighter highlighter = new Highlighter();
+             highlighter.highlight(resultTextPane, query);
+         }
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));

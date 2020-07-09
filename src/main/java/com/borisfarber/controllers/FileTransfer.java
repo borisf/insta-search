@@ -11,14 +11,36 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.controllers;
+ package com.borisfarber.controllers;
 
-import com.borisfarber.ui.InstaSearch;
+ import com.borisfarber.ui.InstaSearch;
 
-import javax.swing.*;
+ import javax.swing.*;
+ import java.awt.datatransfer.DataFlavor;
+ import java.io.File;
+ import java.util.List;
 
-public class FileTransfer extends TransferHandler {
-    public FileTransfer(InstaSearch instaSearch) {
-        
-    }
-}
+ public class FileTransfer extends TransferHandler {
+     private  InstaSearch instaSearch;
+
+     public FileTransfer(InstaSearch instaSearch) {
+         this.instaSearch = instaSearch;
+     }
+
+     @Override
+     public boolean canImport(TransferHandler.TransferSupport ts) {
+         return true;
+     }
+
+     @Override
+     public boolean importData(TransferHandler.TransferSupport ts) {
+         try {
+             List files = (List) ts.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+             instaSearch.onFileDragged((File)files.get(0));
+             return true;
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return false;
+     }
+ }
