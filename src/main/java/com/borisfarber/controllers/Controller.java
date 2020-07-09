@@ -193,6 +193,8 @@
          Pair<String, Integer> filenameAndPosition;
 
          for (String res : search.getResultSet()) {
+             // TODO add here different logic for line numbers
+             // TODO to get the line numbers from search.getFileNameAndPosition(res);
              filenameAndPosition = search.getFileNameAndPosition(res);
              if(i == selectedGuiIndex) {
                  builder.append(SELECTOR + res);

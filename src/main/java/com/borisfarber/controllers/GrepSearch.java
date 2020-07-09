@@ -61,7 +61,6 @@ public class GrepSearch implements Search {
     private static Pattern pattern;
     private final Controller controller;
 
-    // our stuff
     private File file = new File("test.txt");
     private ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
@@ -100,8 +99,8 @@ public class GrepSearch implements Search {
             fis.close();
             fc.close();
 
-            cb1 = mapToCharBuffer(file, 0, qq);
-            cb2 = mapToCharBuffer(file, qq, qq);
+            cb1 = mapToCharBuffer(file, 0 * qq, qq);
+            cb2 = mapToCharBuffer(file, 1 * qq, qq);
             cb3 = mapToCharBuffer(file, 2 * qq, qq);
             cb4 = mapToCharBuffer(file, 3 * qq, qq);
         } catch (Exception e) {
@@ -113,8 +112,7 @@ public class GrepSearch implements Search {
 
     private CharBuffer mapToCharBuffer(File file, int start, int size) {
         CharBuffer result = null;
-        try
-        {
+        try {
             // Open the file and then get a channel from the stream
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
@@ -145,6 +143,8 @@ public class GrepSearch implements Search {
 
     // Search for occurrences of the input pattern in the given file
     private void executeGrep() {
+        // TODO add task
+        // TODO add execution service start and shutdown
         executorService.execute(() -> {
             ArrayList<String> partialResults = grep(file, cb1);
             result.addAll(partialResults);
@@ -253,11 +253,7 @@ public class GrepSearch implements Search {
             if (lm.end() == cb.limit())
                 break;
         }
-        
+
         return result;
-    }
-
-    public static void main(String[] args) {
-
     }
 }
