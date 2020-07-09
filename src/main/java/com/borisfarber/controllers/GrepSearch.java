@@ -175,8 +175,8 @@ public class GrepSearch implements Search {
 
     @Override
     public Pair<String, Integer> getFileNameAndPosition(String line) {
-        int key = line.indexOf(":", line.indexOf(":") + 1);
-        String strkey = line.substring(key + 1, line.length() - 1);
+
+        String strkey = line.substring(0, line.length() - 1);
         int result = 0;
 
         result = preview.indexOf(strkey);
@@ -246,8 +246,9 @@ public class GrepSearch implements Search {
             else
                 pm.reset(cs);
             if (pm.find()) {
-                String s = f.toPath().getFileName().toString();
-                result.add(s + ":" + lines + ":" + cs);
+                //String s = f.toPath().getFileName().toString();
+                //result.add(s + ":" + lines + ":" + cs);
+                result.add(cs.toString());
             }
 
             if (lm.end() == cb.limit())

@@ -112,9 +112,8 @@
 
      @Override
      public Pair<String, Integer> getFileNameAndPosition(String line) {
-         // TODO parameter checks
-         String[] split = line.split(":");
-         return new Pair<>(split[0], Integer.parseInt(split[1]));
+         Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(line);
+         return filenameAndPosition;
      }
 
      @Override
@@ -143,7 +142,7 @@
              return "";
          }
 
-         int allLinesIndex = preview.get(getResultSetRawLines().get(resultIndex));
+         int allLinesIndex = preview.get(getResultSet().get(resultIndex));
 
          int lower = allLinesIndex - 7;
          int upper = allLinesIndex + 7;
@@ -166,28 +165,12 @@
      }
 
      @Override
-     public List<String> getResultSet() {
-         ArrayList<String> result = new ArrayList<>(resultSet.size());
-
-         for (ExtractedResult er : resultSet) {
-
-             Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(er.getString());
-
-             String resultLine = filenameAndPosition.t + ":" + filenameAndPosition.u + ":" + er.getString();
-
-             result.add(resultLine);
-         }
-
-         return result;
-     }
-
-     @Override
      public String getResultSetCount() {
-         return Integer.toString(getResultSetRawLines().size());
+         return Integer.toString(getResultSet().size());
      }
 
      public String toString() {
-         for (String res : getResultSetRawLines()) {
+         for (String res : getResultSet()) {
              System.out.println(res);
          }
          return "";
@@ -223,7 +206,8 @@
          return new Pair<>("file.txt", 0);
      }
 
-     private List<String> getResultSetRawLines() {
+     @Override
+     public List<String> getResultSet() {
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
          for (ExtractedResult er : resultSet) {
