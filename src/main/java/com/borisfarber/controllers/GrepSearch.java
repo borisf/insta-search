@@ -39,6 +39,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -72,6 +73,8 @@ public class GrepSearch implements Search {
 
     private TreeMap<String, Path> nameToPaths;
     private int qq;
+    private List<String> preview;
+    private ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public GrepSearch(Controller controller) {
         this.controller = controller;
@@ -82,8 +85,10 @@ public class GrepSearch implements Search {
     public void crawl(File file) {
         long start = System.currentTimeMillis();
         try {
-            this.file = file;
+            preview = Files.readAllLines(file.toPath(), charset);
+            System.out.println("Read file " + (System.currentTimeMillis() - start));
 
+            this.file = file;
             nameToPaths.clear();
             nameToPaths.put(file.getName(), Path.of(file.toURI()));
 
@@ -138,31 +143,29 @@ public class GrepSearch implements Search {
         executeGrep();
     }
 
-    ExecutorService executorService = Executors.newFixedThreadPool(4);
-
     // Search for occurrences of the input pattern in the given file
     private void executeGrep() {
         executorService.execute(() -> {
-            ArrayList<String> mmm = grep(file, cb1, 0);
-            result.addAll(mmm);
+            ArrayList<String> partialResults = grep(file, cb1);
+            result.addAll(partialResults);
             controller.onUpdateGUI();
         });
 
         executorService.execute(() -> {
-            ArrayList<String> mmm = grep(file, cb2, qq);
-            result.addAll(mmm);
+            ArrayList<String> partialResults = grep(file, cb2);
+            result.addAll(partialResults);
             controller.onUpdateGUI();
         });
 
         executorService.execute(() -> {
-            ArrayList<String> mmm = grep(file, cb3, 2*qq);
-            result.addAll(mmm);
+            ArrayList<String> partialResults = grep(file, cb3);
+            result.addAll(partialResults);
             controller.onUpdateGUI();
         });
 
         executorService.execute(() -> {
-            ArrayList<String> mmm = grep(file, cb4, 3*qq);
-            result.addAll(mmm);
+            ArrayList<String> partialResults = grep(file, cb4);
+            result.addAll(partialResults);
             controller.onUpdateGUI();
         });
 
@@ -172,14 +175,11 @@ public class GrepSearch implements Search {
 
     @Override
     public Pair<String, Integer> getFileNameAndPosition(String line) {
-        String[] splitted = line.split(":");
-        int result;
+        int key = line.indexOf(":", line.indexOf(":") + 1);
+        String strkey = line.substring(key + 1, line.length() - 1);
+        int result = 0;
 
-        try {
-            result  = Integer.parseInt(splitted[1]);
-        } catch (Exception e) {
-            result = 0;
-        }
+        result = preview.indexOf(strkey);
 
         return new Pair<>(file.getName(), result);
     }
@@ -232,12 +232,12 @@ public class GrepSearch implements Search {
     // Use the linePattern to break the given CharBuffer into lines, applying
     // the input pattern to each line to see if we have a match
     //
-    private static ArrayList<String> grep(File f, CharBuffer cb, int i) {
+    private static ArrayList<String> grep(File f, CharBuffer cb) {
         ArrayList<String> result = new ArrayList<>();
 
         Matcher lm = linePattern.matcher(cb); // Line matcher
         Matcher pm = null;      // Pattern matcher
-        int lines = i;
+        int lines = 0;
         while (lm.find()) {
             lines++;
             CharSequence cs = lm.group();   // The current line
@@ -253,7 +253,7 @@ public class GrepSearch implements Search {
             if (lm.end() == cb.limit())
                 break;
         }
-
+        
         return result;
     }
 
