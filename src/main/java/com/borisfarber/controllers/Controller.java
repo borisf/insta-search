@@ -215,8 +215,11 @@
          resultTextPane.setText(builder.toString());
          int selector = builder.toString().indexOf(SELECTOR);
 
-         // TODO add try catch for threading exceptions/ IllegalArgumentException: bad position: -1
-         resultTextPane.setCaretPosition(selector);
+         try {
+             resultTextPane.setCaretPosition(selector);
+         } catch (IllegalArgumentException iae) {
+
+         }
 
          if(query != null) {
              Highlighter highlighter = new Highlighter();

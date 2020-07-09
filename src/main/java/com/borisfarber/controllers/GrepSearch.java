@@ -45,6 +45,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -73,7 +74,23 @@ public class GrepSearch implements Search {
     private TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview;
-    private ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private static ExecutorService executorService =
+            Executors.newFixedThreadPool(4);
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                if (executorService.isShutdown()) {
+                    return;
+                }
+                executorService.shutdown();
+                executorService.awaitTermination(10, TimeUnit.SECONDS);
+                executorService.shutdownNow();
+            } catch (Throwable e) {
+
+            }
+        }));
+    }
 
     public GrepSearch(Controller controller) {
         this.controller = controller;
@@ -85,7 +102,8 @@ public class GrepSearch implements Search {
         long start = System.currentTimeMillis();
         try {
             preview = Files.readAllLines(file.toPath(), charset);
-            System.out.println("Read file " + (System.currentTimeMillis() - start));
+            System.out.println("Read file " +
+                    (System.currentTimeMillis() - start));
 
             this.file = file;
             nameToPaths.clear();
@@ -143,8 +161,9 @@ public class GrepSearch implements Search {
 
     // Search for occurrences of the input pattern in the given file
     private void executeGrep() {
-        // TODO add task
-        // TODO add execution service start and shutdown
+        executorService.shutdownNow();
+        executorService = Executors.newFixedThreadPool(4);
+
         executorService.execute(() -> {
             ArrayList<String> partialResults = grep(file, cb1);
             result.addAll(partialResults);
@@ -168,14 +187,10 @@ public class GrepSearch implements Search {
             result.addAll(partialResults);
             controller.onUpdateGUI();
         });
-
-        // TODO find way to tear down the executor service
-        //executorService.shutdown();
     }
 
     @Override
     public Pair<String, Integer> getFileNameAndPosition(String line) {
-
         String strkey = line.substring(0, line.length() - 1);
         int result = 0;
 
