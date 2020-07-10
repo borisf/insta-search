@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class GrepSearch implements Search {
-
     private static Charset charset = Charset.forName("ISO-8859-15");
     public static CharsetDecoder decoder = charset.newDecoder();
 
@@ -74,6 +73,8 @@ public class GrepSearch implements Search {
     private TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview;
+
+    // keep the static reference for multi grep
     private static ExecutorService executorService =
             Executors.newFixedThreadPool(4);
 
@@ -83,8 +84,7 @@ public class GrepSearch implements Search {
                 if (executorService.isShutdown()) {
                     return;
                 }
-                executorService.shutdown();
-                executorService.awaitTermination(10, TimeUnit.SECONDS);
+
                 executorService.shutdownNow();
             } catch (Throwable e) {
 

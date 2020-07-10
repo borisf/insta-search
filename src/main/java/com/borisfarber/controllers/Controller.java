@@ -212,10 +212,11 @@
                  break;
              }
          }
+
          resultTextPane.setText(builder.toString());
-         int selector = builder.toString().indexOf(SELECTOR);
 
          try {
+             int selector = builder.toString().indexOf(SELECTOR);
              resultTextPane.setCaretPosition(selector);
          } catch (IllegalArgumentException iae) {
 
