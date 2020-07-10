@@ -32,6 +32,7 @@ package com.borisfarber.controllers;
 
 import com.borisfarber.data.Pair;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.CharBuffer;
@@ -161,31 +162,32 @@ public class GrepSearch implements Search {
 
     // Search for occurrences of the input pattern in the given file
     private void executeGrep() {
-        executorService.shutdownNow();
-        executorService = Executors.newFixedThreadPool(4);
-
         executorService.execute(() -> {
             ArrayList<String> partialResults = grep(file, cb1);
             result.addAll(partialResults);
-            controller.onUpdateGUI();
+            Runnable  runnable = () -> controller.onUpdateGUI();
+            SwingUtilities.invokeLater(runnable);
         });
 
         executorService.execute(() -> {
             ArrayList<String> partialResults = grep(file, cb2);
             result.addAll(partialResults);
-            controller.onUpdateGUI();
+            Runnable  runnable = () -> controller.onUpdateGUI();
+            SwingUtilities.invokeLater(runnable);
         });
 
         executorService.execute(() -> {
             ArrayList<String> partialResults = grep(file, cb3);
             result.addAll(partialResults);
-            controller.onUpdateGUI();
+            Runnable  runnable = () -> controller.onUpdateGUI();
+            SwingUtilities.invokeLater(runnable);
         });
 
         executorService.execute(() -> {
             ArrayList<String> partialResults = grep(file, cb4);
             result.addAll(partialResults);
-            controller.onUpdateGUI();
+            Runnable  runnable = () -> controller.onUpdateGUI();
+            SwingUtilities.invokeLater(runnable);
         });
     }
 
