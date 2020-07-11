@@ -46,7 +46,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -160,35 +159,61 @@ public class GrepSearch implements Search {
         executeGrep();
     }
 
-    // Search for occurrences of the input pattern in the given file
     private void executeGrep() {
-        executorService.execute(() -> {
-            ArrayList<String> partialResults = grep(file, cb1);
-            result.addAll(partialResults);
-            Runnable  runnable = () -> controller.onUpdateGUI();
-            SwingUtilities.invokeLater(runnable);
-        });
+        executorService.execute(() -> grepTask(file, result, controller, cb1));
+        executorService.execute(() -> grepTask(file, result, controller, cb2));
+        executorService.execute(() -> grepTask(file, result, controller, cb3));
+        executorService.execute(() -> grepTask(file, result, controller, cb4));
+    }
 
-        executorService.execute(() -> {
-            ArrayList<String> partialResults = grep(file, cb2);
-            result.addAll(partialResults);
-            Runnable  runnable = () -> controller.onUpdateGUI();
-            SwingUtilities.invokeLater(runnable);
-        });
+    private static void grepTask(File file, ConcurrentLinkedQueue<String> result,
+                                 Controller controller, CharBuffer charBuffer) {
+        if(result.size() > 80) {
+            return;
+        }
 
-        executorService.execute(() -> {
-            ArrayList<String> partialResults = grep(file, cb3);
-            result.addAll(partialResults);
-            Runnable  runnable = () -> controller.onUpdateGUI();
-            SwingUtilities.invokeLater(runnable);
-        });
+        ArrayList<String> partialResults = grep(file, charBuffer);
+        result.addAll(partialResults);
 
-        executorService.execute(() -> {
-            ArrayList<String> partialResults = grep(file, cb4);
-            result.addAll(partialResults);
-            Runnable  runnable = () -> controller.onUpdateGUI();
-            SwingUtilities.invokeLater(runnable);
-        });
+        Runnable runnable = () -> controller.onUpdateGUI();
+        SwingUtilities.invokeLater(runnable);
+    }
+
+    // Use the linePattern to break the given CharBuffer into lines, applying
+    // the input pattern to each line to see if we have a match
+    //
+    private static ArrayList<String> grep(File f, CharBuffer cb) {
+        if (cb == null) {
+            return new ArrayList<>();
+        }
+
+        ArrayList<String> result = new ArrayList<>();
+
+        Matcher lm = linePattern.matcher(cb); // Line matcher
+        Matcher pm = null;      // Pattern matcher
+        int lines = 0;
+        while (lm.find()) {
+            lines++;
+            CharSequence cs = lm.group();   // The current line
+            if (pm == null)
+                pm = pattern.matcher(cs);
+            else
+                pm.reset(cs);
+            if (pm.find()) {
+                //String s = f.toPath().getFileName().toString();
+                //result.add(s + ":" + lines + ":" + cs);
+                result.add(cs.toString());
+
+                if(result.size() > 80) {
+                    break;
+                }
+            }
+
+            if (lm.end() == cb.limit())
+                break;
+        }
+
+        return result;
     }
 
     @Override
@@ -215,9 +240,13 @@ public class GrepSearch implements Search {
     public List<String> getResultSet() {
         System.out.println("size" + result.size());
         String[] tmpArray = new String[result.size()];
-        result.toArray(tmpArray);
+        String[] mmm = result.toArray(tmpArray);
+        List<String> result = Arrays.asList(mmm);
 
-        return Arrays.asList(tmpArray);
+        // TODO better comparison on log numbers (second entry)
+        Collections.sort(result);
+
+        return result;
     }
 
     @Override
@@ -244,34 +273,5 @@ public class GrepSearch implements Search {
             System.err.println(x.getMessage());
             System.exit(1);
         }
-    }
-
-    // Use the linePattern to break the given CharBuffer into lines, applying
-    // the input pattern to each line to see if we have a match
-    //
-    private static ArrayList<String> grep(File f, CharBuffer cb) {
-        ArrayList<String> result = new ArrayList<>();
-
-        Matcher lm = linePattern.matcher(cb); // Line matcher
-        Matcher pm = null;      // Pattern matcher
-        int lines = 0;
-        while (lm.find()) {
-            lines++;
-            CharSequence cs = lm.group();   // The current line
-            if (pm == null)
-                pm = pattern.matcher(cs);
-            else
-                pm.reset(cs);
-            if (pm.find()) {
-                //String s = f.toPath().getFileName().toString();
-                //result.add(s + ":" + lines + ":" + cs);
-                result.add(cs.toString());
-            }
-
-            if (lm.end() == cb.limit())
-                break;
-        }
-
-        return result;
     }
 }
