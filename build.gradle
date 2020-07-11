@@ -31,6 +31,8 @@ jar {
         attributes "Main-Class": javaMainClass
     }
 
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
+
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
