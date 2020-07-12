@@ -52,7 +52,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class GrepSearch implements Search {
     private static Charset charset = Charset.forName("ISO-8859-15");
-    public static CharsetDecoder decoder = charset.newDecoder();
+    private static CharsetDecoder decoder = charset.newDecoder();
 
     // Pattern used to parse lines
     private static Pattern linePattern= Pattern.compile(".*\r?\n");
@@ -181,7 +181,6 @@ public class GrepSearch implements Search {
 
     // Use the linePattern to break the given CharBuffer into lines, applying
     // the input pattern to each line to see if we have a match
-    //
     private static ArrayList<String> grep(File f, CharBuffer cb) {
         if (cb == null) {
             return new ArrayList<>();
