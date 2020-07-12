@@ -20,12 +20,17 @@ incrementally.
 * Results view - where you see file set that include the text from
 the search line, use arrows to land to the relevant line
 
-* Once found the relevant line, press Enter, and the log file will be opened on the relevant line in your defined
+* Once found the relevant line, press Enter, and the log file will be opened on the relevant line within your defined
 editor
+
+
+## Download & Run
+To run, grab the [latest JAR](https://github.com/borisf/insta-search/releases)
+and run `java -jar insta-search.jar`
 
 **This is not an official Google product.**
 
-### License
+## License
 
 ```
 Copyright 2020 Google Inc.
