@@ -17,6 +17,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 import com.borisfarber.controllers.Controller;
@@ -96,12 +98,21 @@ public final class InstaSearch extends JFrame {
         final JMenuItem closeItem = new JMenuItem("Exit");
         closeItem.setFont(f);
         closeItem.addActionListener(actionEvent -> {
+            controller.close();
             System.exit(0);
         });
         menu.add(closeItem);
         this.setJMenuBar(menuBar);
-        final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+               controller.close();
+               System.exit(0);
+            }
+        });
+
+        final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
         final Dimension dim = defaultToolkit.getScreenSize();
         setPreferredSize(new Dimension(1200, 900));
         setLocation(dim.width / 4 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
@@ -199,6 +210,6 @@ public final class InstaSearch extends JFrame {
         }
 
         InstaSearch classySearch = new InstaSearch();
-        classySearch.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 }

@@ -190,6 +190,11 @@
          }
      }
 
+     @Override
+     public void close() {
+
+     }
+
      private Pair<String, Integer> getFileNameAndPositionFromRawLine(String line) {
 
          int index = preview.get(line).intValue();

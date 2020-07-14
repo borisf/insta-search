@@ -62,35 +62,17 @@ public class GrepSearch implements Search {
     private final Controller controller;
 
     private File file = new File("test.txt");
-    private ConcurrentLinkedQueue<String> result =
-            new ConcurrentLinkedQueue<>();
-
     private CharBuffer cb1;
     private CharBuffer cb2;
     private CharBuffer cb3;
     private CharBuffer cb4;
-
     private TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview;
-
-    // keep the static reference for multi grep
-    private static ExecutorService executorService =
+    private ExecutorService executorService =
             Executors.newFixedThreadPool(4);
-
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                if (executorService.isShutdown()) {
-                    return;
-                }
-
-                executorService.shutdownNow();
-            } catch (Throwable e) {
-
-            }
-        }));
-    }
+    private ConcurrentLinkedQueue<String> result =
+            new ConcurrentLinkedQueue<>();
 
     public GrepSearch(Controller controller) {
         this.controller = controller;
@@ -261,6 +243,19 @@ public class GrepSearch implements Search {
     @Override
     public void testCrawl(ArrayList<String> testLoad) {
 
+    }
+
+    @Override
+    public void close() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                if (executorService.isShutdown()) {
+                    return;
+                }
+                executorService.shutdownNow();
+            } catch (Throwable e) {
+            }
+        }));
     }
 
     // Compile the pattern from the command line

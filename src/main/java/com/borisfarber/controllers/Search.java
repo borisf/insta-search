@@ -26,4 +26,6 @@ public interface Search {
     TreeMap<String, Path> getNameToPaths();
 
     void testCrawl(ArrayList<String> testLoad);
+
+    void close();
 }

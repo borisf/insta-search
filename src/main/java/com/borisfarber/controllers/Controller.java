@@ -232,6 +232,10 @@
          resultCountLabel.setText(search.getResultSetCount());
      }
 
+     public void close() {
+         search.close();
+     }
+
      public static void main(String[] args) {
          repl();
      }
