@@ -26,12 +26,15 @@
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Paths;
+ import java.util.Set;
+ import java.util.TreeSet;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
      public static final String SELECTOR = "==> ";
+     public static final int UI_VIEW_LIMIT = 50;
      public JTextPane resultTextPane;
      private final JTextArea previewTextArea;
      private final JLabel resultCountLabel;
@@ -125,7 +128,8 @@
      }
 
      public void downPressed() {
-         if(selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1)) {
+         if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
+                 && selectedGuiIndex < (UI_VIEW_LIMIT - 1)) {
              selectedGuiIndex++;
          }
 
@@ -192,29 +196,40 @@
          StringBuilder builder = new StringBuilder();
          Pair<String, Integer> filenameAndPosition;
 
+         Set<String> resultPreview = new TreeSet<>(new ResultsSorter());
+
          for (String res : search.getResultSet()) {
              filenameAndPosition = search.getFileNameAndPosition(res);
+             String line = filenameAndPosition.t + ":" +
+                     filenameAndPosition.u +":" + res + "\n";
+
              if(i == selectedGuiIndex) {
-                 builder.append(SELECTOR + filenameAndPosition.t + ":"
-                         + filenameAndPosition.u +":" + res);
                  editorFilenameAndPosition.t = filenameAndPosition.t;
                  editorFilenameAndPosition.u = filenameAndPosition.u;
-             } else {
-                 builder.append(filenameAndPosition.t +
-                         ":" + filenameAndPosition.u +":" + res);
              }
+             resultPreview.add(line);
              i++;
 
-             builder.append("\n");
-
-             if (i >= 50) {
+             if (i >= UI_VIEW_LIMIT) {
                  // at most show 50 results
+
+                 // TODO stopped here issue with same lines
+                 // TODO need to keep ui_view_limit as a class member
                  break;
              }
          }
 
-         resultTextPane.setText(builder.toString());
+         i = 0;
+         for (String str : resultPreview) {
+             if(i == selectedGuiIndex) {
+                 builder.append(SELECTOR + str);
+             } else {
+                 builder.append(str);
+             }
+             i++;
+         }
 
+         resultTextPane.setText(builder.toString());
          try {
              int selector = builder.toString().indexOf(SELECTOR);
              resultTextPane.setCaretPosition(selector);

@@ -16,9 +16,9 @@ package com.borisfarber.ui;
 public class Background {
 
     public final static String SHARK_BG =
-            "    ,|\n" +
+            "      ,|\n" +
                     "     / ;\n" +
-                    "    /  \\\n" +
+                    "    /  \\\n" +  "Drop me a file/or open a folder\n" +
                     "   : ,'(\n" +
                     "   |( `.\\\n" +
                     "   : \\  `\\       \\.\n" +

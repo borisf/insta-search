@@ -221,13 +221,8 @@ public class GrepSearch implements Search {
     public List<String> getResultSet() {
         System.out.println("size" + result.size());
         String[] tmpArray = new String[result.size()];
-        String[] mmm = result.toArray(tmpArray);
-        List<String> result = Arrays.asList(mmm);
-
-        // TODO better comparison on log numbers (second entry)
-        Collections.sort(result);
-
-        return result;
+        result.toArray(tmpArray);
+        return Arrays.asList(tmpArray);
     }
 
     @Override
