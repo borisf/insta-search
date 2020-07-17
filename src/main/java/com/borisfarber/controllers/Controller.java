@@ -54,7 +54,6 @@
          this.resultCountLabel = resultCountLabel;
 
          search = new GrepSearch(this);
-         //search = new FuzzySearch(this);
      }
 
      public void crawl(final File file) {

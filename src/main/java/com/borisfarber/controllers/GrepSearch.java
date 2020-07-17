@@ -74,6 +74,7 @@ public class GrepSearch implements Search {
             Executors.newFixedThreadPool(4);
     private ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
+    private String query;
 
     public GrepSearch(Controller controller) {
         this.controller = controller;
@@ -123,10 +124,6 @@ public class GrepSearch implements Search {
                 occurences.put(preview.get(index), list);
             }
         }
-
-        System.out.println("All:" + preview.size());
-        System.out.println("Duplicates:" + occurences.size());
-
     }
 
     private CharBuffer mapToCharBuffer(File file, int start, int size) {
@@ -156,9 +153,16 @@ public class GrepSearch implements Search {
         }
 
         result.clear();
+        this.query = query;
         compile(query);
         executeGrep();
     }
+
+    /*
+    private void executeGrep() {
+        executorService.execute(() -> FuzzyTask.fuzzyTask(controller, result, preview , query));
+    }*/
+
 
     private void executeGrep() {
         executorService.execute(() -> grepTask(file, result, controller, cb1));
@@ -199,10 +203,6 @@ public class GrepSearch implements Search {
                 //String s = f.toPath().getFileName().toString();
                 //result.add(s + ":" + lines + ":" + cs);
                 result.add(cs.toString());
-
-                if(result.size() > 80) {
-                    break;
-                }
             }
 
             if (lm.end() == cb.limit())

@@ -32,7 +32,6 @@
      private TreeMap<String, Path> nameToPaths;
      private final ArrayList<Pair<Integer, String>> numLinesToFiles;
      private List<ExtractedResult> resultSet;
-
      public FuzzySearch(Controller controller) {
          allLines = new ArrayList<>();
          preview = new TreeMap<>();
@@ -112,6 +111,8 @@
 
      @Override
      public Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line) {
+         // TODO stopped here, add hash table for double lines, same idea as grep
+
          Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(line);
          LinkedList<Integer> list = new LinkedList<>();
          list.add(filenameAndPosition.u);
