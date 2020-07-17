@@ -120,7 +120,6 @@
                  if(newFile.isDirectory()) {
                      search = new FuzzySearch(this);
                  } else {
-                     // TODO freezes here on the new file opened with grep after folder
                      search = new GrepSearch(this);
                  }
 
