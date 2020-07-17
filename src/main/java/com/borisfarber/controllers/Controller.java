@@ -26,6 +26,7 @@
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Paths;
+ import java.util.ArrayList;
  import java.util.LinkedList;
  import java.util.Set;
  import java.util.TreeSet;
@@ -193,14 +194,13 @@
          }
      }
 
-     // TODO remove synchronized
-     public synchronized void onUpdateGUI() {
+     public void onUpdateGUI() {
          int i = 0;
          StringBuilder builder = new StringBuilder();
          Pair<String, LinkedList<Integer>> filenameAndPositions;
 
          // TODO maybe string array/collection and then sort
-         Set<String> resultPreview = new TreeSet<>(new ResultsSorter());
+         ArrayList<String> resultPreview = new ArrayList<>();
 
          while ((i < search.getResultSet().size()) && (i < UI_VIEW_LIMIT)) {
              String rawLine = search.getResultSet().get(i);
@@ -219,6 +219,7 @@
              }
          } // end while
 
+         resultPreview.sort(new ResultsSorter());
          numLines = i;
          i = 0;
          for (String str : resultPreview) {
