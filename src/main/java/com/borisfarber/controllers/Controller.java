@@ -26,6 +26,7 @@
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Paths;
+ import java.util.LinkedList;
  import java.util.Set;
  import java.util.TreeSet;
 
@@ -44,6 +45,7 @@
      private Pair<String, Integer> editorFilenameAndPosition =
              new Pair<>("test.txt",0);
      private int selectedGuiIndex = 0;
+     private int numLines = 0;
 
      public Controller(final JTextPane resultTextPane,
                        final JTextArea previewArea,
@@ -129,7 +131,7 @@
 
      public void downPressed() {
          if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
-                 && selectedGuiIndex < (UI_VIEW_LIMIT - 1)) {
+                 && selectedGuiIndex < (numLines - 1)) {
              selectedGuiIndex++;
          }
 
@@ -191,34 +193,33 @@
          }
      }
 
+     // TODO remove synchronized
      public synchronized void onUpdateGUI() {
          int i = 0;
          StringBuilder builder = new StringBuilder();
-         Pair<String, Integer> filenameAndPosition;
+         Pair<String, LinkedList<Integer>> filenameAndPositions;
 
+         // TODO maybe string array/collection and then sort
          Set<String> resultPreview = new TreeSet<>(new ResultsSorter());
 
-         for (String res : search.getResultSet()) {
-             filenameAndPosition = search.getFileNameAndPosition(res);
-             String line = filenameAndPosition.t + ":" +
-                     filenameAndPosition.u +":" + res + "\n";
+         while ((i < search.getResultSet().size()) && (i < UI_VIEW_LIMIT)) {
+             String rawLine = search.getResultSet().get(i);
+             filenameAndPositions = search.getFileNameAndPosition(rawLine);
 
-             if(i == selectedGuiIndex) {
-                 editorFilenameAndPosition.t = filenameAndPosition.t;
-                 editorFilenameAndPosition.u = filenameAndPosition.u;
+             for(Integer index : filenameAndPositions.u) {
+                 String line = filenameAndPositions.t + ":" +
+                         index +":" + rawLine + "\n";
+
+                 if(i == selectedGuiIndex) {
+                     editorFilenameAndPosition.t = filenameAndPositions.t;
+                     editorFilenameAndPosition.u = index;
+                 }
+                 resultPreview.add(line);
+                 i++;
              }
-             resultPreview.add(line);
-             i++;
+         } // end while
 
-             if (i >= UI_VIEW_LIMIT) {
-                 // at most show 50 results
-
-                 // TODO stopped here issue with same lines
-                 // TODO need to keep ui_view_limit as a class member
-                 break;
-             }
-         }
-
+         numLines = i;
          i = 0;
          for (String str : resultPreview) {
              if(i == selectedGuiIndex) {
@@ -244,7 +245,7 @@
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));
-         resultCountLabel.setText(search.getResultSetCount());
+         resultCountLabel.setText(String.valueOf(numLines));
      }
 
      public void close() {

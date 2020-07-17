@@ -111,9 +111,13 @@
      }
 
      @Override
-     public Pair<String, Integer> getFileNameAndPosition(String line) {
+     public Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line) {
          Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(line);
-         return filenameAndPosition;
+         LinkedList<Integer> list = new LinkedList<>();
+         list.add(filenameAndPosition.u);
+         Pair<String, LinkedList<Integer>> result = new Pair<>(filenameAndPosition.t, list);
+
+         return result;
      }
 
      @Override

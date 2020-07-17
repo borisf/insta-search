@@ -5,6 +5,7 @@ import com.borisfarber.data.Pair;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -13,7 +14,7 @@ public interface Search {
 
     void search(String query);
 
-    Pair<String, Integer> getFileNameAndPosition(String line);
+    Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line);
 
     String getResults();
 

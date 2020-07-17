@@ -21,11 +21,9 @@ public class ResultsSorter implements Comparator<String> {
     public int compare(String s1, String s2) {
         String[] s1Parts = s1.split(":");
         String[] s2Parts = s2.split(":");
-
         if(!s1Parts[0].equals(s2Parts[0])) {
             return s1Parts[0].compareTo(s2Parts[0]);
         }
-
         return Integer.valueOf(s1Parts[1]).compareTo(Integer.valueOf(s2Parts[1]));
     }
 }
