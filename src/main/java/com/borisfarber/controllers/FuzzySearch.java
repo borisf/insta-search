@@ -105,15 +105,19 @@
      @Override
      public void search(String query) {
          //long start = System.currentTimeMillis();
-         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 15);
+         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
          //System.out.println(": " + ( System.currentTimeMillis() - start));
          controller.onUpdateGUI();
      }
 
      @Override
-     public Pair<String, Integer> getFileNameAndPosition(String line) {
+     public Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line) {
          Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(line);
-         return filenameAndPosition;
+         LinkedList<Integer> list = new LinkedList<>();
+         list.add(filenameAndPosition.u);
+         Pair<String, LinkedList<Integer>> result = new Pair<>(filenameAndPosition.t, list);
+
+         return result;
      }
 
      @Override

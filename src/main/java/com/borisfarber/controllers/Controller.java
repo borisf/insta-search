@@ -26,12 +26,15 @@
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Paths;
+ import java.util.ArrayList;
+ import java.util.LinkedList;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
      public static final String SELECTOR = "==> ";
+     public static final int UI_VIEW_LIMIT = 50;
      public JTextPane resultTextPane;
      private final JTextArea previewTextArea;
      private final JLabel resultCountLabel;
@@ -41,6 +44,7 @@
      private Pair<String, Integer> editorFilenameAndPosition =
              new Pair<>("test.txt",0);
      private int selectedGuiIndex = 0;
+     private int numLines = 0;
 
      public Controller(final JTextPane resultTextPane,
                        final JTextArea previewArea,
@@ -58,8 +62,12 @@
              return;
          }
 
-         search = new GrepSearch(this);
-         //search = new FuzzySearch(this);
+         if(file.isDirectory()) {
+             search = new FuzzySearch(this);
+         } else {
+             search = new GrepSearch(this);
+         }
+
          search.crawl(file);
      }
 
@@ -108,6 +116,14 @@
                  resultTextPane.setText(Background.SHARK_BG);
                  previewTextArea.setText("");
                  resultCountLabel.setText("");
+
+                 if(newFile.isDirectory()) {
+                     search = new FuzzySearch(this);
+                 } else {
+                     // TODO freezes here on the new file opened with grep after folder
+                     search = new GrepSearch(this);
+                 }
+
                  crawl(newFile);
              }
          } catch (Exception e) {
@@ -125,7 +141,8 @@
      }
 
      public void downPressed() {
-         if(selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1)) {
+         if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
+                 && selectedGuiIndex < (numLines - 1)) {
              selectedGuiIndex++;
          }
 
@@ -187,34 +204,48 @@
          }
      }
 
-     public synchronized void onUpdateGUI() {
+     public void onUpdateGUI() {
          int i = 0;
          StringBuilder builder = new StringBuilder();
-         Pair<String, Integer> filenameAndPosition;
+         Pair<String, LinkedList<Integer>> filenameAndPositions;
+         ArrayList<String> resultPreview = new ArrayList<>();
+         boolean isViewLimit = false;
 
-         for (String res : search.getResultSet()) {
-             filenameAndPosition = search.getFileNameAndPosition(res);
+         while ((i < search.getResultSet().size()) && !isViewLimit) {
+             String rawLine = search.getResultSet().get(i);
+             filenameAndPositions = search.getFileNameAndPosition(rawLine);
+
+             for(Integer index : filenameAndPositions.u) {
+                 String line = filenameAndPositions.t + ":" +
+                         index +":" + rawLine + "\n";
+
+                 if(i == selectedGuiIndex) {
+                     editorFilenameAndPosition.t = filenameAndPositions.t;
+                     editorFilenameAndPosition.u = index;
+                 }
+                 resultPreview.add(line);
+                 i++;
+
+                 if(i >= UI_VIEW_LIMIT) {
+                    isViewLimit = true;
+                    break;
+                 }
+             }
+         } // end while
+
+         resultPreview.sort(new ResultsSorter());
+         numLines = i;
+         i = 0;
+         for (String str : resultPreview) {
              if(i == selectedGuiIndex) {
-                 builder.append(SELECTOR + filenameAndPosition.t + ":"
-                         + filenameAndPosition.u +":" + res);
-                 editorFilenameAndPosition.t = filenameAndPosition.t;
-                 editorFilenameAndPosition.u = filenameAndPosition.u;
+                 builder.append(SELECTOR + str);
              } else {
-                 builder.append(filenameAndPosition.t +
-                         ":" + filenameAndPosition.u +":" + res);
+                 builder.append(str);
              }
              i++;
-
-             builder.append("\n");
-
-             if (i >= 50) {
-                 // at most show 50 results
-                 break;
-             }
          }
 
          resultTextPane.setText(builder.toString());
-
          try {
              int selector = builder.toString().indexOf(SELECTOR);
              resultTextPane.setCaretPosition(selector);
@@ -229,7 +260,12 @@
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));
-         resultCountLabel.setText(search.getResultSetCount());
+
+         if(isViewLimit) {
+             resultCountLabel.setText("...");
+         } else {
+             resultCountLabel.setText(String.valueOf(numLines));
+         }
      }
 
      public void close() {

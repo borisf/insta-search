@@ -69,6 +69,7 @@ public class GrepSearch implements Search {
     private TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview;
+    private HashMap<String, LinkedList<Integer>> occurences;
     private ExecutorService executorService =
             Executors.newFixedThreadPool(4);
     private ConcurrentLinkedQueue<String> result =
@@ -84,6 +85,7 @@ public class GrepSearch implements Search {
         long start = System.currentTimeMillis();
         try {
             preview = Files.readAllLines(file.toPath(), charset);
+            processDuplicates(preview);
             System.out.println("Read file " +
                     (System.currentTimeMillis() - start));
 
@@ -108,6 +110,23 @@ public class GrepSearch implements Search {
         }
 
         System.out.println("Crawl " + (System.currentTimeMillis() - start));
+    }
+
+    private void processDuplicates(List<String> preview) {
+        occurences = new HashMap<>();
+        for(int index=0; index < preview.size(); index++){
+            if(occurences.containsKey(preview.get(index))) {
+                occurences.get(preview.get(index)).add(index);
+            } else {
+                LinkedList<Integer> list = new LinkedList<>();
+                list.add(index);
+                occurences.put(preview.get(index), list);
+            }
+        }
+
+        System.out.println("All:" + preview.size());
+        System.out.println("Duplicates:" + occurences.size());
+
     }
 
     private CharBuffer mapToCharBuffer(File file, int start, int size) {
@@ -150,10 +169,6 @@ public class GrepSearch implements Search {
 
     private static void grepTask(File file, ConcurrentLinkedQueue<String> result,
                                  Controller controller, CharBuffer charBuffer) {
-        if(result.size() > 80) {
-            return;
-        }
-
         ArrayList<String> partialResults = grep(file, charBuffer);
         result.addAll(partialResults);
 
@@ -198,13 +213,9 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public Pair<String, Integer> getFileNameAndPosition(String line) {
+    public Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line) {
         String strkey = line.substring(0, line.length() - 1);
-        int result = 0;
-
-        result = preview.indexOf(strkey);
-
-        return new Pair<>(file.getName(), result);
+        return new Pair<>(file.getName(), occurences.get(strkey));
     }
 
     @Override
@@ -221,13 +232,8 @@ public class GrepSearch implements Search {
     public List<String> getResultSet() {
         System.out.println("size" + result.size());
         String[] tmpArray = new String[result.size()];
-        String[] mmm = result.toArray(tmpArray);
-        List<String> result = Arrays.asList(mmm);
-
-        // TODO better comparison on log numbers (second entry)
-        Collections.sort(result);
-
-        return result;
+        result.toArray(tmpArray);
+        return Arrays.asList(tmpArray);
     }
 
     @Override
