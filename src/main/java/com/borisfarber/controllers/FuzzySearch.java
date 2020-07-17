@@ -105,7 +105,7 @@
      @Override
      public void search(String query) {
          //long start = System.currentTimeMillis();
-         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 15);
+         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
          //System.out.println(": " + ( System.currentTimeMillis() - start));
          controller.onUpdateGUI();
      }

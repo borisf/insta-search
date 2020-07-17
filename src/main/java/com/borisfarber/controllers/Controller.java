@@ -62,8 +62,12 @@
              return;
          }
 
-         search = new GrepSearch(this);
-         //search = new FuzzySearch(this);
+         if(file.isDirectory()) {
+             search = new FuzzySearch(this);
+         } else {
+             search = new GrepSearch(this);
+         }
+
          search.crawl(file);
      }
 
@@ -112,6 +116,14 @@
                  resultTextPane.setText(Background.SHARK_BG);
                  previewTextArea.setText("");
                  resultCountLabel.setText("");
+
+                 if(newFile.isDirectory()) {
+                     search = new FuzzySearch(this);
+                 } else {
+                     // TODO freezes here on the new file opened with grep after folder
+                     search = new GrepSearch(this);
+                 }
+
                  crawl(newFile);
              }
          } catch (Exception e) {
