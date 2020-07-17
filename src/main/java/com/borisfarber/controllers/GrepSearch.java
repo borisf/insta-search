@@ -157,13 +157,7 @@ public class GrepSearch implements Search {
         compile(query);
         executeGrep();
     }
-
-    /*
-    private void executeGrep() {
-        executorService.execute(() -> FuzzyTask.fuzzyTask(controller, result, preview , query));
-    }*/
-
-
+    
     private void executeGrep() {
         executorService.execute(() -> grepTask(file, result, controller, cb1));
         executorService.execute(() -> grepTask(file, result, controller, cb2));
