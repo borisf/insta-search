@@ -28,8 +28,6 @@
  import java.nio.file.Paths;
  import java.util.ArrayList;
  import java.util.LinkedList;
- import java.util.Set;
- import java.util.TreeSet;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
@@ -198,11 +196,10 @@
          int i = 0;
          StringBuilder builder = new StringBuilder();
          Pair<String, LinkedList<Integer>> filenameAndPositions;
-
-         // TODO maybe string array/collection and then sort
          ArrayList<String> resultPreview = new ArrayList<>();
+         boolean isViewLimit = false;
 
-         while ((i < search.getResultSet().size()) && (i < UI_VIEW_LIMIT)) {
+         while ((i < search.getResultSet().size()) && !isViewLimit) {
              String rawLine = search.getResultSet().get(i);
              filenameAndPositions = search.getFileNameAndPosition(rawLine);
 
@@ -216,6 +213,11 @@
                  }
                  resultPreview.add(line);
                  i++;
+
+                 if(i >= UI_VIEW_LIMIT) {
+                    isViewLimit = true;
+                    break;
+                 }
              }
          } // end while
 
@@ -246,7 +248,12 @@
 
          // the usual updates
          previewTextArea.setText(search.getPreview(selectedGuiIndex));
-         resultCountLabel.setText(String.valueOf(numLines));
+
+         if(isViewLimit) {
+             resultCountLabel.setText("...");
+         } else {
+             resultCountLabel.setText(String.valueOf(numLines));
+         }
      }
 
      public void close() {
