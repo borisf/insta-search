@@ -18,9 +18,13 @@
  import java.nio.file.*;
  import java.nio.file.attribute.BasicFileAttributes;
  import java.util.*;
+ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
 
  import com.borisfarber.data.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+
+ import javax.swing.*;
 
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
@@ -33,6 +37,9 @@
      private final TreeMap<String, Path> filenamesToPathes;
      private final ArrayList<Pair<Integer, String>> numLinesToFilenames;
      private HashMap<String, List<Integer>> occurrences;
+
+     private ExecutorService executorService =
+             Executors.newSingleThreadExecutor();
 
      public FuzzySearch(Controller controller) {
          this.controller = controller;
@@ -113,12 +120,11 @@
 
      @Override
      public void search(String query) {
-         //long start = System.currentTimeMillis();
-         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
-         //System.out.println(": " + ( System.currentTimeMillis() - start));
-         // TODO convert to a thread call, executor with one thread
-         // TODO for responsiveness
-         controller.onUpdateGUI();
+         executorService.execute(() -> {
+             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
+             Runnable runnable = () -> controller.onUpdateGUI();
+             SwingUtilities.invokeLater(runnable);
+         });
      }
 
      @Override
@@ -234,7 +240,15 @@
 
      @Override
      public void close() {
-
+         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+             try {
+                 if (executorService.isShutdown()) {
+                     return;
+                 }
+                 executorService.shutdownNow();
+             } catch (Throwable e) {
+             }
+         }));
      }
 
      public String toString() {
@@ -267,5 +281,4 @@
          System.out.println(search.getPreview(0));
          System.out.println(search.getResultSetCount());*/
      }
-
  }

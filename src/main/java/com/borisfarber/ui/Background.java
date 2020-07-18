@@ -16,20 +16,5 @@ package com.borisfarber.ui;
 public class Background {
 
     public final static String SHARK_BG =
-            "      ,|\n" +
-                    "     / ;\n" +
-                    "    /  \\\n" +  "Drop me a file/or open a folder\n" +
-                    "   : ,'(\n" +
-                    "   |( `.\\\n" +
-                    "   : \\  `\\       \\.\n" +
-                    "    \\ `.         | `.\n" +
-                    "     \\  `-._     ;   \\\n" +
-                    "      \\     ``-.'.. _ `._\n" +
-                    "       `. `-.            ```-...__\n" +
-                    "        .'`.        --..          ``-..____\n" +
-                    "      ,'.-'`,_-._            ((((   <o.   ,'\n" +
-                    "           `' `-.)``-._-...__````  ____.-'\n" +
-                    "        SSt    ,'    _,'.--,---------'\n" +
-                    "           _.-' _..-'   ),'\n" +
-                    "          ``--''        `  ";
+            "\n\n\n\n\n\n\n\n                          ClassyShark Insta Search ver. 2.0";
 }

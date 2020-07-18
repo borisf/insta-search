@@ -117,7 +117,7 @@ public final class InstaSearch extends JFrame {
         final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
         final Dimension dim = defaultToolkit.getScreenSize();
         setPreferredSize(new Dimension(1200, 900));
-        setLocation(dim.width / 4 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
+        setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
         pack();
         setVisible(true);
     }
