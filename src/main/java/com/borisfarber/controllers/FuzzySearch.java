@@ -30,7 +30,6 @@
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
      private List<ExtractedResult> resultSet;
-     //private final TreeMap<String, Integer> linesToNumLines;
      private final TreeMap<String, Path> filenamesToPathes;
      private final ArrayList<Pair<Integer, String>> numLinesToFilenames;
      private HashMap<String, List<Integer>> occurrences;
@@ -129,7 +128,6 @@
          for (Integer occ : occurrences.get(line)) {
              Pair<String, Integer> pair = getFileNameAndPositionFromLineIndex(occ);
              result.add(pair);
-
          }
 
          return result;
@@ -138,10 +136,10 @@
      private Pair<String, Integer> getFileNameAndPositionFromLineIndex(int index) {
          int base = 0;
          for (Pair<Integer, String> pair : numLinesToFilenames) {
-             if ((index >= base) && index < (base + pair.t.intValue() - 1)) {
+             if ((index >= base) && index < (base + pair.t - 1)) {
                  return new Pair<>(pair.u, (index - base));
              }
-             base += pair.t.intValue();
+             base += pair.t;
          }
          return new Pair<>("file.txt", 0);
      }

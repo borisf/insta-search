@@ -196,6 +196,7 @@
          try {
              final String query = searchQueryDoc.getText(0,
                      searchQueryDoc.getLength());
+             this.query = query;
              search(query);
          }
          catch (Exception ex) {
@@ -218,11 +219,6 @@
                  String line = currentSearch.t + ":" +
                          currentSearch.u +":" + rawLine + "\n";
 
-                 if(previewLinesIndex == selectedGuiIndex) {
-                     editorFilenameAndPosition.t = currentSearch.t;
-                     editorFilenameAndPosition.u = currentSearch.u;
-                 }
-
                  resultPreview.add(line);
                  previewLinesIndex++;
 
@@ -239,6 +235,13 @@
          for (String str : resultPreview) {
              if(previewLinesIndex == selectedGuiIndex) {
                  builder.append(SELECTOR + str);
+
+                 String[] parts  = str.split(":");
+                 String fileName = parts[0];
+                 String line = parts[1];
+
+                 editorFilenameAndPosition.t = fileName;
+                 editorFilenameAndPosition.u = Integer.parseInt(line);
              } else {
                  builder.append(str);
              }
