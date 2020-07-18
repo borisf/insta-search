@@ -69,7 +69,7 @@ public class GrepSearch implements Search {
     private TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview;
-    private HashMap<String, LinkedList<Integer>> occurences;
+    private HashMap<String, LinkedList<Integer>> occurrences;
     private ExecutorService executorService =
             Executors.newFixedThreadPool(4);
     private ConcurrentLinkedQueue<String> result =
@@ -114,14 +114,14 @@ public class GrepSearch implements Search {
     }
 
     private void processDuplicates(List<String> preview) {
-        occurences = new HashMap<>();
+        occurrences = new HashMap<>();
         for(int index=0; index < preview.size(); index++){
-            if(occurences.containsKey(preview.get(index))) {
-                occurences.get(preview.get(index)).add(index);
+            if(occurrences.containsKey(preview.get(index))) {
+                occurrences.get(preview.get(index)).add(index);
             } else {
                 LinkedList<Integer> list = new LinkedList<>();
                 list.add(index);
-                occurences.put(preview.get(index), list);
+                occurrences.put(preview.get(index), list);
             }
         }
     }
@@ -207,9 +207,16 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line) {
+    public LinkedList <Pair<String,Integer>> getFileNameAndPosition(String line) {
         String strkey = line.substring(0, line.length() - 1);
-        return new Pair<>(file.getName(), occurences.get(strkey));
+        LinkedList <Pair<String,Integer>> result = new LinkedList<>();
+
+        for (Integer occ : occurrences.get(strkey)) {
+            Pair<String, Integer> pair = new Pair<>(file.getName(), occ);
+            result.add(pair);
+        }
+
+        return result;
     }
 
     @Override
@@ -218,7 +225,7 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public String getPreview(int resultIndex) {
+    public String getPreview(String resultLine) {
         return "";
     }
 
@@ -236,7 +243,7 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public TreeMap<String, Path> getNameToPaths() {
+    public TreeMap<String, Path> getFilenamesToPathes() {
         return nameToPaths;
     }
 

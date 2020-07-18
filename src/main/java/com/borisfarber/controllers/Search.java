@@ -14,17 +14,17 @@ public interface Search {
 
     void search(String query);
 
-    Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line);
+    LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line);
 
     String getResults();
 
-    String getPreview(int resultIndex);
+    String getPreview(String resultLine);
 
     List<String> getResultSet();
 
     String getResultSetCount();
 
-    TreeMap<String, Path> getNameToPaths();
+    TreeMap<String, Path> getFilenamesToPathes();
 
     void testCrawl(ArrayList<String> testLoad);
 
