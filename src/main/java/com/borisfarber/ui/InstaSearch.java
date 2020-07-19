@@ -52,8 +52,7 @@ public final class InstaSearch extends JFrame {
 
     public final void onFileDragged(final File file) {
         setTitle("ClassySearch - " + file.getName());
-        //TODO follow up
-        //searchField.setText("");
+        searchField.setText("");
         controller.onFileDragged(file);
     }
 
