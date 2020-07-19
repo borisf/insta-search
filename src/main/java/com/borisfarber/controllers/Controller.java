@@ -20,9 +20,11 @@
  import javax.swing.*;
  import javax.swing.event.DocumentEvent;
  import javax.swing.event.DocumentListener;
- import javax.swing.text.*;
+ import javax.swing.text.BadLocationException;
+ import javax.swing.text.Document;
  import java.awt.*;
- import java.io.*;
+ import java.io.File;
+ import java.io.IOException;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Paths;
@@ -172,7 +174,6 @@
      }
 
      public void onFileDragged(File file) {
-
          previewTextArea.setText("");
          resultTextPane.setText(Background.SHARK_BG);
          crawl(file);
@@ -223,8 +224,8 @@
                  previewLinesIndex++;
 
                  if(previewLinesIndex >= UI_VIEW_LIMIT) {
-                    isViewLimit = true;
-                    break;
+                     isViewLimit = true;
+                     break;
                  }
              }
          } // end while

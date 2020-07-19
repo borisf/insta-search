@@ -37,6 +37,11 @@ public final class InstaSearch extends JFrame {
     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
 
+    public InstaSearch(String file) {
+        this();
+        controller.fileOpened(new File(file));
+    }
+
     public InstaSearch() {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
@@ -211,7 +216,12 @@ public final class InstaSearch extends JFrame {
             // handle exception
         }
 
-        InstaSearch classySearch = new InstaSearch();
+        InstaSearch classySearch;
+        if (args.length == 0) {
+            classySearch = new InstaSearch(System.getProperty("user.dir"));
+        } else {
+            classySearch = new InstaSearch(args[1]);
+        }
         classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 }
