@@ -30,7 +30,7 @@ public final class InstaSearch extends JFrame {
     private final Font textFont;
     private JTextField searchField;
     private JTextPane resultTextPane;
-    private JTextArea previewArea;
+    private JTextPane previewTextPane;
     private JLabel resultCountLabel;
     private Controller controller;
 
@@ -46,7 +46,7 @@ public final class InstaSearch extends JFrame {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
         buildUI();
-        controller = new Controller(resultTextPane, previewArea, resultCountLabel);
+        controller = new Controller(resultTextPane, previewTextPane, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
     }
 
@@ -57,41 +57,42 @@ public final class InstaSearch extends JFrame {
     }
 
     private final void buildUI() {
-        resultCountLabel = new JLabel("");
-        resultTextPane = this.buildResultTextArea();
-        JScrollPane showResultsScrolled = new JScrollPane(this.resultTextPane);
-        previewArea = this.buildPreviewArea();
-        JScrollPane showFileScrolled = new JScrollPane(this.previewArea);
+        searchField = buildSearchField();
+        searchField.setAlignmentX(0.0f);
+        searchField.setMaximumSize(new Dimension(1400, 30));
 
-        searchField = this.buildSearchField();
+        resultTextPane = buildResultTextPane();
+        JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
+        previewTextPane = buildPreviewTextPane();
+        JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
+
+        resultCountLabel = new JLabel("...");
         JPanel statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, 0));
-
         resultCountLabel.setAlignmentX(0.5f);
         statusPanel.add(resultCountLabel);
+        statusPanel.setAlignmentX(0.0f);
+
         JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
         splitPane.setDividerSize(20);
         splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        splitPane.setDividerLocation(600);
+        splitPane.setDividerLocation(400);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
-        final Container contentPane = this.getContentPane();
-        contentPane.setLayout(new BoxLayout(this.getContentPane(), 1));
-        searchField.setAlignmentX(0.0f);
         splitPane.setAlignmentX(0.0f);
-        statusPanel.setAlignmentX(0.0f);
-        this.getContentPane().add(searchField);
-        this.getContentPane().add(splitPane);
-        this.getContentPane().add(statusPanel);
-        final JMenuBar menuBar = new JMenuBar();
-        final Font f = this.textFont;
-        UIManager.put("Menu.font", f);
-        final JMenu menu = new JMenu("File");
+
+        getContentPane().add(searchField);
+        getContentPane().add(splitPane);
+        getContentPane().add(statusPanel);
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
+        JMenuBar menuBar = new JMenuBar();
+        UIManager.put("Menu.font", textFont);
+        JMenu menu = new JMenu("File");
         menuBar.add(menu);
         menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(Box.createHorizontalGlue());
-        final JMenuItem openFolderItem = new JMenuItem("Open...");
-        openFolderItem.setFont(f);
+        JMenuItem openFolderItem = new JMenuItem("Open...");
+        openFolderItem.setFont(textFont);
         openFolderItem.addActionListener(actionEvent -> {
             try {
                 File newFile = open();
@@ -102,13 +103,13 @@ public final class InstaSearch extends JFrame {
         });
         menu.add(openFolderItem);
         final JMenuItem closeItem = new JMenuItem("Exit");
-        closeItem.setFont(f);
+        closeItem.setFont(textFont);
         closeItem.addActionListener(actionEvent -> {
             controller.close();
             System.exit(0);
         });
         menu.add(closeItem);
-        this.setJMenuBar(menuBar);
+        setJMenuBar(menuBar);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -118,8 +119,8 @@ public final class InstaSearch extends JFrame {
             }
         });
 
-        final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-        final Dimension dim = defaultToolkit.getScreenSize();
+        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+        Dimension dim = defaultToolkit.getScreenSize();
         setPreferredSize(new Dimension(1200, 900));
         setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
         pack();
@@ -128,7 +129,7 @@ public final class InstaSearch extends JFrame {
 
     private final JTextField buildSearchField() {
         final JTextField result = new JTextField();
-        result.setFont(this.textFont);
+        result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
         result.setForeground(FOREGROUND_COLOR);
         result.setCaretColor(FOREGROUND_COLOR);
@@ -167,9 +168,9 @@ public final class InstaSearch extends JFrame {
         return result;
     }
 
-    private final JTextPane buildResultTextArea() {
+    private final JTextPane buildResultTextPane() {
         final JTextPane result = new JTextPane();
-        result.setFont(this.textFont);
+        result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
         result.setForeground(FOREGROUND_COLOR);
         result.setText(Background.SHARK_BG);
@@ -180,15 +181,16 @@ public final class InstaSearch extends JFrame {
         return result;
     }
 
-    private final JTextArea buildPreviewArea() {
-        previewArea = new JTextArea(30, 80);
-        previewArea.setFont(this.textFont);
-        previewArea.setBackground(BACKGROUND_COLOR);
-        previewArea.setForeground(FOREGROUND_COLOR);
-        previewArea.setEditable(false);
-        previewArea.setWrapStyleWord(true);
+    private final JTextPane buildPreviewTextPane() {
+        final JTextPane result = new JTextPane();
+        result.setFont(textFont);
+        result.setBackground(BACKGROUND_COLOR);
+        result.setForeground(FOREGROUND_COLOR);
+        result.setDragEnabled(true);
+        result.setTransferHandler(new FileTransfer(this));
+        result.setEditable(false);
 
-        return previewArea;
+        return result;
     }
 
     private final File open() {

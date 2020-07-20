@@ -38,7 +38,7 @@
      public static final String SELECTOR = "==> ";
      public static final int UI_VIEW_LIMIT = 50;
      public JTextPane resultTextPane;
-     private final JTextArea previewTextArea;
+     private JTextPane previewTextPane;
      private final JLabel resultCountLabel;
 
      private String query;
@@ -48,11 +48,11 @@
      private int selectedGuiIndex = 0;
      private int numLines = 0;
 
-     public Controller(final JTextPane resultTextPane,
-                       final JTextArea previewArea,
-                       final JLabel resultCountLabel) {
+     public Controller(JTextPane resultTextPane,
+                       JTextPane previewArea,
+                       JLabel resultCountLabel) {
          this.resultTextPane = resultTextPane;
-         this.previewTextArea = previewArea;
+         this.previewTextPane = previewArea;
          this.resultCountLabel = resultCountLabel;
 
          search = new GrepSearch(this);
@@ -96,7 +96,7 @@
                  search(query);
              } else {
                  resultTextPane.setText("");
-                 previewTextArea.setText("");
+                 previewTextPane.setText("");
                  resultCountLabel.setText("");
              }
 
@@ -115,7 +115,7 @@
          try {
              if(newFile != null) {
                  resultTextPane.setText(Background.SHARK_BG);
-                 previewTextArea.setText("");
+                 previewTextPane.setText("");
                  resultCountLabel.setText("");
 
                  if(newFile.isDirectory()) {
@@ -165,17 +165,17 @@
                  try {
                      String content =
                              Files.readString(Paths.get(editorFilenameAndPosition.t), StandardCharsets.US_ASCII);
-                     previewTextArea.setText(content);
+                     previewTextPane.setText(content);
                  } catch (IOException exception) {
-                     previewTextArea.setText("Something is wrong with the file " + exception.getMessage());
+                     previewTextPane.setText("Something is wrong with the file " + exception.getMessage());
                  }
              }
          }
      }
 
      public void onFileDragged(File file) {
-         previewTextArea.setText("");
          resultTextPane.setText(Background.SHARK_BG);
+         previewTextPane.setText("");
          crawl(file);
      }
 
@@ -210,6 +210,7 @@
          StringBuilder builder = new StringBuilder();
          LinkedList<Pair<String, Integer>> filenamesAndPositions;
          ArrayList<String> resultPreview = new ArrayList<>();
+         String previewText = "";
          boolean isViewLimit = false;
 
          while ((previewLinesIndex < search.getResultSet().size()) && !isViewLimit) {
@@ -240,6 +241,7 @@
                  String[] parts  = str.split(":");
                  String fileName = parts[0];
                  String line = parts[1];
+                 previewText = parts[2];
 
                  editorFilenameAndPosition.t = fileName;
                  editorFilenameAndPosition.u = Integer.parseInt(line);
@@ -263,7 +265,12 @@
          }
 
          // the usual updates
-         previewTextArea.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+
+         if(query != null) {
+             Highlighter highlighter1 = new Highlighter();
+             highlighter1.highlight(previewTextPane, previewText);
+         }
 
          if(isViewLimit) {
              resultCountLabel.setText("...");

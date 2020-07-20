@@ -226,6 +226,7 @@ public class GrepSearch implements Search {
 
     @Override
     public String getPreview(String resultLine) {
+        // TODO add some metadata about search results ? have preview
         return "";
     }
 
