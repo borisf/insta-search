@@ -51,6 +51,7 @@
 
      @Override
      public void crawl(File file) {
+         // TODO follow up when the folder is empty
          if (file == null || !file.exists()) {
              return;
          }

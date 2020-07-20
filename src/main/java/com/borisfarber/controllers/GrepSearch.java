@@ -111,9 +111,10 @@ public class GrepSearch implements Search {
                 if(upper > preview.size()) {
                     upper = preview.size();
                 }
-F
-                controller.resultTextPane.setText(
-                        preview.subList(0, upper).toString());
+
+                // TODO add new lines with ... last
+                controller.resultTextPane.
+                        setText(preview.subList(0, upper).toString());
             };
             SwingUtilities.invokeLater(runnable);
         } catch (Exception e) {

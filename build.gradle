@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.borisfarber'
-version '1.0-SNAPSHOT'
+version '3.0'
 
 repositories {
     mavenCentral()
@@ -29,7 +29,8 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": javaMainClass
+        attributes 'Main-Class': javaMainClass,
+                'Implementation-Version': archiveVersion
     }
 
     duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
@@ -41,7 +42,8 @@ jar {
 
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': javaMainClass
+        attributes 'Main-Class': javaMainClass,
+                'Implementation-Version': archiveVersion
     }
     archiveBaseName = 'insta-search'
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
