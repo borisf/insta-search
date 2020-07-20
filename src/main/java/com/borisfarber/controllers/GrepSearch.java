@@ -31,10 +31,12 @@
 package com.borisfarber.controllers;
 
 import com.borisfarber.data.Pair;
+import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -83,12 +85,9 @@ public class GrepSearch implements Search {
 
     @Override
     public void crawl(File file) {
-        long start = System.currentTimeMillis();
         try {
             preview = Files.readAllLines(file.toPath(), charset);
             processDuplicates(preview);
-            System.out.println("Read file " +
-                    (System.currentTimeMillis() - start));
 
             this.file = file;
             nameToPaths.clear();
@@ -109,8 +108,6 @@ public class GrepSearch implements Search {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("Crawl " + (System.currentTimeMillis() - start));
     }
 
     private void processDuplicates(List<String> preview) {
@@ -226,13 +223,35 @@ public class GrepSearch implements Search {
 
     @Override
     public String getPreview(String resultLine) {
-        // TODO add some metadata about search results ? have preview
+        try {
+            String[] parts  = resultLine.split(":");
+            String lineNum = parts[1];
+            int lineNumInt = Integer.parseInt(lineNum);
+
+            int lowerBound = lineNumInt - 7;
+            if(lowerBound < 0) {
+                lowerBound = 0;
+            }
+
+            IndexedFileReader reader = new IndexedFileReader(file);
+
+            int upperBound = lineNumInt + 7;
+
+            if(upperBound > reader.getLineCount()) {
+                upperBound = reader.getLineCount() - 1;
+            }
+
+            SortedMap<Integer, String> lines = reader.readLines(lowerBound,upperBound);
+            return lines.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return "";
     }
 
     @Override
     public List<String> getResultSet() {
-        System.out.println("size" + result.size());
         String[] tmpArray = new String[result.size()];
         result.toArray(tmpArray);
         return Arrays.asList(tmpArray);
