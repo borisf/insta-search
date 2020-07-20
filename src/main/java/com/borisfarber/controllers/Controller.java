@@ -264,8 +264,9 @@
              highlighter.highlight(resultTextPane, query);
          }
 
-         // the usual updates
-         previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         if(resultPreview.size() > 0) {
+             previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         }
 
          if(query != null) {
              Highlighter highlighter1 = new Highlighter();

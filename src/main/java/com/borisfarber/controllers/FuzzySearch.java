@@ -101,8 +101,14 @@
 
          processDuplicates(allLines);
 
-         // not a problem, pretty quick on one thread
-         // System.out.println("finished crawling ==> " + allLines.size() + " elements");
+         Runnable runnable = () -> {
+             StringBuilder builder = new StringBuilder();
+             for (String file1 : filenamesToPathes.keySet()) {
+                 builder.append(file1 + "\n");
+             }
+             controller.resultTextPane.setText(builder.toString());
+         };
+         SwingUtilities.invokeLater(runnable);
      }
 
      private void processDuplicates(List<String> allLines) {

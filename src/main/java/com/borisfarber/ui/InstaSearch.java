@@ -221,7 +221,7 @@ public final class InstaSearch extends JFrame {
         if (args.length == 0) {
             classySearch = new InstaSearch(System.getProperty("user.dir"));
         } else {
-            classySearch = new InstaSearch(args[1]);
+            classySearch = new InstaSearch(args[0]);
         }
         classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }

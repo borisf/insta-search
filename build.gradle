@@ -24,7 +24,7 @@ application {
 
 dependencies {
     implementation 'me.xdrop:fuzzywuzzy:1.3.1'
-    compile "com.jramoyo:indexed-file-reader:1.0"
+    implementation 'com.jramoyo:indexed-file-reader:1.0'
 }
 
 jar {

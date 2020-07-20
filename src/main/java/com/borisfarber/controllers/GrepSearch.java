@@ -105,6 +105,11 @@ public class GrepSearch implements Search {
             cb2 = mapToCharBuffer(file, 1 * qq, qq);
             cb3 = mapToCharBuffer(file, 2 * qq, qq);
             cb4 = mapToCharBuffer(file, 3 * qq, qq);
+
+            // TODO go over the upper index
+            Runnable runnable = () -> controller.resultTextPane.setText(
+                    preview.subList(0, 10).toString());
+            SwingUtilities.invokeLater(runnable);
         } catch (Exception e) {
             e.printStackTrace();
         }
