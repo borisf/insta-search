@@ -47,18 +47,24 @@
          resultSet = new ArrayList<>();
          filenamesToPathes = new TreeMap<>();
          numLinesToFilenames = new ArrayList<>();
+         occurrences = new HashMap<>();
      }
 
      @Override
      public void crawl(File file) {
-         // TODO follow up when the folder is empty
+         allLines.clear();
+         numLinesToFilenames.clear();
+         filenamesToPathes.clear();
+         occurrences.clear();
+
          if (file == null || !file.exists()) {
              return;
          }
 
-         allLines.clear();
-         numLinesToFilenames.clear();
-         filenamesToPathes.clear();
+         if(file.isDirectory() && file.list().length ==0) {
+             return;
+         }
+
          Path pathString = file.toPath();
 
          PathMatcher matcher =
@@ -98,7 +104,7 @@
              });
          } catch (IOException e) {
              e.printStackTrace();
-         }
+         };
 
          processDuplicates(allLines);
 
@@ -107,13 +113,13 @@
              for (String fileName : filenamesToPathes.keySet()) {
                  builder.append(fileName + "\n");
              }
+
              controller.resultTextPane.setText(builder.toString());
          };
          SwingUtilities.invokeLater(runnable);
      }
 
      private void processDuplicates(List<String> allLines) {
-         occurrences = new HashMap<>();
          for(int index=0; index < allLines.size(); index++){
              if(occurrences.containsKey(allLines.get(index))) {
                  occurrences.get(allLines.get(index)).add(index);
@@ -128,6 +134,11 @@
      @Override
      public void search(String query) {
          executorService.execute(() -> {
+             if(allLines.isEmpty()) {
+                 resultSet = new LinkedList<>();
+                 return;
+             }
+
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
              Runnable runnable = () -> controller.onUpdateGUI();
              SwingUtilities.invokeLater(runnable);
@@ -154,7 +165,7 @@
              }
              base += pair.t;
          }
-         return new Pair<>("file.txt", 0);
+         return new Pair<>("", 0);
      }
 
      @Override
