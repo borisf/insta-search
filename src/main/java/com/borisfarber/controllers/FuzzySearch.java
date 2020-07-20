@@ -103,8 +103,8 @@
 
          Runnable runnable = () -> {
              StringBuilder builder = new StringBuilder();
-             for (String file1 : filenamesToPathes.keySet()) {
-                 builder.append(file1 + "\n");
+             for (String fileName : filenamesToPathes.keySet()) {
+                 builder.append(fileName + "\n");
              }
              controller.resultTextPane.setText(builder.toString());
          };
