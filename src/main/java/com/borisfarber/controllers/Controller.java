@@ -20,9 +20,11 @@
  import javax.swing.*;
  import javax.swing.event.DocumentEvent;
  import javax.swing.event.DocumentListener;
- import javax.swing.text.*;
+ import javax.swing.text.BadLocationException;
+ import javax.swing.text.Document;
  import java.awt.*;
- import java.io.*;
+ import java.io.File;
+ import java.io.IOException;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Paths;
@@ -36,7 +38,7 @@
      public static final String SELECTOR = "==> ";
      public static final int UI_VIEW_LIMIT = 50;
      public JTextPane resultTextPane;
-     private final JTextArea previewTextArea;
+     private JTextPane previewTextPane;
      private final JLabel resultCountLabel;
 
      private String query;
@@ -46,11 +48,11 @@
      private int selectedGuiIndex = 0;
      private int numLines = 0;
 
-     public Controller(final JTextPane resultTextPane,
-                       final JTextArea previewArea,
-                       final JLabel resultCountLabel) {
+     public Controller(JTextPane resultTextPane,
+                       JTextPane previewArea,
+                       JLabel resultCountLabel) {
          this.resultTextPane = resultTextPane;
-         this.previewTextArea = previewArea;
+         this.previewTextPane = previewArea;
          this.resultCountLabel = resultCountLabel;
 
          search = new GrepSearch(this);
@@ -94,7 +96,7 @@
                  search(query);
              } else {
                  resultTextPane.setText("");
-                 previewTextArea.setText("");
+                 previewTextPane.setText("");
                  resultCountLabel.setText("");
              }
 
@@ -113,7 +115,7 @@
          try {
              if(newFile != null) {
                  resultTextPane.setText(Background.SHARK_BG);
-                 previewTextArea.setText("");
+                 previewTextPane.setText("");
                  resultCountLabel.setText("");
 
                  if(newFile.isDirectory()) {
@@ -148,7 +150,7 @@
      }
 
      public void enterPressed() {
-         String fullPath = search.getNameToPaths().get(editorFilenameAndPosition.t).toString();
+         String fullPath = search.getFilenamesToPathes().get(editorFilenameAndPosition.t).toString();
 
          try {
              String command = "nvim +\"set number\" +"
@@ -163,17 +165,17 @@
                  try {
                      String content =
                              Files.readString(Paths.get(editorFilenameAndPosition.t), StandardCharsets.US_ASCII);
-                     previewTextArea.setText(content);
+                     previewTextPane.setText(content);
                  } catch (IOException exception) {
-                     previewTextArea.setText("Something is wrong with the file " + exception.getMessage());
+                     previewTextPane.setText("Something is wrong with the file " + exception.getMessage());
                  }
              }
          }
      }
 
      public void onFileDragged(File file) {
-         previewTextArea.setText("");
          resultTextPane.setText(Background.SHARK_BG);
+         previewTextPane.setText("");
          crawl(file);
      }
 
@@ -185,7 +187,7 @@
 
      public String dump() {
          System.out.println(search.getResults());
-         System.out.println(search.getPreview(0));
+         System.out.println(search.getPreview(""));
          System.out.println(search.getResultSetCount());
 
          return "";
@@ -195,6 +197,7 @@
          try {
              final String query = searchQueryDoc.getText(0,
                      searchQueryDoc.getLength());
+             this.query = query;
              search(query);
          }
          catch (Exception ex) {
@@ -203,44 +206,49 @@
      }
 
      public void onUpdateGUI() {
-         int i = 0;
+         int previewLinesIndex = 0;
          StringBuilder builder = new StringBuilder();
-         Pair<String, LinkedList<Integer>> filenameAndPositions;
+         LinkedList<Pair<String, Integer>> filenamesAndPositions;
          ArrayList<String> resultPreview = new ArrayList<>();
+         String previewText = "";
          boolean isViewLimit = false;
 
-         while ((i < search.getResultSet().size()) && !isViewLimit) {
-             String rawLine = search.getResultSet().get(i);
-             filenameAndPositions = search.getFileNameAndPosition(rawLine);
+         while ((previewLinesIndex < search.getResultSet().size()) && !isViewLimit) {
+             String rawLine = search.getResultSet().get(previewLinesIndex);
+             filenamesAndPositions = search.getFileNameAndPosition(rawLine);
 
-             for(Integer index : filenameAndPositions.u) {
-                 String line = filenameAndPositions.t + ":" +
-                         index +":" + rawLine + "\n";
+             for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
+                 String line = currentSearch.t + ":" +
+                         currentSearch.u +":" + rawLine + "\n";
 
-                 if(i == selectedGuiIndex) {
-                     editorFilenameAndPosition.t = filenameAndPositions.t;
-                     editorFilenameAndPosition.u = index;
-                 }
                  resultPreview.add(line);
-                 i++;
+                 previewLinesIndex++;
 
-                 if(i >= UI_VIEW_LIMIT) {
-                    isViewLimit = true;
-                    break;
+                 if(previewLinesIndex >= UI_VIEW_LIMIT) {
+                     isViewLimit = true;
+                     break;
                  }
              }
          } // end while
 
          resultPreview.sort(new ResultsSorter());
-         numLines = i;
-         i = 0;
+         numLines = previewLinesIndex;
+         previewLinesIndex = 0;
          for (String str : resultPreview) {
-             if(i == selectedGuiIndex) {
+             if(previewLinesIndex == selectedGuiIndex) {
                  builder.append(SELECTOR + str);
+
+                 String[] parts  = str.split(":");
+                 String fileName = parts[0];
+                 String line = parts[1];
+                 previewText = parts[2];
+
+                 editorFilenameAndPosition.t = fileName;
+                 editorFilenameAndPosition.u = Integer.parseInt(line);
              } else {
                  builder.append(str);
              }
-             i++;
+             previewLinesIndex++;
          }
 
          resultTextPane.setText(builder.toString());
@@ -257,7 +265,12 @@
          }
 
          // the usual updates
-         previewTextArea.setText(search.getPreview(selectedGuiIndex));
+         previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+
+         if(query != null) {
+             Highlighter highlighter1 = new Highlighter();
+             highlighter1.highlight(previewTextPane, previewText);
+         }
 
          if(isViewLimit) {
              resultCountLabel.setText("...");

@@ -18,27 +18,35 @@
  import java.nio.file.*;
  import java.nio.file.attribute.BasicFileAttributes;
  import java.util.*;
+ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
 
  import com.borisfarber.data.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+
+ import javax.swing.*;
 
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public class FuzzySearch implements Search {
-     private final ArrayList<String> allLines;
-     private final TreeMap<String, Integer> preview;
      private final Controller controller;
-     private TreeMap<String, Path> nameToPaths;
-     private final ArrayList<Pair<Integer, String>> numLinesToFiles;
+     // key design idea, no such thing file, it is recreated by line numbers
+     private final ArrayList<String> allLines;
      private List<ExtractedResult> resultSet;
+     private final TreeMap<String, Path> filenamesToPathes;
+     private final ArrayList<Pair<Integer, String>> numLinesToFilenames;
+     private HashMap<String, List<Integer>> occurrences;
+
+     private ExecutorService executorService =
+             Executors.newSingleThreadExecutor();
+
      public FuzzySearch(Controller controller) {
-         allLines = new ArrayList<>();
-         preview = new TreeMap<>();
-         nameToPaths = new TreeMap<>();
-         numLinesToFiles = new ArrayList<>();
-         resultSet = new ArrayList<>();
          this.controller = controller;
+         allLines = new ArrayList<>();
+         resultSet = new ArrayList<>();
+         filenamesToPathes = new TreeMap<>();
+         numLinesToFilenames = new ArrayList<>();
      }
 
      @Override
@@ -48,9 +56,8 @@
          }
 
          allLines.clear();
-         numLinesToFiles.clear();
-         nameToPaths.clear();
-         preview.clear();
+         numLinesToFilenames.clear();
+         filenamesToPathes.clear();
          Path pathString = file.toPath();
 
          PathMatcher matcher =
@@ -79,8 +86,8 @@
                              allLines.addAll(allFileLines);
                              Pair<Integer, String> pair = new Pair<>(allFileLines.size(),
                                      path.getFileName().toString());
-                             numLinesToFiles.add(pair);
-                             nameToPaths.put(path.getFileName().toString(), path);
+                             numLinesToFilenames.add(pair);
+                             filenamesToPathes.put(path.getFileName().toString(), path);
                          } catch (java.nio.charset.MalformedInputException e) {
                              System.out.println("Bad file format " + path.getFileName().toString());
                          }
@@ -92,33 +99,55 @@
              e.printStackTrace();
          }
 
-         int index = 0;
-         for (String line : this.allLines) {
-             preview.put(line, index);
-             index++;
-         }
+         processDuplicates(allLines);
+
          // not a problem, pretty quick on one thread
          // System.out.println("finished crawling ==> " + allLines.size() + " elements");
      }
 
-     @Override
-     public void search(String query) {
-         //long start = System.currentTimeMillis();
-         resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
-         //System.out.println(": " + ( System.currentTimeMillis() - start));
-         controller.onUpdateGUI();
+     private void processDuplicates(List<String> allLines) {
+         occurrences = new HashMap<>();
+         for(int index=0; index < allLines.size(); index++){
+             if(occurrences.containsKey(allLines.get(index))) {
+                 occurrences.get(allLines.get(index)).add(index);
+             } else {
+                 LinkedList<Integer> list = new LinkedList<>();
+                 list.add(index);
+                 occurrences.put(allLines.get(index), list);
+             }
+         }
      }
 
      @Override
-     public Pair<String, LinkedList<Integer>> getFileNameAndPosition(String line) {
-         // TODO stopped here, add hash table for double lines, same idea as grep
+     public void search(String query) {
+         executorService.execute(() -> {
+             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
+             Runnable runnable = () -> controller.onUpdateGUI();
+             SwingUtilities.invokeLater(runnable);
+         });
+     }
 
-         Pair<String, Integer> filenameAndPosition = getFileNameAndPositionFromRawLine(line);
-         LinkedList<Integer> list = new LinkedList<>();
-         list.add(filenameAndPosition.u);
-         Pair<String, LinkedList<Integer>> result = new Pair<>(filenameAndPosition.t, list);
+     @Override
+     public LinkedList <Pair<String,Integer>> getFileNameAndPosition(String line) {
+         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
+
+         for (Integer occ : occurrences.get(line)) {
+             Pair<String, Integer> pair = getFileNameAndPositionFromLineIndex(occ);
+             result.add(pair);
+         }
 
          return result;
+     }
+
+     private Pair<String, Integer> getFileNameAndPositionFromLineIndex(int index) {
+         int base = 0;
+         for (Pair<Integer, String> pair : numLinesToFilenames) {
+             if ((index >= base) && index < (base + pair.t - 1)) {
+                 return new Pair<>(pair.u, (index - base));
+             }
+             base += pair.t;
+         }
+         return new Pair<>("file.txt", 0);
      }
 
      @Override
@@ -142,12 +171,26 @@
       * @return
       */
      @Override
-     public String getPreview(int resultIndex) {
-         if (resultSet.isEmpty()) {
+     public String getPreview(String resultLine) {
+         if (resultLine.isEmpty()) {
              return "";
          }
 
-         int allLinesIndex = preview.get(getResultSet().get(resultIndex));
+         String[] parts  = resultLine.split(":");
+         String fileName = parts[0];
+         String line = parts[1];
+
+         int bline = 0;
+
+         for(Pair<Integer,String> fData : numLinesToFilenames) {
+             if(fData.u.equals(fileName)) {
+                 break;
+             }
+             bline += fData.t;
+         }
+
+         StringBuilder builder = new StringBuilder();
+         int allLinesIndex = Integer.parseInt(line) + bline;
 
          int lower = allLinesIndex - 7;
          int upper = allLinesIndex + 7;
@@ -160,8 +203,6 @@
              upper = allLines.size() - 1;
          }
 
-         StringBuilder builder = new StringBuilder();
-
          for (int i = lower; i < upper; i++) {
              builder.append(allLines.get(i) + "\n");
          }
@@ -170,50 +211,8 @@
      }
 
      @Override
-     public String getResultSetCount() {
-         return Integer.toString(getResultSet().size());
-     }
-
-     public String toString() {
-         for (String res : getResultSet()) {
-             System.out.println(res);
-         }
-         return "";
-     }
-
-     @Override
-     public void testCrawl(ArrayList<String> testLoad) {
-         allLines.clear();
-         allLines.addAll(testLoad);
-         numLinesToFiles.clear();
-         preview.clear();
-
-         int index = 0;
-         for (String line : this.allLines) {
-             preview.put(line, index);
-             index++;
-         }
-     }
-
-     @Override
-     public void close() {
-
-     }
-
-     private Pair<String, Integer> getFileNameAndPositionFromRawLine(String line) {
-
-         int index = preview.get(line).intValue();
-         int base = 0;
-
-         for (Pair<Integer, String> pair : numLinesToFiles) {
-             if (index >= base && index < (base + pair.t.intValue() - 1)) {
-                 return new Pair<>(pair.u, (index - base));
-             }
-
-             base += pair.t.intValue();
-         }
-
-         return new Pair<>("file.txt", 0);
+     public TreeMap<String, Path> getFilenamesToPathes() {
+         return filenamesToPathes;
      }
 
      @Override
@@ -225,6 +224,38 @@
          }
 
          return result;
+     }
+
+     @Override
+     public String getResultSetCount() {
+         return Integer.toString(getResultSet().size());
+     }
+
+     @Override
+     public void testCrawl(ArrayList<String> testLoad) {
+         allLines.clear();
+         allLines.addAll(testLoad);
+         numLinesToFilenames.clear();
+     }
+
+     @Override
+     public void close() {
+         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+             try {
+                 if (executorService.isShutdown()) {
+                     return;
+                 }
+                 executorService.shutdownNow();
+             } catch (Throwable e) {
+             }
+         }));
+     }
+
+     public String toString() {
+         for (String res : getResultSet()) {
+             System.out.println(res);
+         }
+         return "";
      }
 
      public static ArrayList<String> testLoad() {
@@ -249,10 +280,5 @@
          System.out.println(search.getResults());
          System.out.println(search.getPreview(0));
          System.out.println(search.getResultSetCount());*/
-     }
-
-     @Override
-     public TreeMap<String, Path> getNameToPaths() {
-         return nameToPaths;
      }
  }

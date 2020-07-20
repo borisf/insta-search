@@ -20,9 +20,14 @@ incrementally.
 * Results view - where you see file set that include the text from
 the search line, use arrows to land to the relevant line
 
-* Once found the relevant line, press Enter, and the log file will be opened on the relevant line within your defined
+* Once found the relevant line, press Enter, and the log file 
+will be opened on the relevant line within your defined
 editor
 
+## Command Line Arguments
+
+* No args - InstaSearch will crawl recursively the current working folder (pwd) 
+* File name - the (large) log  file to crawl
 
 ## Download & Run
 To run, grab the [latest JAR](https://github.com/borisf/insta-search/releases)

@@ -28,7 +28,7 @@ public class Repl {
 
     public static void repl() {
         Controller controller = new Controller(new JTextPane(),
-                new JTextArea(), new JLabel());
+                new JTextPane(), new JLabel());
         controller.testCrawl();
         Reader inreader = new InputStreamReader(System.in);
         try {
