@@ -31,10 +31,12 @@
 package com.borisfarber.controllers;
 
 import com.borisfarber.data.Pair;
+import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -83,12 +85,9 @@ public class GrepSearch implements Search {
 
     @Override
     public void crawl(File file) {
-        long start = System.currentTimeMillis();
         try {
             preview = Files.readAllLines(file.toPath(), charset);
             processDuplicates(preview);
-            System.out.println("Read file " +
-                    (System.currentTimeMillis() - start));
 
             this.file = file;
             nameToPaths.clear();
@@ -106,11 +105,24 @@ public class GrepSearch implements Search {
             cb2 = mapToCharBuffer(file, 1 * qq, qq);
             cb3 = mapToCharBuffer(file, 2 * qq, qq);
             cb4 = mapToCharBuffer(file, 3 * qq, qq);
+
+            int upper = 10;
+            if(upper > preview.size()) {
+                upper = preview.size();
+            }
+
+            StringBuilder builder = new StringBuilder();
+            for(String str : preview.subList(0, upper)) {
+                builder.append(str + "\n");
+            }
+
+            builder.append("...");
+            controller.resultTextPane.setText(builder.toString());
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("Crawl " + (System.currentTimeMillis() - start));
     }
 
     private void processDuplicates(List<String> preview) {
@@ -157,7 +169,7 @@ public class GrepSearch implements Search {
         compile(query);
         executeGrep();
     }
-    
+
     private void executeGrep() {
         executorService.execute(() -> grepTask(file, result, controller, cb1));
         executorService.execute(() -> grepTask(file, result, controller, cb2));
@@ -177,6 +189,7 @@ public class GrepSearch implements Search {
     // Use the linePattern to break the given CharBuffer into lines, applying
     // the input pattern to each line to see if we have a match
     private static ArrayList<String> grep(File f, CharBuffer cb) {
+
         if (cb == null) {
             return new ArrayList<>();
         }
@@ -226,13 +239,35 @@ public class GrepSearch implements Search {
 
     @Override
     public String getPreview(String resultLine) {
-        // TODO add some metadata about search results ? have preview
+        try {
+            String[] parts  = resultLine.split(":");
+            String lineNum = parts[1];
+            int lineNumInt = Integer.parseInt(lineNum);
+
+            int lowerBound = lineNumInt - 7;
+            if(lowerBound < 1) {
+                lowerBound = 1;
+            }
+
+            IndexedFileReader reader = new IndexedFileReader(file);
+
+            int upperBound = lineNumInt + 7;
+
+            if(upperBound > reader.getLineCount()) {
+                upperBound = reader.getLineCount() - 1;
+            }
+
+            SortedMap<Integer, String> lines = reader.readLines(lowerBound,upperBound);
+            return lines.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return "";
     }
 
     @Override
     public List<String> getResultSet() {
-        System.out.println("size" + result.size());
         String[] tmpArray = new String[result.size()];
         result.toArray(tmpArray);
         return Arrays.asList(tmpArray);

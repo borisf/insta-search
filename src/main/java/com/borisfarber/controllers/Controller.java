@@ -30,6 +30,7 @@
  import java.nio.file.Paths;
  import java.util.ArrayList;
  import java.util.LinkedList;
+ import java.util.List;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.Repl.repl;
@@ -213,8 +214,9 @@
          String previewText = "";
          boolean isViewLimit = false;
 
-         while ((previewLinesIndex < search.getResultSet().size()) && !isViewLimit) {
-             String rawLine = search.getResultSet().get(previewLinesIndex);
+         List<String> resultSearchFromSearch = search.getResultSet();
+         while ((previewLinesIndex < resultSearchFromSearch.size()) && !isViewLimit) {
+             String rawLine = resultSearchFromSearch.get(previewLinesIndex);
              filenamesAndPositions = search.getFileNameAndPosition(rawLine);
 
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
@@ -252,6 +254,7 @@
          }
 
          resultTextPane.setText(builder.toString());
+
          try {
              int selector = builder.toString().indexOf(SELECTOR);
              resultTextPane.setCaretPosition(selector);
@@ -264,14 +267,17 @@
              highlighter.highlight(resultTextPane, query);
          }
 
-         // the usual updates
-         previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         if(resultPreview.size() > 0) {
+             previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         }
 
+         /*
+         TODO fix here, race condition
          if(query != null) {
              Highlighter highlighter1 = new Highlighter();
              highlighter1.highlight(previewTextPane, previewText);
          }
-
+        */
          if(isViewLimit) {
              resultCountLabel.setText("...");
          } else {

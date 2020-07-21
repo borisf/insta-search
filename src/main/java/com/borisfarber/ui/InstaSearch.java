@@ -21,6 +21,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
+import com.borisfarber.controllers.BuildVersion;
 import com.borisfarber.controllers.Controller;
 import com.borisfarber.controllers.FileTransfer;
 
@@ -102,6 +103,17 @@ public final class InstaSearch extends JFrame {
             }
         });
         menu.add(openFolderItem);
+
+        final JMenuItem aboutItem = new JMenuItem("About");
+        aboutItem.setFont(textFont);
+        aboutItem.addActionListener(actionEvent -> {
+            JOptionPane.showMessageDialog(this,"Classy Shark Insta Search version " +
+                    BuildVersion.getBuildVersion());
+
+
+        });
+        menu.add(aboutItem);
+
         final JMenuItem closeItem = new JMenuItem("Exit");
         closeItem.setFont(textFont);
         closeItem.addActionListener(actionEvent -> {
@@ -221,7 +233,7 @@ public final class InstaSearch extends JFrame {
         if (args.length == 0) {
             classySearch = new InstaSearch(System.getProperty("user.dir"));
         } else {
-            classySearch = new InstaSearch(args[1]);
+            classySearch = new InstaSearch(args[0]);
         }
         classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }

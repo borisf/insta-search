@@ -47,17 +47,24 @@
          resultSet = new ArrayList<>();
          filenamesToPathes = new TreeMap<>();
          numLinesToFilenames = new ArrayList<>();
+         occurrences = new HashMap<>();
      }
 
      @Override
      public void crawl(File file) {
+         allLines.clear();
+         numLinesToFilenames.clear();
+         filenamesToPathes.clear();
+         occurrences.clear();
+
          if (file == null || !file.exists()) {
              return;
          }
 
-         allLines.clear();
-         numLinesToFilenames.clear();
-         filenamesToPathes.clear();
+         if(file.isDirectory() && file.list().length ==0) {
+             return;
+         }
+
          Path pathString = file.toPath();
 
          PathMatcher matcher =
@@ -97,16 +104,22 @@
              });
          } catch (IOException e) {
              e.printStackTrace();
-         }
+         };
 
          processDuplicates(allLines);
 
-         // not a problem, pretty quick on one thread
-         // System.out.println("finished crawling ==> " + allLines.size() + " elements");
+         Runnable runnable = () -> {
+             StringBuilder builder = new StringBuilder();
+             for (String fileName : filenamesToPathes.keySet()) {
+                 builder.append(fileName + "\n");
+             }
+
+             controller.resultTextPane.setText(builder.toString());
+         };
+         SwingUtilities.invokeLater(runnable);
      }
 
      private void processDuplicates(List<String> allLines) {
-         occurrences = new HashMap<>();
          for(int index=0; index < allLines.size(); index++){
              if(occurrences.containsKey(allLines.get(index))) {
                  occurrences.get(allLines.get(index)).add(index);
@@ -121,6 +134,11 @@
      @Override
      public void search(String query) {
          executorService.execute(() -> {
+             if(allLines.isEmpty()) {
+                 resultSet = new LinkedList<>();
+                 return;
+             }
+
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
              Runnable runnable = () -> controller.onUpdateGUI();
              SwingUtilities.invokeLater(runnable);
@@ -147,7 +165,7 @@
              }
              base += pair.t;
          }
-         return new Pair<>("file.txt", 0);
+         return new Pair<>("", 0);
      }
 
      @Override

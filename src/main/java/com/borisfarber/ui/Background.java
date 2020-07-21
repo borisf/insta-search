@@ -13,8 +13,11 @@
  */
 package com.borisfarber.ui;
 
-public class Background {
+ import com.borisfarber.controllers.BuildVersion;
+
+ public class Background {
 
     public final static String SHARK_BG =
-            "\n\n\n\n\n\n\n\n                          ClassyShark Insta Search ver. 2.0";
+            "\n\n\n\n\n\n\n\n                          ClassyShark Insta Search ver."
+            + BuildVersion.getBuildVersion();
 }
