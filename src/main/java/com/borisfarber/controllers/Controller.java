@@ -20,8 +20,7 @@
  import javax.swing.*;
  import javax.swing.event.DocumentEvent;
  import javax.swing.event.DocumentListener;
- import javax.swing.text.BadLocationException;
- import javax.swing.text.Document;
+ import javax.swing.text.*;
  import java.awt.*;
  import java.io.File;
  import java.io.IOException;
@@ -271,20 +270,33 @@
              previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
          }
 
-         /*
-         TODO fix here, race condition
          if(query != null) {
-             Highlighter highlighter1 = new Highlighter();
-             highlighter1.highlight(previewTextPane, previewText);
+             DefaultHighlighter.DefaultHighlightPainter cyanPainter =
+                     new DefaultHighlighter.DefaultHighlightPainter(new Color(0,0,128));
+
+             try {
+                 // TODO tweak here background parameters, take from highlighter
+                 // TODO do opposite backgound foreground colors, UX less focus on the preview
+                 Document doc = previewTextPane.getDocument();
+                 String text = doc.getText(0, doc.getLength());
+
+                 if (previewText.length() > 2) {
+                     int pos = text.indexOf(previewText.substring(0, previewText.length()-2));
+                     previewTextPane.getHighlighter().addHighlight(pos,
+                             pos + previewText.length()-2, cyanPainter);
+                 }
+             } catch (final BadLocationException ble) {
+                 System.err.println("Ignored in this example");
+             }
          }
-        */
+
          if(isViewLimit) {
              resultCountLabel.setText("...");
          } else {
              resultCountLabel.setText(String.valueOf(numLines));
          }
      }
-
+     
      public void close() {
          search.close();
      }
