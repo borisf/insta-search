@@ -106,17 +106,20 @@ public class GrepSearch implements Search {
             cb3 = mapToCharBuffer(file, 2 * qq, qq);
             cb4 = mapToCharBuffer(file, 3 * qq, qq);
 
-            Runnable runnable = () -> {
-                int upper = 10;
-                if(upper > preview.size()) {
-                    upper = preview.size();
-                }
+            int upper = 10;
+            if(upper > preview.size()) {
+                upper = preview.size();
+            }
 
-                // TODO add new lines with ... last
-                controller.resultTextPane.
-                        setText(preview.subList(0, upper).toString());
-            };
-            SwingUtilities.invokeLater(runnable);
+            StringBuilder builder = new StringBuilder();
+            for(String str : preview.subList(0, upper)) {
+                builder.append(str + "\n");
+            }
+
+            builder.append("...");
+            controller.resultTextPane.setText(builder.toString());
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -166,7 +169,7 @@ public class GrepSearch implements Search {
         compile(query);
         executeGrep();
     }
-    
+
     private void executeGrep() {
         executorService.execute(() -> grepTask(file, result, controller, cb1));
         executorService.execute(() -> grepTask(file, result, controller, cb2));
@@ -186,6 +189,7 @@ public class GrepSearch implements Search {
     // Use the linePattern to break the given CharBuffer into lines, applying
     // the input pattern to each line to see if we have a match
     private static ArrayList<String> grep(File f, CharBuffer cb) {
+
         if (cb == null) {
             return new ArrayList<>();
         }
@@ -241,8 +245,8 @@ public class GrepSearch implements Search {
             int lineNumInt = Integer.parseInt(lineNum);
 
             int lowerBound = lineNumInt - 7;
-            if(lowerBound < 0) {
-                lowerBound = 0;
+            if(lowerBound < 1) {
+                lowerBound = 1;
             }
 
             IndexedFileReader reader = new IndexedFileReader(file);
