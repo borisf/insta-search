@@ -183,8 +183,8 @@
 
      public void search(String query) {
          selectedGuiIndex = 0;
-         search.search(query);
          this.query = query;
+         search.search(query);
      }
 
      public String dump() {
@@ -211,40 +211,41 @@
          int previewLinesIndex = 0;
          StringBuilder builder = new StringBuilder();
          LinkedList<Pair<String, Integer>> filenamesAndPositions;
-         ArrayList<String> resultPreview = new ArrayList<>();
-         String previewText = "";
-         boolean isViewLimit = false;
+         ArrayList<String> searchPreview = new ArrayList<>();
+         String selectedLine = "";
+         boolean isViewLimitReached = false;
 
-         List<String> resultSearchFromSearch = search.getResultSet();
-         while ((previewLinesIndex < resultSearchFromSearch.size()) && !isViewLimit) {
-             String rawLine = resultSearchFromSearch.get(previewLinesIndex);
+         List<String> searchResults = search.getResultSet();
+         while ((previewLinesIndex < searchResults.size()) && !isViewLimitReached) {
+             String rawLine = searchResults.get(previewLinesIndex);
              filenamesAndPositions = search.getFileNameAndPosition(rawLine);
 
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
                  String line = currentSearch.t + ":" +
                          currentSearch.u +":" + rawLine + "\n";
 
-                 resultPreview.add(line);
+                 searchPreview.add(line);
                  previewLinesIndex++;
 
                  if(previewLinesIndex >= UI_VIEW_LIMIT) {
-                     isViewLimit = true;
+                     isViewLimitReached = true;
                      break;
                  }
              }
-         } // end while
+         }
 
-         resultPreview.sort(new ResultsSorter());
+         searchPreview.sort(new SearchResultsSorter());
          numLines = previewLinesIndex;
          previewLinesIndex = 0;
-         for (String str : resultPreview) {
+
+         for (String str : searchPreview) {
              if(previewLinesIndex == selectedGuiIndex) {
                  builder.append(SELECTOR + str);
 
                  String[] parts  = str.split(":");
                  String fileName = parts[0];
                  String line = parts[1];
-                 previewText = parts[2];
+                 selectedLine = parts[2];
 
                  editorFilenameAndPosition.t = fileName;
                  editorFilenameAndPosition.u = Integer.parseInt(line);
@@ -268,39 +269,38 @@
              highlighter.highlight(resultTextPane, query);
          }
 
-         if(resultPreview.size() > 0) {
-             previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         if(searchPreview.size() > 0) {
+             previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
          }
 
          if(query != null) {
-             DefaultHighlighter.DefaultHighlightPainter cyanPainter =
+             DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
                      new DefaultHighlighter.DefaultHighlightPainter(FOREGROUND_COLOR);
 
              try {
                  Document doc = previewTextPane.getDocument();
                  String text = doc.getText(0, doc.getLength());
 
-                 if (previewText.length() > 2) {
-                     int pos = text.indexOf(previewText.substring(0, previewText.length() - 2));
+                 if (selectedLine.length() > 2) {
+                     int pos = text.indexOf(selectedLine.substring(0, selectedLine.length() - 2));
                      previewTextPane.getHighlighter().addHighlight(pos,
-                             pos + previewText.length() - 2, cyanPainter);
+                             pos + selectedLine.length() - 2, previewHighlighter);
 
-                     // back UX less focus on the preview
+                     // back, UX less focus on the preview
                      MutableAttributeSet attrs = previewTextPane.getInputAttributes();
                      StyledDocument doc1 = previewTextPane.getStyledDocument();
                      StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
-                     doc1.setCharacterAttributes(pos, pos + previewText.length(), attrs, false);
+                     doc1.setCharacterAttributes(pos, pos + selectedLine.length(), attrs, false);
                      StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
-                     doc1.setCharacterAttributes(pos + previewText.length(), text.length(),attrs, false);
+                     doc1.setCharacterAttributes(pos + selectedLine.length(), text.length(),attrs, false);
                      // end back
-
                  }
              } catch (final BadLocationException ble) {
                  System.err.println("Ignored in this example");
              }
          }
 
-         if(isViewLimit) {
+         if(isViewLimitReached) {
              resultCountLabel.setText("...");
          } else {
              resultCountLabel.setText(String.valueOf(numLines));
