@@ -16,17 +16,15 @@
  import javax.swing.*;
  import javax.swing.text.*;
  import java.awt.*;
- import javax.swing.text.Highlighter.HighlightPainter;
 
  import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
  import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
 
  public class Highlighter {
+     public void highlightSearch(JTextPane textPane, String pattern, Color color) {
 
-     // Creates highlights around all occurrences of pattern in textPane
-     public void highlight(JTextPane textPane, String pattern) {
-         // First remove all old highlights
-         removeHighlights(textPane);
+         DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
+                 new DefaultHighlighter.DefaultHighlightPainter(color);
 
          try {
              javax.swing.text.Highlighter hilite = textPane.getHighlighter();
@@ -41,7 +39,7 @@
              // Search for pattern
              while ((pos = text.indexOf(pattern, pos)) >= 0) {
                  // Create highlighter using private painter and apply around pattern
-                 hilite.addHighlight(pos, pos + pattern.length(), myHighlightPainter);
+                 hilite.addHighlight(pos, pos + pattern.length(), previewHighlighter);
 
                  // back
                  StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
@@ -56,25 +54,32 @@
          }
      }
 
-     // Removes only our private highlights
-     private void removeHighlights(JTextComponent textComp) {
-         javax.swing.text.Highlighter hilite = textComp.getHighlighter();
-         javax.swing.text.Highlighter.Highlight[] hilites = hilite.getHighlights();
-
-         for (int i = 0; i < hilites.length; i++) {
-             if (hilites[i].getPainter() instanceof MyHighlightPainter) {
-                 hilite.removeHighlight(hilites[i]);
-             }
+     public void highlightPreview(JTextPane previewTextPane, String selectedLine, Color color) {
+         if(selectedLine.endsWith("\n\n")) {
+             selectedLine = selectedLine.substring(0, selectedLine.length() - 2);
          }
-     }
-     // An instance of the private subclass of the default highlight painter
-     HighlightPainter myHighlightPainter = new MyHighlightPainter(Color.ORANGE);
 
-     // A private subclass of the default highlight painter
-     private static class MyHighlightPainter
-             extends DefaultHighlighter.DefaultHighlightPainter {
-         public MyHighlightPainter(Color color) {
-             super(color);
+         DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
+                 new DefaultHighlighter.DefaultHighlightPainter(color);
+
+         try {
+             Document doc = previewTextPane.getDocument();
+             String text = doc.getText(0, doc.getLength());
+
+             int pos = text.indexOf(selectedLine);
+             previewTextPane.getHighlighter().addHighlight(pos,
+                     pos + selectedLine.length(), previewHighlighter);
+
+             // back, UX less focus on the preview
+             MutableAttributeSet attrs = previewTextPane.getInputAttributes();
+             StyledDocument doc1 = previewTextPane.getStyledDocument();
+             StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
+             doc1.setCharacterAttributes(pos, pos + selectedLine.length(), attrs, false);
+             StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
+             doc1.setCharacterAttributes(pos + selectedLine.length(), text.length(),attrs, false);
+             // end back
+         } catch (final BadLocationException ble) {
+             System.err.println("Ignored in this example");
          }
      }
  }

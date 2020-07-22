@@ -32,7 +32,6 @@
  import java.util.List;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
- import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
  import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
  import static com.borisfarber.ui.Repl.repl;
 
@@ -266,7 +265,7 @@
 
          if(query != null) {
              Highlighter highlighter = new Highlighter();
-             highlighter.highlight(resultTextPane, query);
+             highlighter.highlightSearch(resultTextPane, query, Color.ORANGE);
          }
 
          if(searchPreview.size() > 0) {
@@ -274,30 +273,8 @@
          }
 
          if(query != null) {
-             DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
-                     new DefaultHighlighter.DefaultHighlightPainter(FOREGROUND_COLOR);
-
-             try {
-                 Document doc = previewTextPane.getDocument();
-                 String text = doc.getText(0, doc.getLength());
-
-                 if (selectedLine.length() > 2) {
-                     int pos = text.indexOf(selectedLine.substring(0, selectedLine.length() - 2));
-                     previewTextPane.getHighlighter().addHighlight(pos,
-                             pos + selectedLine.length() - 2, previewHighlighter);
-
-                     // back, UX less focus on the preview
-                     MutableAttributeSet attrs = previewTextPane.getInputAttributes();
-                     StyledDocument doc1 = previewTextPane.getStyledDocument();
-                     StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
-                     doc1.setCharacterAttributes(pos, pos + selectedLine.length(), attrs, false);
-                     StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
-                     doc1.setCharacterAttributes(pos + selectedLine.length(), text.length(),attrs, false);
-                     // end back
-                 }
-             } catch (final BadLocationException ble) {
-                 System.err.println("Ignored in this example");
-             }
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
          }
 
          if(isViewLimitReached) {
