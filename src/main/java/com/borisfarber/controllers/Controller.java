@@ -32,6 +32,8 @@
  import java.util.List;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
+ import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
+ import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
@@ -272,18 +274,26 @@
 
          if(query != null) {
              DefaultHighlighter.DefaultHighlightPainter cyanPainter =
-                     new DefaultHighlighter.DefaultHighlightPainter(new Color(0,0,128));
+                     new DefaultHighlighter.DefaultHighlightPainter(FOREGROUND_COLOR);
 
              try {
-                 // TODO tweak here background parameters, take from highlighter
-                 // TODO do opposite backgound foreground colors, UX less focus on the preview
                  Document doc = previewTextPane.getDocument();
                  String text = doc.getText(0, doc.getLength());
 
                  if (previewText.length() > 2) {
-                     int pos = text.indexOf(previewText.substring(0, previewText.length()-2));
+                     int pos = text.indexOf(previewText.substring(0, previewText.length() - 2));
                      previewTextPane.getHighlighter().addHighlight(pos,
-                             pos + previewText.length()-2, cyanPainter);
+                             pos + previewText.length() - 2, cyanPainter);
+
+                     // back UX less focus on the preview
+                     MutableAttributeSet attrs = previewTextPane.getInputAttributes();
+                     StyledDocument doc1 = previewTextPane.getStyledDocument();
+                     StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
+                     doc1.setCharacterAttributes(pos, pos + previewText.length(), attrs, false);
+                     StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
+                     doc1.setCharacterAttributes(pos + previewText.length(), text.length(),attrs, false);
+                     // end back
+
                  }
              } catch (final BadLocationException ble) {
                  System.err.println("Ignored in this example");
