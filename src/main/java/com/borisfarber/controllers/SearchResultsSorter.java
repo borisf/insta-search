@@ -14,7 +14,7 @@
 package com.borisfarber.controllers;
 import java.util.Comparator;
 
-public class ResultsSorter implements Comparator<String> {
+public class SearchResultsSorter implements Comparator<String> {
     //  "log.txt:2424:something";
 
     @Override
