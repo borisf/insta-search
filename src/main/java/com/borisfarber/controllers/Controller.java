@@ -20,8 +20,7 @@
  import javax.swing.*;
  import javax.swing.event.DocumentEvent;
  import javax.swing.event.DocumentListener;
- import javax.swing.text.BadLocationException;
- import javax.swing.text.Document;
+ import javax.swing.text.*;
  import java.awt.*;
  import java.io.File;
  import java.io.IOException;
@@ -33,6 +32,7 @@
  import java.util.List;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
+ import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
  import static com.borisfarber.ui.Repl.repl;
 
  public final class Controller implements DocumentListener {
@@ -182,8 +182,8 @@
 
      public void search(String query) {
          selectedGuiIndex = 0;
-         search.search(query);
          this.query = query;
+         search.search(query);
      }
 
      public String dump() {
@@ -210,40 +210,41 @@
          int previewLinesIndex = 0;
          StringBuilder builder = new StringBuilder();
          LinkedList<Pair<String, Integer>> filenamesAndPositions;
-         ArrayList<String> resultPreview = new ArrayList<>();
-         String previewText = "";
-         boolean isViewLimit = false;
+         ArrayList<String> searchPreview = new ArrayList<>();
+         String selectedLine = "";
+         boolean isViewLimitReached = false;
 
-         List<String> resultSearchFromSearch = search.getResultSet();
-         while ((previewLinesIndex < resultSearchFromSearch.size()) && !isViewLimit) {
-             String rawLine = resultSearchFromSearch.get(previewLinesIndex);
+         List<String> searchResults = search.getResultSet();
+         while ((previewLinesIndex < searchResults.size()) && !isViewLimitReached) {
+             String rawLine = searchResults.get(previewLinesIndex);
              filenamesAndPositions = search.getFileNameAndPosition(rawLine);
 
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
                  String line = currentSearch.t + ":" +
                          currentSearch.u +":" + rawLine + "\n";
 
-                 resultPreview.add(line);
+                 searchPreview.add(line);
                  previewLinesIndex++;
 
                  if(previewLinesIndex >= UI_VIEW_LIMIT) {
-                     isViewLimit = true;
+                     isViewLimitReached = true;
                      break;
                  }
              }
-         } // end while
+         }
 
-         resultPreview.sort(new ResultsSorter());
+         searchPreview.sort(new SearchResultsSorter());
          numLines = previewLinesIndex;
          previewLinesIndex = 0;
-         for (String str : resultPreview) {
+
+         for (String str : searchPreview) {
              if(previewLinesIndex == selectedGuiIndex) {
                  builder.append(SELECTOR + str);
 
                  String[] parts  = str.split(":");
                  String fileName = parts[0];
                  String line = parts[1];
-                 previewText = parts[2];
+                 selectedLine = parts[2];
 
                  editorFilenameAndPosition.t = fileName;
                  editorFilenameAndPosition.u = Integer.parseInt(line);
@@ -264,27 +265,25 @@
 
          if(query != null) {
              Highlighter highlighter = new Highlighter();
-             highlighter.highlight(resultTextPane, query);
+             highlighter.highlightSearch(resultTextPane, query, Color.ORANGE);
          }
 
-         if(resultPreview.size() > 0) {
-             previewTextPane.setText(search.getPreview(resultPreview.get(selectedGuiIndex)));
+         if(searchPreview.size() > 0) {
+             previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
          }
 
-         /*
-         TODO fix here, race condition
          if(query != null) {
-             Highlighter highlighter1 = new Highlighter();
-             highlighter1.highlight(previewTextPane, previewText);
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
          }
-        */
-         if(isViewLimit) {
+
+         if(isViewLimitReached) {
              resultCountLabel.setText("...");
          } else {
              resultCountLabel.setText(String.valueOf(numLines));
          }
      }
-
+     
      public void close() {
          search.close();
      }

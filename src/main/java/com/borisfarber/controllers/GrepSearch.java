@@ -224,6 +224,12 @@ public class GrepSearch implements Search {
         String strkey = line.substring(0, line.length() - 1);
         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
 
+        if(!occurrences.containsKey(strkey)) {
+            Pair<String, Integer> pair = new Pair<>(file.getName(), 0);
+            result.add(pair);
+            return result;
+        }
+
         for (Integer occ : occurrences.get(strkey)) {
             Pair<String, Integer> pair = new Pair<>(file.getName(), occ);
             result.add(pair);
