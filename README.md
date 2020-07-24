@@ -1,7 +1,7 @@
 # ClassyShark Insta Search
 
-A lot of your time spent on “writing” code on production systems is actually spent on reading large logs. 
-And a decent chunk of time spent reading logs is actually spent on searching logs.
+A lot of your time spent on “writing” code on production systems is actually spent on searching code and 
+reading large logs.  And a decent chunk of time spent reading logs is actually spent on searching logs.
 
 ClassyShark Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) search in folders or in a large log file.
 
@@ -13,14 +13,19 @@ incrementally.
 
 ## Flow
 
-* Drap and drop your file into the results view
+* File - Drag and drop your file into the results view (Insta Search mappps the file)
+* Folder - Open folder via menu, or run Insta Search inside the relevant folder
 
+
+### Components
 * Search line - where you type text that are you looking for
 
 * Results view - where you see file set that include the text from
 the search line, use arrows to land to the relevant line
 
-* Once found the relevant line, press Enter, and the log file 
+* Preview view - shows the context near the selected line
+
+* Editor - once found the relevant line, press Enter, and the log file 
 will be opened on the relevant line within your defined
 editor
 
