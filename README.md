@@ -13,7 +13,7 @@ incrementally.
 
 ## Flow
 
-* File - Drag and drop your file into the results view (Insta Search mappps the file)
+* File - Drag and drop your file into the results view (Insta Search mapps the file)
 * Folder - Open folder via menu, or run Insta Search inside the relevant folder
 
 
