@@ -1,21 +1,21 @@
 # ClassyShark Insta Search
 
-A lot of your time spent on “writing” code on production systems is actually spent on searching code and 
-reading large logs.  And a decent chunk of time spent reading logs is actually spent on searching logs.
+A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
+logs.  And a decent chunk of time spent reading, is actually spent on searching.
 
-ClassyShark Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) search in folders or in a large log file.
+ClassyShark Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) search.
 
-With ClassyShark Insta Search you can easily and quickly find and navigate
+With Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
 incrementally.
 
 ![Image of ClassySearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
 
 ## Flow
+The Insta Search supports two modes: 
 
 * File - Drag and drop your file into the results view (Insta Search mapps the file)
-* Folder - Open folder via menu, or run Insta Search inside the relevant folder
-
+* Folder - Open folder via menu, or run Insta Search inside the relevant folder (Insta Search scans and reads files)
 
 ### Components
 * Search line - where you type text that are you looking for
@@ -32,7 +32,7 @@ editor
 ## Command Line Arguments
 
 * No args - InstaSearch will crawl recursively the current working folder (pwd) 
-* File name - the (large) log  file to crawl
+* File name - a large, usually log file to crawl
 
 ## Download & Run
 To run, grab the [latest JAR](https://github.com/borisf/insta-search/releases)
