@@ -30,6 +30,8 @@
  import java.util.ArrayList;
  import java.util.LinkedList;
  import java.util.List;
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.ThreadPoolExecutor;
 
  import static com.borisfarber.controllers.FuzzySearch.testLoad;
  import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
@@ -42,6 +44,7 @@
      private JTextPane previewTextPane;
      private final JLabel resultCountLabel;
 
+     private ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
      private String query;
      private Search search;
      private Pair<String, Integer> editorFilenameAndPosition =
@@ -183,7 +186,13 @@
      public void search(String query) {
          selectedGuiIndex = 0;
          this.query = query;
-         search.search(query);
+
+         Runnable runnableTask = () -> search.search(query);
+
+         long waitingTasksCount = executor.getActiveCount();
+         if(waitingTasksCount < 3) {
+             executor.submit(runnableTask);
+         }
      }
 
      public String dump() {
@@ -285,6 +294,7 @@
      }
      
      public void close() {
+         executor.shutdown();
          search.close();
      }
 

@@ -221,6 +221,10 @@ public class GrepSearch implements Search {
 
     @Override
     public LinkedList <Pair<String,Integer>> getFileNameAndPosition(String line) {
+        if(line == null) {
+            return new LinkedList<>();
+        }
+
         String strkey = line.substring(0, line.length() - 1);
         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
 
