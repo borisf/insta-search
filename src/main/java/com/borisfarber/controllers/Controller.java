@@ -188,9 +188,8 @@
          this.query = query;
 
          Runnable runnableTask = () -> search.search(query);
-
          long waitingTasksCount = executor.getActiveCount();
-         if(waitingTasksCount < 3) {
+         if(waitingTasksCount < 1) {
              executor.submit(runnableTask);
          }
      }
