@@ -14,8 +14,12 @@ incrementally.
 ## Flow
 The Insta Search supports two modes: 
 
-* File - Drag and drop your file into the results view (Insta Search mapps the file)
-* Folder - Open folder via menu, or run Insta Search inside the relevant folder (Insta Search scans and reads files)
+* File - Drag and drop your file into the results view (Insta Search maps the file)
+* Folder - Open folder via the menu, or run Insta Search inside the relevant folder 
+(Insta Search scans and reads files)
+* APK Based Unity game - Drag and drop your Unity based game inside the results view and Insta Search scans 
+and searches inside all the .rotada values, such as Unity version
+* Zip file - under design ... may be selection of the search algorithm 
 
 ### Components
 * Search line - where you type text that are you looking for

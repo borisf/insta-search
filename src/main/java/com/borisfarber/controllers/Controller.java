@@ -59,7 +59,7 @@
          this.previewTextPane = previewArea;
          this.resultCountLabel = resultCountLabel;
 
-         search = new GrepSearch(this);
+         search = new MockSearch(this);
      }
 
      public void crawl(final File file) {
@@ -67,11 +67,7 @@
              return;
          }
 
-         if(file.isDirectory()) {
-             search = new FuzzySearch(this);
-         } else {
-             search = new GrepSearch(this);
-         }
+         createSearch(file);
 
          search.crawl(file);
      }
@@ -122,11 +118,7 @@
                  previewTextPane.setText("");
                  resultCountLabel.setText("");
 
-                 if(newFile.isDirectory()) {
-                     search = new FuzzySearch(this);
-                 } else {
-                     search = new GrepSearch(this);
-                 }
+                 createSearch(newFile);
 
                  crawl(newFile);
              }
@@ -134,6 +126,14 @@
              e.printStackTrace();
          }
          return;
+     }
+
+     private void createSearch(File newFile) {
+         if (newFile.isDirectory()) {
+             search = new FuzzySearch(this);
+         } else {
+             search = new GrepSearch(this);
+         }
      }
 
      public void upPressed() {
@@ -300,4 +300,5 @@
      public static void main(String[] args) {
          repl();
      }
+
  }
