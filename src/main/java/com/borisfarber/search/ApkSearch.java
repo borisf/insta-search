@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 
 public class ApkSearch implements Search {
 
+    // TODO small set thing, show results with 0 line search
+
     private final Controller controller;
     private File zipFile;
     private final ArrayList<String> allLines = new ArrayList<>();
@@ -46,6 +48,17 @@ public class ApkSearch implements Search {
         allLines.clear();
 
         ZipUtil.iterate(file, zipEntry -> allLines.add(zipEntry.getName()));
+
+
+        Runnable runnable = () -> {
+            StringBuilder builder = new StringBuilder();
+            for (String fileName : allLines) {
+                builder.append(fileName + "\n");
+            }
+
+            controller.resultTextPane.setText(builder.toString());
+        };
+        SwingUtilities.invokeLater(runnable);
     }
 
     @Override
@@ -117,6 +130,9 @@ public class ApkSearch implements Search {
 
     @Override
     public TreeMap<String, Path> getFilenamesToPathes() {
+        // TODO stopped here for executing the file viewer
+        //  private final TreeMap<String, Path> filenamesToPathes;
+        //  think of a JVM file
         return null;
     }
 

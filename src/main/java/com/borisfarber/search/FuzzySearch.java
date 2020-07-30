@@ -139,7 +139,7 @@
                  return;
              }
 
-             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
+             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
              Runnable runnable = () -> controller.onUpdateGUI();
              SwingUtilities.invokeLater(runnable);
          });
