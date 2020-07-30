@@ -29,4 +29,6 @@ public interface Search {
     void testCrawl(ArrayList<String> testLoad);
 
     void close();
+
+    void emptyQuery();
 }

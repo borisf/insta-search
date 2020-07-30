@@ -313,6 +313,11 @@ public class GrepSearch implements Search {
         }));
     }
 
+    @Override
+    public void emptyQuery() {
+
+    }
+
     // Compile the pattern from the command line
     // case insensitive
     private static void compile(String pat) {

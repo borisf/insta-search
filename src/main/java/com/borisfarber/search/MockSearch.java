@@ -110,4 +110,9 @@ public class MockSearch implements Search {
     public void close() {
 
     }
+
+    @Override
+    public void emptyQuery() {
+
+    }
 }

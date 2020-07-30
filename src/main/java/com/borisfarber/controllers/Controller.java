@@ -99,6 +99,8 @@
                  resultTextPane.setText("");
                  previewTextPane.setText("");
                  resultCountLabel.setText("");
+
+                 search.emptyQuery();
              }
 
          } catch (BadLocationException e) {

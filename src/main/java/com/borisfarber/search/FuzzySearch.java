@@ -108,15 +108,7 @@
 
          processDuplicates(allLines);
 
-         Runnable runnable = () -> {
-             StringBuilder builder = new StringBuilder();
-             for (String fileName : filenamesToPathes.keySet()) {
-                 builder.append(fileName + "\n");
-             }
-
-             controller.resultTextPane.setText(builder.toString());
-         };
-         SwingUtilities.invokeLater(runnable);
+         emptyQuery();
      }
 
      private void processDuplicates(List<String> allLines) {
@@ -267,6 +259,19 @@
              } catch (Throwable e) {
              }
          }));
+     }
+
+     @Override
+     public void emptyQuery() {
+         Runnable runnable = () -> {
+             StringBuilder builder = new StringBuilder();
+             for (String fileName : filenamesToPathes.keySet()) {
+                 builder.append(fileName + "\n");
+             }
+
+             controller.resultTextPane.setText(builder.toString());
+         };
+         SwingUtilities.invokeLater(runnable);
      }
 
      public String toString() {
