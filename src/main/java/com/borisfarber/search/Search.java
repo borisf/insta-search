@@ -1,4 +1,4 @@
-package com.borisfarber.controllers;
+package com.borisfarber.search;
 
 import com.borisfarber.data.Pair;
 

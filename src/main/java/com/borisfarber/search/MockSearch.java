@@ -28,9 +28,11 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.borisfarber.controllers;
+package com.borisfarber.search;
 
+import com.borisfarber.controllers.Controller;
 import com.borisfarber.data.Pair;
+import com.borisfarber.search.Search;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -39,7 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-class MockSearch implements Search {
+public class MockSearch implements Search {
     private final Controller controller;
     private String query = "query";
 

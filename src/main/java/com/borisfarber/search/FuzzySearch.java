@@ -11,8 +11,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.controllers;
+ package com.borisfarber.search;
 
+ import com.borisfarber.controllers.Controller;
+ import com.borisfarber.data.Pair;
+ import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+
+ import javax.swing.*;
  import java.io.File;
  import java.io.IOException;
  import java.nio.file.*;
@@ -20,11 +25,6 @@
  import java.util.*;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
-
- import com.borisfarber.data.Pair;
- import me.xdrop.fuzzywuzzy.model.ExtractedResult;
-
- import javax.swing.*;
 
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
