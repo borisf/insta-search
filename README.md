@@ -17,9 +17,9 @@ The Insta Search supports two modes:
 * File - Drag and drop your file into the results view (Insta Search maps the file)
 * Folder - Open folder via the menu, or run Insta Search inside the relevant folder 
 (Insta Search scans and reads files)
-* APK Based Unity game - Drag and drop your Unity based game inside the results view and Insta Search scans 
-and searches inside all the .rotada values, such as Unity version
-* Zip file - under design ... may be selection of the search algorithm 
+* APK/Zip file- Drag and drop your file into the results view. Insta Search will show the entries. 
+Searching will result of filtering of the filenames. Going over the entries you see the preview, 
+pressing enter will open the temp file, with all the data in. 
 
 ### Components
 * Search line - where you type text that are you looking for

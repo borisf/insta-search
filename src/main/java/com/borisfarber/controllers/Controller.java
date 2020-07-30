@@ -14,6 +14,7 @@
  package com.borisfarber.controllers;
 
  import com.borisfarber.data.Pair;
+ import com.borisfarber.search.*;
  import com.borisfarber.ui.Background;
  import com.borisfarber.ui.Highlighter;
 
@@ -33,7 +34,7 @@
  import java.util.concurrent.Executors;
  import java.util.concurrent.ThreadPoolExecutor;
 
- import static com.borisfarber.controllers.FuzzySearch.testLoad;
+ import static com.borisfarber.search.FuzzySearch.testLoad;
  import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
  import static com.borisfarber.ui.Repl.repl;
 
@@ -132,7 +133,11 @@
          if (newFile.isDirectory()) {
              search = new FuzzySearch(this);
          } else {
-             search = new GrepSearch(this);
+             if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")) {
+                 search = new ApkSearch(newFile, this);
+             } else {
+                 search = new GrepSearch(this);
+             }
          }
      }
 
