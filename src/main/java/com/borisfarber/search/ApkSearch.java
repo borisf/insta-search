@@ -32,7 +32,7 @@
      private final ArrayList<String> allLines = new ArrayList<>();
      private ExecutorService executorService =
              Executors.newSingleThreadExecutor();
-     private List<ExtractedResult> resultSet;
+     private List<ExtractedResult> resultSet = new ArrayList<>();
 
      public ApkSearch(File newFile, Controller controller) {
          this.zipFile = newFile;
@@ -44,6 +44,7 @@
      public void crawl(File file) {
          this.zipFile = file;
          allLines.clear();
+         resultSet.clear();
          ZipUtil.iterate(file, zipEntry -> allLines.add(zipEntry.getName()));
          emptyQuery();
      }
@@ -56,7 +57,7 @@
                  return;
              }
 
-             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
+             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted(query, allLines, 50);
              Runnable runnable = () -> controller.onUpdateGUI();
              SwingUtilities.invokeLater(runnable);
          });
