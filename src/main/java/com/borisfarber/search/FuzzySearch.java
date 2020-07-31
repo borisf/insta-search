@@ -11,8 +11,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.controllers;
+ package com.borisfarber.search;
 
+ import com.borisfarber.controllers.Controller;
+ import com.borisfarber.data.Pair;
+ import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+
+ import javax.swing.*;
  import java.io.File;
  import java.io.IOException;
  import java.nio.file.*;
@@ -20,11 +25,6 @@
  import java.util.*;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
-
- import com.borisfarber.data.Pair;
- import me.xdrop.fuzzywuzzy.model.ExtractedResult;
-
- import javax.swing.*;
 
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
@@ -108,15 +108,7 @@
 
          processDuplicates(allLines);
 
-         Runnable runnable = () -> {
-             StringBuilder builder = new StringBuilder();
-             for (String fileName : filenamesToPathes.keySet()) {
-                 builder.append(fileName + "\n");
-             }
-
-             controller.resultTextPane.setText(builder.toString());
-         };
-         SwingUtilities.invokeLater(runnable);
+         emptyQuery();
      }
 
      private void processDuplicates(List<String> allLines) {
@@ -139,7 +131,7 @@
                  return;
              }
 
-             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 10);
+             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
              Runnable runnable = () -> controller.onUpdateGUI();
              SwingUtilities.invokeLater(runnable);
          });
@@ -229,8 +221,8 @@
      }
 
      @Override
-     public TreeMap<String, Path> getFilenamesToPathes() {
-         return filenamesToPathes;
+     public Path getPathPerFileName(String fileName) {
+         return filenamesToPathes.get(fileName);
      }
 
      @Override
@@ -267,6 +259,19 @@
              } catch (Throwable e) {
              }
          }));
+     }
+
+     @Override
+     public void emptyQuery() {
+         Runnable runnable = () -> {
+             StringBuilder builder = new StringBuilder();
+             for (String fileName : filenamesToPathes.keySet()) {
+                 builder.append(fileName + "\n");
+             }
+
+             controller.resultTextPane.setText(builder.toString());
+         };
+         SwingUtilities.invokeLater(runnable);
      }
 
      public String toString() {

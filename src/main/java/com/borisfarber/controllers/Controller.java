@@ -14,6 +14,7 @@
  package com.borisfarber.controllers;
 
  import com.borisfarber.data.Pair;
+ import com.borisfarber.search.*;
  import com.borisfarber.ui.Background;
  import com.borisfarber.ui.Highlighter;
 
@@ -33,7 +34,7 @@
  import java.util.concurrent.Executors;
  import java.util.concurrent.ThreadPoolExecutor;
 
- import static com.borisfarber.controllers.FuzzySearch.testLoad;
+ import static com.borisfarber.search.FuzzySearch.testLoad;
  import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
  import static com.borisfarber.ui.Repl.repl;
 
@@ -59,7 +60,7 @@
          this.previewTextPane = previewArea;
          this.resultCountLabel = resultCountLabel;
 
-         search = new GrepSearch(this);
+         search = new MockSearch(this);
      }
 
      public void crawl(final File file) {
@@ -67,11 +68,7 @@
              return;
          }
 
-         if(file.isDirectory()) {
-             search = new FuzzySearch(this);
-         } else {
-             search = new GrepSearch(this);
-         }
+         createSearch(file);
 
          search.crawl(file);
      }
@@ -102,6 +99,8 @@
                  resultTextPane.setText("");
                  previewTextPane.setText("");
                  resultCountLabel.setText("");
+
+                 search.emptyQuery();
              }
 
          } catch (BadLocationException e) {
@@ -122,11 +121,7 @@
                  previewTextPane.setText("");
                  resultCountLabel.setText("");
 
-                 if(newFile.isDirectory()) {
-                     search = new FuzzySearch(this);
-                 } else {
-                     search = new GrepSearch(this);
-                 }
+                 createSearch(newFile);
 
                  crawl(newFile);
              }
@@ -134,6 +129,18 @@
              e.printStackTrace();
          }
          return;
+     }
+
+     private void createSearch(File newFile) {
+         if (newFile.isDirectory()) {
+             search = new FuzzySearch(this);
+         } else {
+             if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")) {
+                 search = new ApkSearch(newFile, this);
+             } else {
+                 search = new GrepSearch(this);
+             }
+         }
      }
 
      public void upPressed() {
@@ -154,7 +161,7 @@
      }
 
      public void enterPressed() {
-         String fullPath = search.getFilenamesToPathes().get(editorFilenameAndPosition.t).toString();
+         String fullPath = search.getPathPerFileName(editorFilenameAndPosition.t).toString();
 
          try {
              String command = "nvim +\"set number\" +"
@@ -228,8 +235,8 @@
              filenamesAndPositions = search.getFileNameAndPosition(rawLine);
 
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
-                 String line = currentSearch.t + ":" +
-                         currentSearch.u +":" + rawLine + "\n";
+                 String line = currentSearch.t + ":" + currentSearch.u +":"
+                         + rawLine + "\n";
 
                  searchPreview.add(line);
                  previewLinesIndex++;
@@ -300,4 +307,5 @@
      public static void main(String[] args) {
          repl();
      }
+
  }

@@ -14,8 +14,12 @@ incrementally.
 ## Flow
 The Insta Search supports two modes: 
 
-* File - Drag and drop your file into the results view (Insta Search mapps the file)
-* Folder - Open folder via menu, or run Insta Search inside the relevant folder (Insta Search scans and reads files)
+* File - Drag and drop your file into the results view (Insta Search maps the file)
+* Folder - Open folder via the menu, or run Insta Search inside the relevant folder 
+(Insta Search scans and reads files)
+* APK/Zip file- Drag and drop your file into the results view. Insta Search will show the entries. 
+Searching will result of filtering of the filenames. Going over the entries you see the preview, 
+pressing enter will open the temp file, with all the data in. 
 
 ### Components
 * Search line - where you type text that are you looking for

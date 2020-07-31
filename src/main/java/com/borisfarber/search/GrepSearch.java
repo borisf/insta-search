@@ -28,8 +28,9 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.borisfarber.controllers;
+package com.borisfarber.search;
 
+import com.borisfarber.controllers.Controller;
 import com.borisfarber.data.Pair;
 import com.jramoyo.io.IndexedFileReader;
 
@@ -289,8 +290,8 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public TreeMap<String, Path> getFilenamesToPathes() {
-        return nameToPaths;
+    public Path getPathPerFileName(String fileName) {
+        return nameToPaths.get(fileName);
     }
 
     @Override
@@ -309,6 +310,11 @@ public class GrepSearch implements Search {
             } catch (Throwable e) {
             }
         }));
+    }
+
+    @Override
+    public void emptyQuery() {
+
     }
 
     // Compile the pattern from the command line

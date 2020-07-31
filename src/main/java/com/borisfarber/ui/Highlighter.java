@@ -67,6 +67,12 @@
              String text = doc.getText(0, doc.getLength());
 
              int pos = text.indexOf(selectedLine);
+
+             if(pos == -1) {
+                 System.err.println("wrong search index");
+                 return;
+             }
+
              previewTextPane.getHighlighter().addHighlight(pos,
                      pos + selectedLine.length(), previewHighlighter);
 
