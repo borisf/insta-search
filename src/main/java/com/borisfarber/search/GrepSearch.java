@@ -32,7 +32,6 @@ package com.borisfarber.search;
 
 import com.borisfarber.controllers.Controller;
 import com.borisfarber.data.Pair;
-import com.borisfarber.search.Search;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -291,8 +290,8 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public TreeMap<String, Path> getFilenamesToPathes() {
-        return nameToPaths;
+    public Path getPathPerFileName(String fileName) {
+        return nameToPaths.get(fileName);
     }
 
     @Override

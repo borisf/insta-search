@@ -26,7 +26,6 @@
  import java.util.concurrent.Executors;
 
  public class ApkSearch implements Search {
-
      private final Controller controller;
      private File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
@@ -44,9 +43,7 @@
      public void crawl(File file) {
          this.zipFile = file;
          allLines.clear();
-
          ZipUtil.iterate(file, zipEntry -> allLines.add(zipEntry.getName()));
-
          emptyQuery();
      }
 
@@ -70,8 +67,6 @@
          //line is a file name
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         // TODO think of a file, after parsing the line
-         // ZipUtil.unpackEntry(new File("/tmp/demo.zip"), "foo.txt", new File("/tmp/bar.txt"));
          Pair<String, Integer> pair = new Pair(this.zipFile.getName(), 0);
          result.add(pair);
          return result;
@@ -118,7 +113,11 @@
      }
 
      @Override
-     public TreeMap<String, Path> getFilenamesToPathes() {
+     public Path getPathPerFileName(String fileName) {
+         // TODO change the signature for a file name parameter --- encapsulate field
+         // TODO think of a file, after parsing the line
+         // ZipUtil.unpackEntry(new File("/tmp/demo.zip"), "foo.txt", new File("/tmp/bar.txt"));
+
          // TODO stopped here for executing the file viewer
          //  private final TreeMap<String, Path> filenamesToPathes;
          //  think of a JVM file

@@ -221,8 +221,8 @@
      }
 
      @Override
-     public TreeMap<String, Path> getFilenamesToPathes() {
-         return filenamesToPathes;
+     public Path getPathPerFileName(String fileName) {
+         return filenamesToPathes.get(fileName);
      }
 
      @Override

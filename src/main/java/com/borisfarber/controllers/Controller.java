@@ -161,7 +161,7 @@
      }
 
      public void enterPressed() {
-         String fullPath = search.getFilenamesToPathes().get(editorFilenameAndPosition.t).toString();
+         String fullPath = search.getPathPerFileName(editorFilenameAndPosition.t).toString();
 
          try {
              String command = "nvim +\"set number\" +"

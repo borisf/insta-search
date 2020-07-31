@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
 public interface Search {
     void crawl(File file);
@@ -24,7 +23,7 @@ public interface Search {
 
     String getResultSetCount();
 
-    TreeMap<String, Path> getFilenamesToPathes();
+    Path getPathPerFileName(String fileName);
 
     void testCrawl(ArrayList<String> testLoad);
 

@@ -32,14 +32,12 @@ package com.borisfarber.search;
 
 import com.borisfarber.controllers.Controller;
 import com.borisfarber.data.Pair;
-import com.borisfarber.search.Search;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
 public class MockSearch implements Search {
     private final Controller controller;
@@ -97,7 +95,7 @@ public class MockSearch implements Search {
     }
 
     @Override
-    public TreeMap<String, Path> getFilenamesToPathes() {
+    public Path getPathPerFileName(String fileName) {
         return null;
     }
 
