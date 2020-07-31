@@ -20,6 +20,7 @@
 
  import javax.swing.*;
  import java.io.File;
+ import java.io.IOException;
  import java.nio.file.Path;
  import java.util.*;
  import java.util.concurrent.ExecutorService;
@@ -63,11 +64,9 @@
 
      @Override
      public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
-         System.out.println("line-" + line);
-         //line is a file name
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         Pair<String, Integer> pair = new Pair(this.zipFile.getName(), 0);
+         Pair<String, Integer> pair = new Pair(line, 0);
          result.add(pair);
          return result;
      }
@@ -114,14 +113,16 @@
 
      @Override
      public Path getPathPerFileName(String fileName) {
-         // TODO change the signature for a file name parameter --- encapsulate field
-         // TODO think of a file, after parsing the line
-         // ZipUtil.unpackEntry(new File("/tmp/demo.zip"), "foo.txt", new File("/tmp/bar.txt"));
 
-         // TODO stopped here for executing the file viewer
-         //  private final TreeMap<String, Path> filenamesToPathes;
-         //  think of a JVM file
-         return null;
+         File tempFile = null;
+         try {
+             tempFile = File.createTempFile(fileName,"txt");
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+
+         ZipUtil.unpackEntry(zipFile, fileName, tempFile);
+         return Path.of(tempFile.toURI());
      }
 
      @Override

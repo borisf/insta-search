@@ -235,8 +235,8 @@
              filenamesAndPositions = search.getFileNameAndPosition(rawLine);
 
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
-                 String line = currentSearch.t + ":" +
-                         currentSearch.u +":" + rawLine + "\n";
+                 String line = currentSearch.t + ":" + currentSearch.u +":"
+                         + rawLine + "\n";
 
                  searchPreview.add(line);
                  previewLinesIndex++;
