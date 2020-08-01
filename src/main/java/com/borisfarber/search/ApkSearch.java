@@ -91,8 +91,7 @@
          line = line.substring(0, line.length()-1);
          byte[] bytes = ZipUtil.unpackEntry(zipFile, line);
 
-         // todo probably more than 120
-         String result = new String(Arrays.copyOfRange(bytes, 0, 120));
+         String result = new String(Arrays.copyOfRange(bytes, 0, 360));
          return result;
      }
 
@@ -117,7 +116,7 @@
 
          File tempFile = null;
          try {
-             tempFile = File.createTempFile(fileName,"txt");
+             tempFile = File.createTempFile(fileName, "");
          } catch (IOException e) {
              e.printStackTrace();
          }

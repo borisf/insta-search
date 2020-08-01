@@ -27,6 +27,7 @@
  import java.io.IOException;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
+ import java.nio.file.Path;
  import java.nio.file.Paths;
  import java.util.ArrayList;
  import java.util.LinkedList;
@@ -161,13 +162,28 @@
      }
 
      public void enterPressed() {
+         if(search.getPathPerFileName(editorFilenameAndPosition.t) == null) {
+             // garbage files
+             return;
+         }
+
          String fullPath = search.getPathPerFileName(editorFilenameAndPosition.t).toString();
+         //Path path = search.getPathPerFileName(editorFilenameAndPosition.t);
 
          try {
-             String command = "nvim +\"set number\" +"
-                     + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
-                     " " + fullPath;
-             Terminal.executeInLinux(command);
+             String command;
+
+             // TODO check with files from zip
+            // if(BinaryToTextTranslator.MATCHER.matches(path)) {
+                 // text file ends with txt/java/etc'
+                 command = "nvim +\"set number\" +"
+                         + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
+                         " " + fullPath;
+                 Terminal.executeInLinux(command);
+             //} else {
+                 // TODO here do a class file from archive from zip
+             //}
+
          } catch (Exception e) {
              try {
                  Desktop desktop = Desktop.getDesktop();
@@ -237,7 +253,7 @@
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
                  String line = currentSearch.t + ":" + currentSearch.u +":"
                          + rawLine + "\n";
-
+                 
                  searchPreview.add(line);
                  previewLinesIndex++;
 
