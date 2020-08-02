@@ -13,13 +13,25 @@
   */
 package com.borisfarber.controllers;
 
+ import java.io.File;
  import java.nio.file.FileSystems;
  import java.nio.file.PathMatcher;
 
- public class BinaryToTextTranslator {
+ public enum PrivateFolder {
+
+     INSTANCE;
 
      public static final PathMatcher MATCHER  =
              FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+
+
+
+     public File getPrivateFolder() {
+        return new File("");
+     }
+
+
+
 
 
     public static void calcTempoExtension(String fileName) {
