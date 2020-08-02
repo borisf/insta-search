@@ -17,6 +17,8 @@
  import com.borisfarber.search.*;
  import com.borisfarber.ui.Background;
  import com.borisfarber.ui.Highlighter;
+ import com.strobel.decompiler.Decompiler;
+ import com.strobel.decompiler.PlainTextOutput;
 
  import javax.swing.*;
  import javax.swing.event.DocumentEvent;
@@ -25,6 +27,7 @@
  import java.awt.*;
  import java.io.File;
  import java.io.IOException;
+ import java.io.StringWriter;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Path;
@@ -136,7 +139,8 @@
          if (newFile.isDirectory()) {
              search = new FuzzySearch(this);
          } else {
-             if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")) {
+             if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")
+                     || newFile.getName().endsWith("jar")) {
                  search = new ApkSearch(newFile, this);
              } else {
                  search = new GrepSearch(this);
@@ -168,21 +172,31 @@
          }
 
          String fullPath = search.getPathPerFileName(editorFilenameAndPosition.t).toString();
-         //Path path = search.getPathPerFileName(editorFilenameAndPosition.t);
+         Path path = search.getPathPerFileName(editorFilenameAndPosition.t);
 
          try {
              String command;
 
              // TODO check with files from zip
-            // if(BinaryToTextTranslator.MATCHER.matches(path)) {
+             if(PrivateFolder.INSTANCE.MATCHER.matches(path)) {
                  // text file ends with txt/java/etc'
                  command = "nvim +\"set number\" +"
                          + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                          " " + fullPath;
                  Terminal.executeInLinux(command);
-             //} else {
-                 // TODO here do a class file from archive from zip
-             //}
+             } else {
+                 StringWriter writer = new StringWriter();
+
+                 try {
+                     PlainTextOutput pt = new PlainTextOutput(writer);
+                     Decompiler.decompile(fullPath, pt);
+                 } finally {
+                     writer.flush();
+                 }
+
+                 String content = writer.toString();
+                 previewTextPane.setText(content);
+             }
 
          } catch (Exception e) {
              try {
@@ -253,7 +267,7 @@
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
                  String line = currentSearch.t + ":" + currentSearch.u +":"
                          + rawLine + "\n";
-                 
+
                  searchPreview.add(line);
                  previewLinesIndex++;
 
@@ -304,8 +318,8 @@
          }
 
          if(query != null) {
-            Highlighter highlighter = new Highlighter();
-            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
+             Highlighter highlighter = new Highlighter();
+             highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
          }
 
          if(isViewLimitReached) {
@@ -314,7 +328,7 @@
              resultCountLabel.setText(String.valueOf(numLines));
          }
      }
-     
+
      public void close() {
          executor.shutdown();
          search.close();
