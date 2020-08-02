@@ -23,10 +23,12 @@
  import javax.swing.*;
  import javax.swing.event.DocumentEvent;
  import javax.swing.event.DocumentListener;
- import javax.swing.text.*;
+ import javax.swing.text.BadLocationException;
+ import javax.swing.text.Document;
  import java.awt.*;
  import java.io.File;
  import java.io.IOException;
+ import java.io.PrintWriter;
  import java.io.StringWriter;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
@@ -178,13 +180,16 @@
              String command;
 
              // TODO check with files from zip
-             if(PrivateFolder.INSTANCE.MATCHER.matches(path)) {
+             if(PrivateFolder.INSTANCE.SOURCE_MATCHER.matches(path)) {
                  // text file ends with txt/java/etc'
                  command = "nvim +\"set number\" +"
                          + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                          " " + fullPath;
                  Terminal.executeInLinux(command);
-             } else {
+             } else if(PrivateFolder.INSTANCE.CLASS_MATCHER.matches(path)) {
+                 String fileNameWithOutExt = new File(fullPath).getName().replaceFirst("[.][^.]+$", "");
+
+                 String ext = "java";
                  StringWriter writer = new StringWriter();
 
                  try {
@@ -196,8 +201,17 @@
 
                  String content = writer.toString();
                  previewTextPane.setText(content);
-             }
 
+                 File f = PrivateFolder.INSTANCE.getTempFile(fileNameWithOutExt, ext);
+                 try (PrintWriter out = new PrintWriter(f)) {
+                     out.println(content);
+                 }
+
+                 command = "nvim " + f.getAbsolutePath();
+                 Terminal.executeInLinux(command);
+             } else {
+                 // not sure what to do here
+             }
          } catch (Exception e) {
              try {
                  Desktop desktop = Desktop.getDesktop();
@@ -337,5 +351,4 @@
      public static void main(String[] args) {
          repl();
      }
-
  }

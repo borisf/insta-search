@@ -14,19 +14,18 @@
  package com.borisfarber.search;
 
  import com.borisfarber.controllers.Controller;
+ import com.borisfarber.controllers.PrivateFolder;
  import com.borisfarber.data.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 
  import javax.swing.*;
  import java.io.File;
- import java.io.IOException;
- import java.nio.file.Files;
  import java.nio.file.Path;
- import java.nio.file.attribute.PosixFileAttributes;
- import java.nio.file.attribute.PosixFilePermission;
- import java.nio.file.attribute.PosixFilePermissions;
- import java.util.*;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.LinkedList;
+ import java.util.List;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
 
@@ -117,65 +116,10 @@
 
      @Override
      public Path getPathPerFileName(String fileName) {
-         File tempFile = null;
-         try {
-             String path = System.getProperty("user.home");
-             path += File.separator + ".instasearch";
-             File customDir = new File(path);
+         String simpleName = new File(fileName).getName();
+         File tempFile = PrivateFolder.INSTANCE.getTempFile(simpleName);
+         ZipUtil.unpackEntry(zipFile, fileName, tempFile);
 
-             if (customDir.exists()) {
-                 System.out.println(customDir + " already exists");
-             } else if (customDir.mkdirs()) {
-                 System.out.println(customDir + " was created");
-             } else {
-                 System.out.println(customDir + " was not created");
-             }
-
-             Set<PosixFilePermission> perms = Files.readAttributes(Path.of(customDir.toURI()), PosixFileAttributes.class).permissions();
-
-             System.out.format("Permissions before: %s%n",  PosixFilePermissions.toString(perms));
-
-             perms.add(PosixFilePermission.OWNER_WRITE);
-             perms.add(PosixFilePermission.OWNER_READ);
-             perms.add(PosixFilePermission.OWNER_EXECUTE);
-             perms.add(PosixFilePermission.GROUP_WRITE);
-             perms.add(PosixFilePermission.GROUP_READ);
-             perms.add(PosixFilePermission.GROUP_EXECUTE);
-             perms.add(PosixFilePermission.OTHERS_WRITE);
-             perms.add(PosixFilePermission.OTHERS_READ);
-             perms.add(PosixFilePermission.OTHERS_EXECUTE);
-             Files.setPosixFilePermissions(Path.of(customDir.toURI()), perms);
-
-
-             File tempFile1 = new File(customDir + File.separator +  fileName);
-
-             String nnn = tempFile1.getName();
-
-             tempFile = new File(customDir + File.separator +  nnn);
-             System.out.println("create file:" + tempFile.createNewFile());
-
-
-             perms = Files.readAttributes(Path.of(tempFile.toURI()), PosixFileAttributes.class).permissions();
-
-             System.out.format("Permissions before: %s%n",  PosixFilePermissions.toString(perms));
-
-             perms.add(PosixFilePermission.OWNER_WRITE);
-             perms.add(PosixFilePermission.OWNER_READ);
-             perms.add(PosixFilePermission.OWNER_EXECUTE);
-             perms.add(PosixFilePermission.GROUP_WRITE);
-             perms.add(PosixFilePermission.GROUP_READ);
-             perms.add(PosixFilePermission.GROUP_EXECUTE);
-             perms.add(PosixFilePermission.OTHERS_WRITE);
-             perms.add(PosixFilePermission.OTHERS_READ);
-             perms.add(PosixFilePermission.OTHERS_EXECUTE);
-             Files.setPosixFilePermissions(Path.of(tempFile.toURI()), perms);
-
-             ZipUtil.unpackEntry(zipFile, fileName, tempFile);
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-
-         // TODO fix this
          return Path.of(tempFile.toURI());
      }
 
@@ -187,8 +131,7 @@
      @Override
      public void close() {
          executorService.shutdown();
-
-         // TODO delete the folder in controller close
+         PrivateFolder.INSTANCE.shutdown();
      }
 
      @Override
