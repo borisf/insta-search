@@ -187,8 +187,8 @@
                          " " + fullPath;
                  Terminal.executeInLinux(command);
              } else if(PrivateFolder.INSTANCE.CLASS_MATCHER.matches(path)) {
-                 String fileNameWithOutExt = new File(fullPath).getName().replaceFirst("[.][^.]+$", "");
-
+                 String fileNameWithOutExt =
+                         new File(fullPath).getName().replaceFirst("[.][^.]+$", "");
                  String ext = "java";
                  StringWriter writer = new StringWriter();
 
@@ -202,12 +202,12 @@
                  String content = writer.toString();
                  previewTextPane.setText(content);
 
-                 File f = PrivateFolder.INSTANCE.getTempFile(fileNameWithOutExt, ext);
-                 try (PrintWriter out = new PrintWriter(f)) {
+                 File javaFile = PrivateFolder.INSTANCE.getTempFile(fileNameWithOutExt, ext);
+                 try (PrintWriter out = new PrintWriter(javaFile)) {
                      out.println(content);
                  }
 
-                 command = "nvim " + f.getAbsolutePath();
+                 command = "nvim " + javaFile.getAbsolutePath();
                  Terminal.executeInLinux(command);
              } else {
                  // not sure what to do here
