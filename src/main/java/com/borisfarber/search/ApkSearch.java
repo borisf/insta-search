@@ -70,14 +70,14 @@
      public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         Pair<String, Integer> pair = new Pair(line, 0);
+         Pair<String, Integer> pair = new Pair<>(line, 0);
          result.add(pair);
          return result;
      }
 
      @Override
      public String getResults() {
-         return null;
+         return "";
      }
 
      @Override

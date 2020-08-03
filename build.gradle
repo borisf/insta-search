@@ -27,7 +27,15 @@ dependencies {
     implementation 'com.jramoyo:indexed-file-reader:1.0'
     implementation 'org.zeroturnaround:zt-zip:1.14'
     implementation 'org.bitbucket.mstrobel:procyon-compilertools:0.5.36'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
 }
 
 jar {
