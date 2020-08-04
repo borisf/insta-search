@@ -14,15 +14,18 @@
  package com.borisfarber.search;
 
  import com.borisfarber.controllers.Controller;
+ import com.borisfarber.controllers.PrivateFolder;
  import com.borisfarber.data.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 
  import javax.swing.*;
  import java.io.File;
- import java.io.IOException;
  import java.nio.file.Path;
- import java.util.*;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.LinkedList;
+ import java.util.List;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
 
@@ -67,14 +70,14 @@
      public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         Pair<String, Integer> pair = new Pair(line, 0);
+         Pair<String, Integer> pair = new Pair<>(line, 0);
          result.add(pair);
          return result;
      }
 
      @Override
      public String getResults() {
-         return null;
+         return "";
      }
 
      @Override
@@ -91,8 +94,7 @@
          line = line.substring(0, line.length()-1);
          byte[] bytes = ZipUtil.unpackEntry(zipFile, line);
 
-         // todo probably more than 120
-         String result = new String(Arrays.copyOfRange(bytes, 0, 120));
+         String result = new String(Arrays.copyOfRange(bytes, 0, 360));
          return result;
      }
 
@@ -114,15 +116,10 @@
 
      @Override
      public Path getPathPerFileName(String fileName) {
-
-         File tempFile = null;
-         try {
-             tempFile = File.createTempFile(fileName,"txt");
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-
+         String simpleName = new File(fileName).getName();
+         File tempFile = PrivateFolder.INSTANCE.getTempFile(simpleName);
          ZipUtil.unpackEntry(zipFile, fileName, tempFile);
+
          return Path.of(tempFile.toURI());
      }
 
@@ -134,6 +131,7 @@
      @Override
      public void close() {
          executorService.shutdown();
+         PrivateFolder.INSTANCE.shutdown();
      }
 
      @Override

@@ -71,7 +71,7 @@
                  FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
 
          try {
-             Files.walkFileTree(pathString, new SimpleFileVisitor<Path>() {
+             Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
 
                  @Override
                  public FileVisitResult preVisitDirectory(Path dir,
