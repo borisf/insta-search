@@ -67,7 +67,7 @@
              result.createNewFile();
              setPosixPermissions(result);
          } catch(IOException e) {
-
+             e.printStackTrace();
          }
          return result;
      }
