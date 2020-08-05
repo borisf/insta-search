@@ -283,6 +283,13 @@
                  String line = currentSearch.t + ":" + currentSearch.u +":"
                          + rawLine;
 
+                 if(!rawLine.endsWith("\n")) {
+                     // optimization grep lines come with \n
+                     // don;lt want to change the logic there for performance
+                     // TODO fixme in Search Results controller
+                     line += "\n";
+                 }
+
                  searchPreview.add(line);
                  previewLinesIndex++;
 

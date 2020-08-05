@@ -14,6 +14,7 @@
  package com.borisfarber.search;
 
  import com.borisfarber.controllers.Controller;
+ import com.borisfarber.controllers.Hexdump;
  import com.borisfarber.controllers.PrivateFolder;
  import com.borisfarber.data.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
@@ -90,11 +91,23 @@
          String fileName = parts[0];
          String line = parts[2];
 
-         // remove the new line in the end
-         line = line.substring(0, line.length()-1);
-         byte[] bytes = ZipUtil.unpackEntry(zipFile, line);
+         String nLine = line;
 
-         String result = new String(Arrays.copyOfRange(bytes, 0, 360));
+         // remove the new line in the end
+         if(nLine.endsWith("\n")) {
+             nLine = nLine.substring(0, nLine.length()-1);
+         }
+
+         byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
+         int headerSize = bytes.length;
+
+         if(headerSize > 64) {
+             headerSize = 64;
+         }
+
+         String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
+         String result = header +  "\n...\n" + Hexdump.hexdump(bytes);
+
          return result;
      }
 

@@ -88,7 +88,6 @@ public class GrepSearch implements Search {
 
     @Override
     public void crawl(File file) {
-
         if(file.isDirectory()) {
             this.file = dumpFolderToFile(file);
         }
@@ -99,7 +98,6 @@ public class GrepSearch implements Search {
         try {
             preview = Files.readAllLines(this.file.toPath(), charset);
             processDuplicates(preview);
-
             nameToPaths.clear();
             nameToPaths.put(this.file.getName(), Path.of(this.file.toURI()));
 
@@ -128,8 +126,6 @@ public class GrepSearch implements Search {
 
             builder.append("...");
             controller.resultTextPane.setText(builder.toString());
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,7 +178,6 @@ public class GrepSearch implements Search {
             outputWriter.close();
 
             return dumpFile;
-
         } catch (IOException e) {
             e.printStackTrace();
         }
