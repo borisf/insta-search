@@ -122,7 +122,6 @@
                  controller.highlightPreview();
              };
 
-
              SwingUtilities.invokeLater(runnable);
          });
 

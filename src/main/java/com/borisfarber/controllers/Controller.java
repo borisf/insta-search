@@ -263,8 +263,8 @@ public final class Controller implements DocumentListener {
     public void onUpdateGUI() {
         int previewLinesIndex = 0;
         LinkedList<Pair<String, Integer>> filenamesAndPositions;
-        searchPreview.clear();
         boolean isViewLimitReached = false;
+        searchPreview.clear();
 
         List<String> searchResults = search.getResultSet();
         while ((previewLinesIndex < searchResults.size()) && !isViewLimitReached) {
@@ -277,7 +277,7 @@ public final class Controller implements DocumentListener {
 
                 if(!rawLine.endsWith("\n")) {
                     // optimization grep lines come with \n
-                    // don;lt want to change the logic there for performance
+                    // don't want to change the logic there for performance
                     // TODO fixme in Search Results controller
                     line += "\n";
                 }
@@ -299,7 +299,6 @@ public final class Controller implements DocumentListener {
     }
 
     private void onUpdateGUIInternal() {
-        // selected gui index
         int previewLinesIndex = 0;
         StringBuilder builder = new StringBuilder();
         for (String str : searchPreview) {
@@ -321,7 +320,8 @@ public final class Controller implements DocumentListener {
         resultTextPane.setText(builder.toString());
 
         if(searchPreview.size() > 0) {
-            previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
+            previewTextPane.setText
+                    (search.getPreview(searchPreview.get(selectedGuiIndex)));
         }
 
         if(searchPreview.size() > UI_VIEW_LIMIT) {
