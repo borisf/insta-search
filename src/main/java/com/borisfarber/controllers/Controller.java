@@ -48,7 +48,7 @@ public final class Controller implements DocumentListener {
     public static final int UI_VIEW_LIMIT = 50;
     private final JTextField searchField;
     public JTextPane resultTextPane;
-    private JTextPane previewTextPane;
+    public JTextPane previewTextPane;
     private final JLabel resultCountLabel;
 
     private ThreadPoolExecutor executor =
@@ -57,11 +57,13 @@ public final class Controller implements DocumentListener {
     private Search search;
     private Pair<String, Integer> editorFilenameAndPosition =
             new Pair<>("test.txt",0);
+    private ArrayList<String> searchPreview = new ArrayList<>();
     private int selectedGuiIndex = 0;
     private int numLines = 0;
+    private String selectedLine = "";
 
     public Controller(JTextField searchField,
-            JTextPane resultTextPane,
+                      JTextPane resultTextPane,
                       JTextPane previewArea,
                       JLabel resultCountLabel) {
         this.searchField = searchField;
@@ -157,7 +159,7 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex--;
         }
 
-        onUpdateGUI();
+        onUpdateGUIInternal();
     }
 
     public void downPressed() {
@@ -166,7 +168,7 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex++;
         }
 
-        onUpdateGUI();
+        onUpdateGUIInternal();
     }
 
     public void enterPressed() {
@@ -213,10 +215,10 @@ public final class Controller implements DocumentListener {
                 // not sure what to do here
             }
         } catch (Exception e) {
-           // follow up on various OSs where nvim not configured
-           // Desktop desktop = Desktop.getDesktop();
-           // desktop.open(new File(selectedPath.toString())); --- will not work with zip
-          e.printStackTrace();
+            // follow up on various OSs where nvim not configured
+            // Desktop desktop = Desktop.getDesktop();
+            // desktop.open(new File(selectedPath.toString())); --- will not work with zip
+            e.printStackTrace();
         }
     }
 
@@ -260,10 +262,8 @@ public final class Controller implements DocumentListener {
 
     public void onUpdateGUI() {
         int previewLinesIndex = 0;
-        StringBuilder builder = new StringBuilder();
         LinkedList<Pair<String, Integer>> filenamesAndPositions;
-        ArrayList<String> searchPreview = new ArrayList<>();
-        String selectedLine = "";
+        searchPreview.clear();
         boolean isViewLimitReached = false;
 
         List<String> searchResults = search.getResultSet();
@@ -294,16 +294,22 @@ public final class Controller implements DocumentListener {
 
         searchPreview.sort(new SearchResultsSorter());
         numLines = previewLinesIndex;
-        previewLinesIndex = 0;
 
+        onUpdateGUIInternal();
+    }
+
+    private void onUpdateGUIInternal() {
+        // selected gui index
+        int previewLinesIndex = 0;
+        String selectedLine = "";
+        StringBuilder builder = new StringBuilder();
         for (String str : searchPreview) {
             if(previewLinesIndex == selectedGuiIndex) {
                 builder.append(SELECTOR + str);
-
                 String[] parts  = str.split(":");
                 String fileName = parts[0];
                 String line = parts[1];
-                selectedLine = parts[2];
+                this.selectedLine = parts[2];
 
                 editorFilenameAndPosition.t = fileName;
                 editorFilenameAndPosition.u = Integer.parseInt(line);
@@ -314,6 +320,17 @@ public final class Controller implements DocumentListener {
         }
 
         resultTextPane.setText(builder.toString());
+
+        if(searchPreview.size() > 0) {
+            // TODO make async, causing UX freezes
+            previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
+        }
+
+        if(searchPreview.size() > UI_VIEW_LIMIT) {
+            resultCountLabel.setText("...");
+        } else {
+            resultCountLabel.setText(String.valueOf(numLines));
+        }
 
         try {
             int selector = builder.toString().indexOf(SELECTOR);
@@ -326,26 +343,18 @@ public final class Controller implements DocumentListener {
             Highlighter highlighter = new Highlighter();
             highlighter.highlightSearch(resultTextPane, query, Color.ORANGE);
         }
-
-        if(searchPreview.size() > 0) {
-            previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
-        }
-
-        if(query != null) {
-            Highlighter highlighter = new Highlighter();
-            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
-        }
-
-        if(isViewLimitReached) {
-            resultCountLabel.setText("...");
-        } else {
-            resultCountLabel.setText(String.valueOf(numLines));
-        }
     }
 
     public void close() {
         executor.shutdown();
         search.close();
+    }
+
+    public void highlightPreview() {
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
+        }
     }
 
     public static void main(String[] args) {

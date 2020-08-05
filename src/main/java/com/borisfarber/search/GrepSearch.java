@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -77,6 +78,7 @@ public class GrepSearch implements Search {
     private HashMap<String, LinkedList<Integer>> occurrences;
     private ExecutorService executorService =
             Executors.newFixedThreadPool(4);
+
     private ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
     private String query;
@@ -310,39 +312,57 @@ public class GrepSearch implements Search {
 
     @Override
     public String getPreview(String resultLine) {
-        try {
-            String[] parts  = resultLine.split(":");
-            String lineNum = parts[1];
-            int lineNumInt = Integer.parseInt(lineNum);
 
-            int lowerBound = lineNumInt - 7;
-            if(lowerBound < 1) {
-                lowerBound = 1;
-            }
-
-            IndexedFileReader reader = new IndexedFileReader(file);
-
-            int upperBound = lineNumInt + 7;
-
-            if(upperBound > reader.getLineCount()) {
-                upperBound = reader.getLineCount() - 1;
-            }
-
-            SortedMap<Integer, String> lines = reader.readLines(lowerBound,upperBound);
-
-            StringBuilder builder = new StringBuilder();
-
-            for (Map.Entry<Integer, String> entry : lines.entrySet()) {
-                builder.append(entry.getValue());
-                builder.append("\n");
-            }
-
-            return builder.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
+        long waitingTasksCount = ((ThreadPoolExecutor)(executorService)).getActiveCount();
+        if(waitingTasksCount > 1) {
+            return "";
         }
 
-        return "";
+        executorService.execute(() -> {
+
+            try {
+                String[] parts  = resultLine.split(":");
+                String lineNum = parts[1];
+                int lineNumInt = Integer.parseInt(lineNum);
+
+                int lowerBound = lineNumInt - 7;
+                if(lowerBound < 1) {
+                    lowerBound = 1;
+                }
+
+                IndexedFileReader reader = new IndexedFileReader(file);
+
+                int upperBound = lineNumInt + 7;
+
+                if(upperBound > reader.getLineCount()) {
+                    upperBound = reader.getLineCount() - 1;
+                }
+
+                SortedMap<Integer, String> lines = reader.readLines(lowerBound,upperBound);
+
+                StringBuilder builder = new StringBuilder();
+
+                for (Map.Entry<Integer, String> entry : lines.entrySet()) {
+                    builder.append(entry.getValue());
+                    builder.append("\n");
+                }
+
+                String result =  builder.toString();
+
+
+
+                Runnable runnable = () -> {
+                    controller.previewTextPane.setText(result);
+                    controller.highlightPreview();
+                };
+
+                SwingUtilities.invokeLater(runnable);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return "building";
     }
 
     @Override

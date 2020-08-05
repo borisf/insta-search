@@ -29,13 +29,14 @@
  import java.util.List;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
+ import java.util.concurrent.ThreadPoolExecutor;
 
  public class ZipSearch implements Search {
      private final Controller controller;
      private File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
      private ExecutorService executorService =
-             Executors.newSingleThreadExecutor();
+             Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
      public ZipSearch(File newFile, Controller controller) {
@@ -87,28 +88,45 @@
              return "";
          }
 
-         String[] parts  = resultLine.split(":");
-         String fileName = parts[0];
-         String line = parts[2];
-
-         String nLine = line;
-
-         // remove the new line in the end
-         if(nLine.endsWith("\n")) {
-             nLine = nLine.substring(0, nLine.length()-1);
+         long waitingTasksCount = ((ThreadPoolExecutor)(executorService)).getActiveCount();
+         if(waitingTasksCount > 1) {
+             return "";
          }
 
-         byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
-         int headerSize = bytes.length;
+         executorService.execute(() -> {
+             String[] parts  = resultLine.split(":");
+             String fileName = parts[0];
+             String line = parts[2];
 
-         if(headerSize > 64) {
-             headerSize = 64;
-         }
+             String nLine = line;
 
-         String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
-         String result = header +  "\n...\n" + Hexdump.hexdump(bytes);
+             // remove the new line in the end
+             if(nLine.endsWith("\n")) {
+                 nLine = nLine.substring(0, nLine.length()-1);
+             }
 
-         return result;
+             byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
+             int headerSize = bytes.length;
+
+             if(headerSize > 128) {
+                 headerSize = 128;
+             }
+
+             String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
+             String result = header +  "\n...\n" +
+                     Hexdump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
+                     "\n...\n";
+
+             Runnable runnable = () -> {
+                 controller.previewTextPane.setText(result);
+                 controller.highlightPreview();
+             };
+
+
+             SwingUtilities.invokeLater(runnable);
+         });
+
+         return "building";
      }
 
      @Override
