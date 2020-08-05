@@ -31,20 +31,19 @@
 package com.borisfarber.search;
 
 import com.borisfarber.controllers.Controller;
+import com.borisfarber.controllers.PrivateFolder;
 import com.borisfarber.data.Pair;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +51,9 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 public class GrepSearch implements Search {
     private static Charset charset = Charset.forName("ISO-8859-15");
@@ -71,7 +73,7 @@ public class GrepSearch implements Search {
     private CharBuffer cb4;
     private TreeMap<String, Path> nameToPaths;
     private int qq;
-    private List<String> preview;
+    private List<String> preview= new ArrayList<>();
     private HashMap<String, LinkedList<Integer>> occurrences;
     private ExecutorService executorService =
             Executors.newFixedThreadPool(4);
@@ -86,15 +88,20 @@ public class GrepSearch implements Search {
 
     @Override
     public void crawl(File file) {
-        try {
-            preview = Files.readAllLines(file.toPath(), charset);
-            processDuplicates(preview);
-
+        if(file.isDirectory()) {
+            this.file = dumpFolderToFile(file);
+        }
+        else {
             this.file = file;
-            nameToPaths.clear();
-            nameToPaths.put(file.getName(), Path.of(file.toURI()));
+        }
 
-            FileInputStream fis = new FileInputStream(file);
+        try {
+            preview = Files.readAllLines(this.file.toPath(), charset);
+            processDuplicates(preview);
+            nameToPaths.clear();
+            nameToPaths.put(this.file.getName(), Path.of(this.file.toURI()));
+
+            FileInputStream fis = new FileInputStream(this.file);
             FileChannel fc = fis.getChannel();
             int sz = (int)fc.size();
             qq = sz/4;
@@ -102,10 +109,10 @@ public class GrepSearch implements Search {
             fis.close();
             fc.close();
 
-            cb1 = mapToCharBuffer(file, 0 * qq, qq);
-            cb2 = mapToCharBuffer(file, 1 * qq, qq);
-            cb3 = mapToCharBuffer(file, 2 * qq, qq);
-            cb4 = mapToCharBuffer(file, 3 * qq, qq);
+            cb1 = mapToCharBuffer(this.file, 0 * qq, qq);
+            cb2 = mapToCharBuffer(this.file, 1 * qq, qq);
+            cb3 = mapToCharBuffer(this.file, 2 * qq, qq);
+            cb4 = mapToCharBuffer(this.file, 3 * qq, qq);
 
             int upper = 10;
             if(upper > preview.size()) {
@@ -119,11 +126,63 @@ public class GrepSearch implements Search {
 
             builder.append("...");
             controller.resultTextPane.setText(builder.toString());
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private File dumpFolderToFile(File file) {
+        Path pathString = file.toPath();
+        PathMatcher matcher =
+                FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+        try {
+            Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
+
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir,
+                                                         BasicFileAttributes attrs) {
+                    if (dir.getFileName().toString().startsWith(".")) {
+                        return SKIP_SUBTREE;
+                    }
+                    return CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
+                        throws IOException {
+                    if (matcher.matches(path)) {
+                        try {
+                            List<String> allFileLines = Files.readAllLines(path);
+                            preview.addAll(allFileLines);
+                        } catch (java.nio.charset.MalformedInputException e) {
+                            System.out.println("Bad file format " + path.getFileName().toString());
+                        }
+                    }
+                    return CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            File dumpFile = PrivateFolder.INSTANCE.getTempFile("dump.txt");
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(dumpFile));
+
+            for (int i = 0; i < preview.size(); i++) {
+                outputWriter.write(preview.get(i));
+                outputWriter.newLine();
+            }
+
+            outputWriter.flush();
+            outputWriter.close();
+
+            return dumpFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return file;
     }
 
     private void processDuplicates(List<String> preview) {
@@ -154,6 +213,7 @@ public class GrepSearch implements Search {
             return result;
 
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return result;
@@ -269,7 +329,15 @@ public class GrepSearch implements Search {
             }
 
             SortedMap<Integer, String> lines = reader.readLines(lowerBound,upperBound);
-            return lines.toString();
+
+            StringBuilder builder = new StringBuilder();
+
+            for (Map.Entry<Integer, String> entry : lines.entrySet()) {
+                builder.append(entry.getValue());
+                builder.append("\n");
+            }
+
+            return builder.toString();
         } catch (IOException e) {
             e.printStackTrace();
         }

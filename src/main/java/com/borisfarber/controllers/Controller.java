@@ -139,7 +139,8 @@
 
      private void createSearch(File newFile) {
          if (newFile.isDirectory()) {
-             search = new FuzzySearch(this);
+             //search = new FuzzySearch(this);
+             search = new GrepSearch(this);
          } else {
              if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")
                      || newFile.getName().endsWith("jar")) {
@@ -280,7 +281,14 @@
 
              for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
                  String line = currentSearch.t + ":" + currentSearch.u +":"
-                         + rawLine + "\n";
+                         + rawLine;
+
+                 if(!rawLine.endsWith("\n")) {
+                     // optimization grep lines come with \n
+                     // don;lt want to change the logic there for performance
+                     // TODO fixme in Search Results controller
+                     line += "\n";
+                 }
 
                  searchPreview.add(line);
                  previewLinesIndex++;
