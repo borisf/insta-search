@@ -211,19 +211,10 @@ public final class Controller implements DocumentListener {
                 // not sure what to do here
             }
         } catch (Exception e) {
-            try {
-                Desktop desktop = Desktop.getDesktop();
-                desktop.open(new File(selectedPath.toString()));
-            } catch (IOException ioException) {
-                try {
-                    String content =
-                            Files.readString(selectedPath, StandardCharsets.US_ASCII);
-                    previewTextPane.setText(content);
-                } catch (IOException exception) {
-                    previewTextPane.setText("Something is wrong with the file "
-                            + exception.getMessage());
-                }
-            }
+           // follow up on various OSs where nvim not configured
+           // Desktop desktop = Desktop.getDesktop();
+           // desktop.open(new File(selectedPath.toString())); --- will not work with zip
+          e.printStackTrace();
         }
     }
 
