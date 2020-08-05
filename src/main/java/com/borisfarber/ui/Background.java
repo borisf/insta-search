@@ -17,7 +17,7 @@ package com.borisfarber.ui;
 
  public class Background {
 
-    public final static String SHARK_BG =
+    public final static String INTRO =
             "\n\n\n\n\n\n\n\n                          ClassyShark Insta Search ver."
             + BuildVersion.getBuildVersion();
 }

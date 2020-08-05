@@ -12,11 +12,11 @@ incrementally.
 ![Image of ClassySearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
 
 ## Flow
-The Insta Search supports two modes: 
+The Insta Search supports the following modes: 
 
 * File - Drag and drop your file into the results view (Insta Search maps the file)
 * Folder - Open folder via the menu, or run Insta Search inside the relevant folder 
-(Insta Search scans and reads files)
+(Insta Search ds the files into one big text file and then maps that file)
 * APK/Zip file - Drag and drop your file into the results view. Insta Search will show the entries. 
 Searching will result of filtering of the filenames. Going over the entries you see the preview.
 * Jar/Zip file with class files - Drag and drop your file into the results view. Insta Search 

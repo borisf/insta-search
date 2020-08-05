@@ -185,7 +185,7 @@ public final class InstaSearch extends JFrame {
         result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
         result.setForeground(FOREGROUND_COLOR);
-        result.setText(Background.SHARK_BG);
+        result.setText(Background.INTRO);
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
