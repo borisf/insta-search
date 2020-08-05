@@ -14,7 +14,7 @@
 package com.borisfarber.controllers;
 
 import com.borisfarber.data.Pair;
-import com.borisfarber.search.ApkSearch;
+import com.borisfarber.search.ZipSearch;
 import com.borisfarber.search.GrepSearch;
 import com.borisfarber.search.MockSearch;
 import com.borisfarber.search.Search;
@@ -30,11 +30,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,11 +46,13 @@ import static com.borisfarber.ui.Repl.repl;
 public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
     public static final int UI_VIEW_LIMIT = 50;
+    private final JTextField searchField;
     public JTextPane resultTextPane;
     private JTextPane previewTextPane;
     private final JLabel resultCountLabel;
 
-    private ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
+    private ThreadPoolExecutor executor =
+            (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
     private String query;
     private Search search;
     private Pair<String, Integer> editorFilenameAndPosition =
@@ -61,9 +60,11 @@ public final class Controller implements DocumentListener {
     private int selectedGuiIndex = 0;
     private int numLines = 0;
 
-    public Controller(JTextPane resultTextPane,
+    public Controller(JTextField searchField,
+            JTextPane resultTextPane,
                       JTextPane previewArea,
                       JLabel resultCountLabel) {
+        this.searchField = searchField;
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
         this.resultCountLabel = resultCountLabel;
@@ -123,6 +124,7 @@ public final class Controller implements DocumentListener {
     public void fileOpened(File newFile) {
         try {
             if(newFile != null) {
+                searchField.setText("");
                 resultTextPane.setText(Background.INTRO);
                 previewTextPane.setText("");
                 resultCountLabel.setText("");
@@ -143,7 +145,7 @@ public final class Controller implements DocumentListener {
         } else {
             if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")
                     || newFile.getName().endsWith("jar")) {
-                return new ApkSearch(newFile, this);
+                return new ZipSearch(newFile, this);
             } else {
                 return new GrepSearch(this);
             }

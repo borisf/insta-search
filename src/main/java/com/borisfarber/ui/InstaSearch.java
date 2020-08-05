@@ -47,7 +47,9 @@ public final class InstaSearch extends JFrame {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
         buildUI();
-        controller = new Controller(resultTextPane, previewTextPane, resultCountLabel);
+        controller =
+                new Controller(searchField, resultTextPane,
+                        previewTextPane, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
     }
 
