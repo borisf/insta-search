@@ -30,7 +30,7 @@
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
 
- public class ApkSearch implements Search {
+ public class ZipSearch implements Search {
      private final Controller controller;
      private File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
@@ -38,7 +38,7 @@
              Executors.newSingleThreadExecutor();
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
-     public ApkSearch(File newFile, Controller controller) {
+     public ZipSearch(File newFile, Controller controller) {
          this.zipFile = newFile;
          this.controller = controller;
          allLines.clear();
@@ -161,7 +161,7 @@
      }
 
      public static void main(String[] args) {
-         ApkSearch as = new ApkSearch(new File("/home/bfarber/Desktop/shark_v01.apk"), null);
+         ZipSearch as = new ZipSearch(new File("/home/bfarber/Desktop/shark_v01.apk"), null);
          as.crawl(new File("/home/bfarber/Desktop/shark_v01.apk"));
      }
  }
