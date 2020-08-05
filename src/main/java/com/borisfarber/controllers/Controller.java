@@ -221,6 +221,7 @@ public final class Controller implements DocumentListener {
     }
 
     public void onFileDragged(File file) {
+        searchField.setText("");
         resultTextPane.setText(Background.INTRO);
         previewTextPane.setText("");
         crawl(file);
