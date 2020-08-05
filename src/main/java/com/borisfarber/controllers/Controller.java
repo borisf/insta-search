@@ -301,7 +301,6 @@ public final class Controller implements DocumentListener {
     private void onUpdateGUIInternal() {
         // selected gui index
         int previewLinesIndex = 0;
-        String selectedLine = "";
         StringBuilder builder = new StringBuilder();
         for (String str : searchPreview) {
             if(previewLinesIndex == selectedGuiIndex) {
@@ -322,7 +321,6 @@ public final class Controller implements DocumentListener {
         resultTextPane.setText(builder.toString());
 
         if(searchPreview.size() > 0) {
-            // TODO make async, causing UX freezes
             previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
         }
 
@@ -336,7 +334,7 @@ public final class Controller implements DocumentListener {
             int selector = builder.toString().indexOf(SELECTOR);
             resultTextPane.setCaretPosition(selector);
         } catch (IllegalArgumentException iae) {
-
+            iae.printStackTrace();
         }
 
         if(query != null) {
