@@ -70,6 +70,7 @@
 
      @Override
      public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
+         // may be to add mapping to simple file names, not sure
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
          Pair<String, Integer> pair = new Pair<>(line, 0);
