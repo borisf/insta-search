@@ -1,362 +1,365 @@
- /*
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
- package com.borisfarber.controllers;
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.borisfarber.controllers;
 
- import com.borisfarber.data.Pair;
- import com.borisfarber.search.*;
- import com.borisfarber.ui.Background;
- import com.borisfarber.ui.Highlighter;
- import com.strobel.decompiler.Decompiler;
- import com.strobel.decompiler.PlainTextOutput;
+import com.borisfarber.data.Pair;
+import com.borisfarber.search.ZipSearch;
+import com.borisfarber.search.GrepSearch;
+import com.borisfarber.search.MockSearch;
+import com.borisfarber.search.Search;
+import com.borisfarber.ui.Background;
+import com.borisfarber.ui.Highlighter;
+import com.strobel.decompiler.Decompiler;
+import com.strobel.decompiler.PlainTextOutput;
 
- import javax.swing.*;
- import javax.swing.event.DocumentEvent;
- import javax.swing.event.DocumentListener;
- import javax.swing.text.BadLocationException;
- import javax.swing.text.Document;
- import java.awt.*;
- import java.io.File;
- import java.io.IOException;
- import java.io.PrintWriter;
- import java.io.StringWriter;
- import java.nio.charset.StandardCharsets;
- import java.nio.file.Files;
- import java.nio.file.Path;
- import java.nio.file.Paths;
- import java.util.ArrayList;
- import java.util.LinkedList;
- import java.util.List;
- import java.util.concurrent.Executors;
- import java.util.concurrent.ThreadPoolExecutor;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import java.awt.*;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
- import static com.borisfarber.search.FuzzySearch.testLoad;
- import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
- import static com.borisfarber.ui.Repl.repl;
+import static com.borisfarber.search.FuzzySearch.testLoad;
+import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
+import static com.borisfarber.ui.Repl.repl;
 
- public final class Controller implements DocumentListener {
-     public static final String SELECTOR = "==> ";
-     public static final int UI_VIEW_LIMIT = 50;
-     public JTextPane resultTextPane;
-     private JTextPane previewTextPane;
-     private final JLabel resultCountLabel;
+public final class Controller implements DocumentListener {
+    public static final String SELECTOR = "==> ";
+    public static final int UI_VIEW_LIMIT = 50;
+    private static final Comparator<String> RESULTS_SORTER = new SearchResultsSorter();
 
-     private ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
-     private String query;
-     private Search search;
-     private Pair<String, Integer> editorFilenameAndPosition =
-             new Pair<>("test.txt",0);
-     private int selectedGuiIndex = 0;
-     private int numLines = 0;
+    private final JTextField searchField;
+    public JTextPane resultTextPane;
+    public JTextPane previewTextPane;
+    private final JLabel resultCountLabel;
 
-     public Controller(JTextPane resultTextPane,
-                       JTextPane previewArea,
-                       JLabel resultCountLabel) {
-         this.resultTextPane = resultTextPane;
-         this.previewTextPane = previewArea;
-         this.resultCountLabel = resultCountLabel;
+    private ThreadPoolExecutor executor =
+            (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
+    private String query;
+    private Search search;
+    private Pair<String, Integer> editorFilenameAndPosition =
+            new Pair<>("test.txt",0);
+    private ArrayList<String> searchResults = new ArrayList<>();
+    private int selectedGuiIndex = 0;
+    private int numLines = 0;
+    private String selectedLine = "";
 
-         search = new MockSearch(this);
-     }
+    public Controller(JTextField searchField,
+                      JTextPane resultTextPane,
+                      JTextPane previewArea,
+                      JLabel resultCountLabel) {
+        this.searchField = searchField;
+        this.resultTextPane = resultTextPane;
+        this.previewTextPane = previewArea;
+        this.resultCountLabel = resultCountLabel;
 
-     public void crawl(final File file) {
-         if (file == null || !file.exists()) {
-             return;
-         }
+        search = new MockSearch(this);
+    }
 
-         createSearch(file);
+    public void crawl(final File file) {
+        if (file == null || !file.exists()) {
+            return;
+        }
 
-         search.crawl(file);
-     }
+        search = createSearch(file);
+        search.crawl(file);
+    }
 
-     public void testCrawl() {
-         search.testCrawl(testLoad());
-     }
+    public void testCrawl() {
+        search.testCrawl(testLoad());
+    }
 
-     @Override
-     public void insertUpdate(final DocumentEvent evt) {
-         // letter
-         Document document = evt.getDocument();
-         runNewSearch(document);
-     }
+    @Override
+    public void insertUpdate(final DocumentEvent evt) {
+        // letter
+        Document document = evt.getDocument();
+        runNewSearch(document);
+    }
 
-     @Override
-     public void removeUpdate(final DocumentEvent evt) {
-         // when new folder is loaded, this callback gets called
-         Document document = evt.getDocument();
+    @Override
+    public void removeUpdate(final DocumentEvent evt) {
+        // when new folder is loaded, this callback gets called
+        Document document = evt.getDocument();
 
-         try {
-             final String query = document.getText(0,
-                     document.getLength());
+        try {
+            final String query = document.getText(0,
+                    document.getLength());
 
-             if(query.length() > 1) {
-                 search(query);
-             } else {
-                 resultTextPane.setText("");
-                 previewTextPane.setText("");
-                 resultCountLabel.setText("");
+            if(query.length() > 1) {
+                search(query);
+            } else {
+                resultTextPane.setText("");
+                previewTextPane.setText("");
+                resultCountLabel.setText("");
 
-                 search.emptyQuery();
-             }
+                search.emptyQuery();
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
 
-         } catch (BadLocationException e) {
-             e.printStackTrace();
-         }
-     }
+    @Override
+    public void changedUpdate(final DocumentEvent evt) {
+        Document document = evt.getDocument();
+        runNewSearch(document);
+    }
 
-     @Override
-     public void changedUpdate(final DocumentEvent evt) {
-         Document document = evt.getDocument();
-         runNewSearch(document);
-     }
+    public void fileOpened(File newFile) {
+        try {
+            if(newFile != null) {
+                searchField.setText("");
+                resultTextPane.setText(Background.INTRO);
+                previewTextPane.setText("");
+                resultCountLabel.setText("");
 
-     public void fileOpened(File newFile) {
-         try {
-             if(newFile != null) {
-                 resultTextPane.setText(Background.SHARK_BG);
-                 previewTextPane.setText("");
-                 resultCountLabel.setText("");
+                search = createSearch(newFile);
+                crawl(newFile);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return;
+    }
 
-                 createSearch(newFile);
+    private Search createSearch(File newFile) {
+        if (newFile.isDirectory()) {
+            //return new FuzzySearch(this);
+            return new GrepSearch(this);
+        } else {
+            if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")
+                    || newFile.getName().endsWith("jar")) {
+                return new ZipSearch(newFile, this);
+            } else {
+                return new GrepSearch(this);
+            }
+        }
+    }
 
-                 crawl(newFile);
-             }
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
-         return;
-     }
+    public void upPressed() {
+        if(selectedGuiIndex > 0) {
+            selectedGuiIndex--;
+        }
 
-     private void createSearch(File newFile) {
-         if (newFile.isDirectory()) {
-             //search = new FuzzySearch(this);
-             search = new GrepSearch(this);
-         } else {
-             if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")
-                     || newFile.getName().endsWith("jar")) {
-                 search = new ApkSearch(newFile, this);
-             } else {
-                 search = new GrepSearch(this);
-             }
-         }
-     }
+        onUpdateGUIInternal();
+    }
 
-     public void upPressed() {
-         if(selectedGuiIndex > 0) {
-             selectedGuiIndex--;
-         }
+    public void downPressed() {
+        if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
+                && selectedGuiIndex < (numLines - 1)) {
+            selectedGuiIndex++;
+        }
 
-         onUpdateGUI();
-     }
+        onUpdateGUIInternal();
+    }
 
-     public void downPressed() {
-         if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
-                 && selectedGuiIndex < (numLines - 1)) {
-             selectedGuiIndex++;
-         }
+    public void enterPressed() {
+        if(search.getPathPerFileName(editorFilenameAndPosition.t) == null) {
+            // garbage files
+            return;
+        }
 
-         onUpdateGUI();
-     }
+        Path selectedPath = search.getPathPerFileName(editorFilenameAndPosition.t);
 
-     public void enterPressed() {
-         if(search.getPathPerFileName(editorFilenameAndPosition.t) == null) {
-             // garbage files
-             return;
-         }
+        try {
+            String command;
 
-         String fullPath = search.getPathPerFileName(editorFilenameAndPosition.t).toString();
-         Path path = search.getPathPerFileName(editorFilenameAndPosition.t);
+            if(PrivateFolder.INSTANCE.SOURCE_MATCHER.matches(selectedPath)) {
+                command = "nvim +\"set number\" +"
+                        + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
+                        " " + selectedPath.toString();
+                Terminal.executeInLinux(command);
+            } else if(PrivateFolder.INSTANCE.CLASS_MATCHER.matches(selectedPath)) {
+                String fileNameWithoutExt =
+                        new File(selectedPath.toString()).
+                                getName().replaceFirst("[.][^.]+$", "");
+                String ext = "java";
+                StringWriter writer = new StringWriter();
 
-         try {
-             String command;
+                try {
+                    PlainTextOutput pto = new PlainTextOutput(writer);
+                    Decompiler.decompile(selectedPath.toString(), pto);
+                } finally {
+                    writer.flush();
+                }
 
-             // TODO check with files from zip
-             if(PrivateFolder.INSTANCE.SOURCE_MATCHER.matches(path)) {
-                 // text file ends with txt/java/etc'
-                 command = "nvim +\"set number\" +"
-                         + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
-                         " " + fullPath;
-                 Terminal.executeInLinux(command);
-             } else if(PrivateFolder.INSTANCE.CLASS_MATCHER.matches(path)) {
-                 String fileNameWithOutExt =
-                         new File(fullPath).getName().replaceFirst("[.][^.]+$", "");
-                 String ext = "java";
-                 StringWriter writer = new StringWriter();
+                String content = writer.toString();
+                previewTextPane.setText(content);
 
-                 try {
-                     PlainTextOutput pt = new PlainTextOutput(writer);
-                     Decompiler.decompile(fullPath, pt);
-                 } finally {
-                     writer.flush();
-                 }
+                File javaFile = PrivateFolder.INSTANCE.getTempFile(fileNameWithoutExt, ext);
+                try (PrintWriter out = new PrintWriter(javaFile)) {
+                    out.println(content);
+                }
 
-                 String content = writer.toString();
-                 previewTextPane.setText(content);
+                command = "nvim " + javaFile.getAbsolutePath();
+                Terminal.executeInLinux(command);
+            } else {
+                // not sure what to do here
+            }
+        } catch (Exception e) {
+            // follow up on various OSs where nvim not configured
+            // Desktop desktop = Desktop.getDesktop();
+            // desktop.open(new File(selectedPath.toString())); --- will not work with zip
+            e.printStackTrace();
+        }
+    }
 
-                 File javaFile = PrivateFolder.INSTANCE.getTempFile(fileNameWithOutExt, ext);
-                 try (PrintWriter out = new PrintWriter(javaFile)) {
-                     out.println(content);
-                 }
+    public void onFileDragged(File file) {
+        searchField.setText("");
+        resultTextPane.setText(Background.INTRO);
+        previewTextPane.setText("");
+        crawl(file);
+    }
 
-                 command = "nvim " + javaFile.getAbsolutePath();
-                 Terminal.executeInLinux(command);
-             } else {
-                 // not sure what to do here
-             }
-         } catch (Exception e) {
-             try {
-                 Desktop desktop = Desktop.getDesktop();
-                 desktop.open(new File(fullPath));
-             } catch (IOException ioException) {
-                 try {
-                     String content =
-                             Files.readString(Paths.get(editorFilenameAndPosition.t), StandardCharsets.US_ASCII);
-                     previewTextPane.setText(content);
-                 } catch (IOException exception) {
-                     previewTextPane.setText("Something is wrong with the file " + exception.getMessage());
-                 }
-             }
-         }
-     }
+    public void search(String query) {
+        selectedGuiIndex = 0;
+        this.query = query;
 
-     public void onFileDragged(File file) {
-         resultTextPane.setText(Background.SHARK_BG);
-         previewTextPane.setText("");
-         crawl(file);
-     }
+        Runnable runnableTask = () -> search.search(query);
+        long waitingTasksCount = executor.getActiveCount();
+        if(waitingTasksCount < 1) {
+            executor.submit(runnableTask);
+        }
+    }
 
-     public void search(String query) {
-         selectedGuiIndex = 0;
-         this.query = query;
+    public String dump() {
+        System.out.println(search.getResults());
+        System.out.println(search.getPreview(""));
+        System.out.println(search.getResultSetCount());
 
-         Runnable runnableTask = () -> search.search(query);
-         long waitingTasksCount = executor.getActiveCount();
-         if(waitingTasksCount < 1) {
-             executor.submit(runnableTask);
-         }
-     }
+        return "";
+    }
 
-     public String dump() {
-         System.out.println(search.getResults());
-         System.out.println(search.getPreview(""));
-         System.out.println(search.getResultSetCount());
+    private void runNewSearch(final Document searchQueryDoc) {
+        try {
+            final String query = searchQueryDoc.getText(0,
+                    searchQueryDoc.getLength());
+            this.query = query;
+            search(query);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
-         return "";
-     }
+    public void onUpdateGUI() {
+        int resultCount = 0;
+        boolean isViewLimit = false;
+        LinkedList<Pair<String, Integer>> locations;
+        searchResults.clear();
 
-     private void runNewSearch(final Document searchQueryDoc) {
-         try {
-             final String query = searchQueryDoc.getText(0,
-                     searchQueryDoc.getLength());
-             this.query = query;
-             search(query);
-         }
-         catch (Exception ex) {
-             ex.printStackTrace();
-         }
-     }
+        List<String> rawResults = search.getResults();
+        while ((resultCount < rawResults.size()) && !isViewLimit) {
+            String rawLine = rawResults.get(resultCount);
+            locations = search.getFileNameAndPosition(rawLine);
 
-     public void onUpdateGUI() {
-         int previewLinesIndex = 0;
-         StringBuilder builder = new StringBuilder();
-         LinkedList<Pair<String, Integer>> filenamesAndPositions;
-         ArrayList<String> searchPreview = new ArrayList<>();
-         String selectedLine = "";
-         boolean isViewLimitReached = false;
+            for(Pair<String, Integer> location : locations) {
+                String result = location.t + ":" + location.u +":"
+                        + rawLine;
 
-         List<String> searchResults = search.getResultSet();
-         while ((previewLinesIndex < searchResults.size()) && !isViewLimitReached) {
-             String rawLine = searchResults.get(previewLinesIndex);
-             filenamesAndPositions = search.getFileNameAndPosition(rawLine);
+                if(!rawLine.endsWith("\n")) {
+                    // optimization GrepSearch lines come with \n
+                    // don't want to change the logic there for performance
+                    result += "\n";
+                }
 
-             for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
-                 String line = currentSearch.t + ":" + currentSearch.u +":"
-                         + rawLine;
+                searchResults.add(result);
+                resultCount++;
 
-                 if(!rawLine.endsWith("\n")) {
-                     // optimization grep lines come with \n
-                     // don;lt want to change the logic there for performance
-                     // TODO fixme in Search Results controller
-                     line += "\n";
-                 }
+                if(resultCount >= UI_VIEW_LIMIT) {
+                    isViewLimit = true;
+                    break;
+                }
+            }
+        }
 
-                 searchPreview.add(line);
-                 previewLinesIndex++;
+        searchResults.sort(RESULTS_SORTER);
+        numLines = resultCount;
 
-                 if(previewLinesIndex >= UI_VIEW_LIMIT) {
-                     isViewLimitReached = true;
-                     break;
-                 }
-             }
-         }
+        onUpdateGUIInternal();
+    }
 
-         searchPreview.sort(new SearchResultsSorter());
-         numLines = previewLinesIndex;
-         previewLinesIndex = 0;
+    private void onUpdateGUIInternal() {
+        int previewLinesIndex = 0;
+        StringBuilder builder = new StringBuilder();
+        for (String str : searchResults) {
+            if(previewLinesIndex == selectedGuiIndex) {
+                builder.append(SELECTOR + str);
+                String[] parts  = str.split(":");
+                String fileName = parts[0];
+                String line = parts[1];
+                this.selectedLine = parts[2];
 
-         for (String str : searchPreview) {
-             if(previewLinesIndex == selectedGuiIndex) {
-                 builder.append(SELECTOR + str);
+                editorFilenameAndPosition.t = fileName;
+                editorFilenameAndPosition.u = Integer.parseInt(line);
+            } else {
+                builder.append(str);
+            }
+            previewLinesIndex++;
+        }
 
-                 String[] parts  = str.split(":");
-                 String fileName = parts[0];
-                 String line = parts[1];
-                 selectedLine = parts[2];
+        resultTextPane.setText(builder.toString());
 
-                 editorFilenameAndPosition.t = fileName;
-                 editorFilenameAndPosition.u = Integer.parseInt(line);
-             } else {
-                 builder.append(str);
-             }
-             previewLinesIndex++;
-         }
+        if(searchResults.size() > 0) {
+            previewTextPane.setText
+                    (search.getPreview(searchResults.get(selectedGuiIndex)));
+        }
 
-         resultTextPane.setText(builder.toString());
+        if(searchResults.size() > UI_VIEW_LIMIT) {
+            resultCountLabel.setText("...");
+        } else {
+            resultCountLabel.setText(String.valueOf(numLines));
+        }
 
-         try {
-             int selector = builder.toString().indexOf(SELECTOR);
-             resultTextPane.setCaretPosition(selector);
-         } catch (IllegalArgumentException iae) {
+        try {
+            int selector = builder.toString().indexOf(SELECTOR);
+            if(selector != -1) {
+                resultTextPane.setCaretPosition(selector);
+            }
+        } catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+        }
 
-         }
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightSearch(resultTextPane, query, Color.ORANGE);
+        }
+    }
 
-         if(query != null) {
-             Highlighter highlighter = new Highlighter();
-             highlighter.highlightSearch(resultTextPane, query, Color.ORANGE);
-         }
+    public void close() {
+        executor.shutdown();
+        search.close();
+    }
 
-         if(searchPreview.size() > 0) {
-             previewTextPane.setText(search.getPreview(searchPreview.get(selectedGuiIndex)));
-         }
+    public void highlightPreview() {
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
+        }
+    }
 
-         if(query != null) {
-             Highlighter highlighter = new Highlighter();
-             highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
-         }
-
-         if(isViewLimitReached) {
-             resultCountLabel.setText("...");
-         } else {
-             resultCountLabel.setText(String.valueOf(numLines));
-         }
-     }
-
-     public void close() {
-         executor.shutdown();
-         search.close();
-     }
-
-     public static void main(String[] args) {
-         repl();
-     }
- }
+    public static void main(String[] args) {
+        repl();
+    }
+}

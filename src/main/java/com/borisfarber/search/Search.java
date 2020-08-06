@@ -15,11 +15,9 @@ public interface Search {
 
     LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line);
 
-    String getResults();
-
     String getPreview(String resultLine);
 
-    List<String> getResultSet();
+    List<String> getResults();
 
     String getResultSetCount();
 

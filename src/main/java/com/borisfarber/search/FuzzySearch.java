@@ -160,18 +160,6 @@
          return new Pair<>("", 0);
      }
 
-     @Override
-     public String getResults() {
-         StringBuilder builder = new StringBuilder();
-
-         for (ExtractedResult res : resultSet) {
-             builder.append(res.getString());
-             builder.append("\n");
-         }
-
-         return builder.toString();
-     }
-
      /**
       * 7 lines
       * result
@@ -226,7 +214,7 @@
      }
 
      @Override
-     public List<String> getResultSet() {
+     public List<String> getResults() {
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
          for (ExtractedResult er : resultSet) {
@@ -238,7 +226,7 @@
 
      @Override
      public String getResultSetCount() {
-         return Integer.toString(getResultSet().size());
+         return Integer.toString(this.getResults().size());
      }
 
      @Override
@@ -275,7 +263,7 @@
      }
 
      public String toString() {
-         for (String res : getResultSet()) {
+         for (String res : this.getResults()) {
              System.out.println(res);
          }
          return "";

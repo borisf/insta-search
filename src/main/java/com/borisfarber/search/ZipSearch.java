@@ -29,16 +29,17 @@
  import java.util.List;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
+ import java.util.concurrent.ThreadPoolExecutor;
 
- public class ApkSearch implements Search {
+ public class ZipSearch implements Search {
      private final Controller controller;
      private File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
      private ExecutorService executorService =
-             Executors.newSingleThreadExecutor();
+             Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
-     public ApkSearch(File newFile, Controller controller) {
+     public ZipSearch(File newFile, Controller controller) {
          this.zipFile = newFile;
          this.controller = controller;
          allLines.clear();
@@ -69,6 +70,7 @@
 
      @Override
      public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
+         // may be to add mapping to simple file names, not sure
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
          Pair<String, Integer> pair = new Pair<>(line, 0);
@@ -77,42 +79,53 @@
      }
 
      @Override
-     public String getResults() {
-         return "";
-     }
-
-     @Override
      public String getPreview(String resultLine) {
          if (resultLine.isEmpty()) {
              return "";
          }
 
-         String[] parts  = resultLine.split(":");
-         String fileName = parts[0];
-         String line = parts[2];
-
-         String nLine = line;
-
-         // remove the new line in the end
-         if(nLine.endsWith("\n")) {
-             nLine = nLine.substring(0, nLine.length()-1);
+         long waitingTasksCount = ((ThreadPoolExecutor)(executorService)).getActiveCount();
+         if(waitingTasksCount > 1) {
+             return "";
          }
 
-         byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
-         int headerSize = bytes.length;
+         executorService.execute(() -> {
+             String[] parts  = resultLine.split(":");
+             String fileName = parts[0];
+             String line = parts[2];
 
-         if(headerSize > 64) {
-             headerSize = 64;
-         }
+             String nLine = line;
 
-         String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
-         String result = header +  "\n...\n" + Hexdump.hexdump(bytes);
+             // remove the new line in the end
+             if(nLine.endsWith("\n")) {
+                 nLine = nLine.substring(0, nLine.length() - 1);
+             }
 
-         return result;
+             byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
+             int headerSize = bytes.length;
+
+             if(headerSize > 128) {
+                 headerSize = 128;
+             }
+
+             String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
+             String result = header +  "\n...\n" +
+                     Hexdump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
+                     "\n...\n";
+
+             Runnable runnable = () -> {
+                 controller.previewTextPane.setText(result);
+                 controller.highlightPreview();
+             };
+
+             SwingUtilities.invokeLater(runnable);
+         });
+
+         return "building";
      }
 
      @Override
-     public List<String> getResultSet() {
+     public List<String> getResults() {
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
          for (ExtractedResult er : resultSet) {
@@ -124,7 +137,7 @@
 
      @Override
      public String getResultSetCount() {
-         return Integer.toString(getResultSet().size());
+         return Integer.toString(this.getResults().size());
      }
 
      @Override
@@ -161,7 +174,7 @@
      }
 
      public static void main(String[] args) {
-         ApkSearch as = new ApkSearch(new File("/home/bfarber/Desktop/shark_v01.apk"), null);
+         ZipSearch as = new ZipSearch(new File("/home/bfarber/Desktop/shark_v01.apk"), null);
          as.crawl(new File("/home/bfarber/Desktop/shark_v01.apk"));
      }
  }

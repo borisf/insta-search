@@ -14,11 +14,11 @@
 package com.borisfarber.ui;
 
 import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
 import java.io.File;
 
 import com.borisfarber.controllers.BuildVersion;
@@ -35,6 +35,9 @@ public final class InstaSearch extends JFrame {
     private JLabel resultCountLabel;
     private Controller controller;
 
+    private JPopupMenu copyPopup = new JPopupMenu();
+    private CopyPopupListener popupListener = new CopyPopupListener();
+
     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
 
@@ -47,13 +50,14 @@ public final class InstaSearch extends JFrame {
         super("ClassyShark Insta Search");
         textFont = new Font("JetBrains Mono", 0, 23);
         buildUI();
-        controller = new Controller(resultTextPane, previewTextPane, resultCountLabel);
+        controller =
+                new Controller(searchField, resultTextPane,
+                        previewTextPane, resultCountLabel);
         searchField.getDocument().addDocumentListener(this.controller);
     }
 
     public final void onFileDragged(final File file) {
         setTitle("ClassySearch - " + file.getName());
-        searchField.setText("");
         controller.onFileDragged(file);
     }
 
@@ -185,7 +189,7 @@ public final class InstaSearch extends JFrame {
         result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
         result.setForeground(FOREGROUND_COLOR);
-        result.setText(Background.SHARK_BG);
+        result.setText(Background.INTRO);
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
@@ -202,6 +206,9 @@ public final class InstaSearch extends JFrame {
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
 
+        copyPopup.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        result.addMouseListener(popupListener);
+
         return result;
     }
 
@@ -217,6 +224,27 @@ public final class InstaSearch extends JFrame {
         }
 
         return null;
+    }
+
+    class CopyPopupListener extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                copyPopup.show(e.getComponent(),
+                        e.getX(), e.getY());
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(new StringSelection(previewTextPane.getSelectedText()),
+                        null);
+            }
+        }
     }
 
     public static void main(final String[] args) {
