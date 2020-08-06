@@ -47,7 +47,7 @@ import static com.borisfarber.ui.Repl.repl;
 public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
     public static final int UI_VIEW_LIMIT = 50;
-    private static final Comparator RESULTS_SORTER = new SearchResultsSorter();
+    private static final Comparator<String> RESULTS_SORTER = new SearchResultsSorter();
 
     private final JTextField searchField;
     public JTextPane resultTextPane;
