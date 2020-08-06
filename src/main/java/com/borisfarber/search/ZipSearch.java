@@ -78,11 +78,6 @@
      }
 
      @Override
-     public String getResults() {
-         return "";
-     }
-
-     @Override
      public String getPreview(String resultLine) {
          if (resultLine.isEmpty()) {
              return "";
@@ -102,7 +97,7 @@
 
              // remove the new line in the end
              if(nLine.endsWith("\n")) {
-                 nLine = nLine.substring(0, nLine.length()-1);
+                 nLine = nLine.substring(0, nLine.length() - 1);
              }
 
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
@@ -129,7 +124,7 @@
      }
 
      @Override
-     public List<String> getResultSet() {
+     public List<String> getResults() {
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
          for (ExtractedResult er : resultSet) {
@@ -141,7 +136,7 @@
 
      @Override
      public String getResultSetCount() {
-         return Integer.toString(getResultSet().size());
+         return Integer.toString(this.getResults().size());
      }
 
      @Override

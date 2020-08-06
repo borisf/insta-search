@@ -306,11 +306,6 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public String getResults() {
-        return "";
-    }
-
-    @Override
     public String getPreview(String resultLine) {
 
         long waitingTasksCount = ((ThreadPoolExecutor)(executorService)).getActiveCount();
@@ -366,7 +361,7 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public List<String> getResultSet() {
+    public List<String> getResults() {
         String[] tmpArray = new String[result.size()];
         result.toArray(tmpArray);
         return Arrays.asList(tmpArray);

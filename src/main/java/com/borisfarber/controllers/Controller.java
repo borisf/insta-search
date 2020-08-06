@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -46,6 +47,8 @@ import static com.borisfarber.ui.Repl.repl;
 public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
     public static final int UI_VIEW_LIMIT = 50;
+    private static final Comparator RESULTS_SORTER = new SearchResultsSorter();
+
     private final JTextField searchField;
     public JTextPane resultTextPane;
     public JTextPane previewTextPane;
@@ -57,7 +60,7 @@ public final class Controller implements DocumentListener {
     private Search search;
     private Pair<String, Integer> editorFilenameAndPosition =
             new Pair<>("test.txt",0);
-    private ArrayList<String> searchPreview = new ArrayList<>();
+    private ArrayList<String> searchResults = new ArrayList<>();
     private int selectedGuiIndex = 0;
     private int numLines = 0;
     private String selectedLine = "";
@@ -261,39 +264,38 @@ public final class Controller implements DocumentListener {
     }
 
     public void onUpdateGUI() {
-        int previewLinesIndex = 0;
-        LinkedList<Pair<String, Integer>> filenamesAndPositions;
-        boolean isViewLimitReached = false;
-        searchPreview.clear();
+        int resultCount = 0;
+        boolean isViewLimit = false;
+        LinkedList<Pair<String, Integer>> locations;
+        searchResults.clear();
 
-        List<String> searchResults = search.getResultSet();
-        while ((previewLinesIndex < searchResults.size()) && !isViewLimitReached) {
-            String rawLine = searchResults.get(previewLinesIndex);
-            filenamesAndPositions = search.getFileNameAndPosition(rawLine);
+        List<String> rawResults = search.getResults();
+        while ((resultCount < rawResults.size()) && !isViewLimit) {
+            String rawLine = rawResults.get(resultCount);
+            locations = search.getFileNameAndPosition(rawLine);
 
-            for(Pair<String, Integer> currentSearch : filenamesAndPositions) {
-                String line = currentSearch.t + ":" + currentSearch.u +":"
+            for(Pair<String, Integer> location : locations) {
+                String result = location.t + ":" + location.u +":"
                         + rawLine;
 
                 if(!rawLine.endsWith("\n")) {
-                    // optimization grep lines come with \n
+                    // optimization GrepSearch lines come with \n
                     // don't want to change the logic there for performance
-                    // TODO fixme in Search Results controller
-                    line += "\n";
+                    result += "\n";
                 }
 
-                searchPreview.add(line);
-                previewLinesIndex++;
+                searchResults.add(result);
+                resultCount++;
 
-                if(previewLinesIndex >= UI_VIEW_LIMIT) {
-                    isViewLimitReached = true;
+                if(resultCount >= UI_VIEW_LIMIT) {
+                    isViewLimit = true;
                     break;
                 }
             }
         }
 
-        searchPreview.sort(new SearchResultsSorter());
-        numLines = previewLinesIndex;
+        searchResults.sort(RESULTS_SORTER);
+        numLines = resultCount;
 
         onUpdateGUIInternal();
     }
@@ -301,7 +303,7 @@ public final class Controller implements DocumentListener {
     private void onUpdateGUIInternal() {
         int previewLinesIndex = 0;
         StringBuilder builder = new StringBuilder();
-        for (String str : searchPreview) {
+        for (String str : searchResults) {
             if(previewLinesIndex == selectedGuiIndex) {
                 builder.append(SELECTOR + str);
                 String[] parts  = str.split(":");
@@ -319,12 +321,12 @@ public final class Controller implements DocumentListener {
 
         resultTextPane.setText(builder.toString());
 
-        if(searchPreview.size() > 0) {
+        if(searchResults.size() > 0) {
             previewTextPane.setText
-                    (search.getPreview(searchPreview.get(selectedGuiIndex)));
+                    (search.getPreview(searchResults.get(selectedGuiIndex)));
         }
 
-        if(searchPreview.size() > UI_VIEW_LIMIT) {
+        if(searchResults.size() > UI_VIEW_LIMIT) {
             resultCountLabel.setText("...");
         } else {
             resultCountLabel.setText(String.valueOf(numLines));
@@ -332,7 +334,9 @@ public final class Controller implements DocumentListener {
 
         try {
             int selector = builder.toString().indexOf(SELECTOR);
-            resultTextPane.setCaretPosition(selector);
+            if(selector != -1) {
+                resultTextPane.setCaretPosition(selector);
+            }
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
         }

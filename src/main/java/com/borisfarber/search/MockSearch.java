@@ -68,17 +68,12 @@ public class MockSearch implements Search {
     }
 
     @Override
-    public String getResults() {
-        return getSearchValue();
-    }
-
-    @Override
     public String getPreview(String resultLine) {
         return getSearchValue();
     }
 
     @Override
-    public List<String> getResultSet() {
+    public List<String> getResults() {
         String search = getSearchValue();
         LinkedList<String> result = new LinkedList<>();
         result.add(search);
