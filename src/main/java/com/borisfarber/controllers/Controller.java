@@ -19,6 +19,7 @@ import com.borisfarber.search.GrepSearch;
 import com.borisfarber.search.MockSearch;
 import com.borisfarber.search.Search;
 import com.borisfarber.ui.Background;
+import com.borisfarber.ui.HexPanel;
 import com.borisfarber.ui.Highlighter;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;
@@ -215,7 +216,7 @@ public final class Controller implements DocumentListener {
                 command = "nvim " + javaFile.getAbsolutePath();
                 Terminal.executeInLinux(command);
             } else {
-                // not sure what to do here
+                HexPanel.openPanel(selectedPath.toFile());
             }
         } catch (Exception e) {
             // follow up on various OSs where nvim not configured
