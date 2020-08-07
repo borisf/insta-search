@@ -26,9 +26,7 @@ import java.awt.*;
 import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
 import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
 
-public final class HexPanel extends JPanel implements CaretListener
-{
-    public static final Color  BACKGROUND = new Color(46, 48, 50);
+public final class HexPanel extends JPanel implements CaretListener {
     private static final int DEFAULT_BYTES_PER_LINE = 16;
     private JTextComponent offsetView;
     private JTextComponent hexView;
@@ -40,7 +38,7 @@ public final class HexPanel extends JPanel implements CaretListener
     private int hexLastSelectionEnd;
     private int asciiLastSelectionStart;
     private int asciiLastSelectionEnd;
-    private  int bytesPerLine;
+    private int bytesPerLine;
 
     public HexPanel(final ByteBuffer bytes, final int bytesPerLine) {
         super(new BorderLayout());
@@ -50,6 +48,9 @@ public final class HexPanel extends JPanel implements CaretListener
         this.hexView = new JTextArea();
         this.asciiView = new JTextArea();
         final JPanel statusView = new JPanel();
+        statusView.setBackground(BACKGROUND_COLOR);
+        statusView.setForeground(FOREGROUND_COLOR);
+
         this.offsetView.setBackground(BACKGROUND_COLOR);
         this.hexView.setBackground(BACKGROUND_COLOR);
         this.asciiView.setBackground(BACKGROUND_COLOR);
@@ -77,10 +78,15 @@ public final class HexPanel extends JPanel implements CaretListener
         this.fillFromByteBuffer(bytes);
         this.hexView.addCaretListener(this);
         this.asciiView.addCaretListener(this);
-        this.asciiView.setSelectedTextColor(this.asciiView.getForeground());
-        this.hexView.setSelectedTextColor(this.asciiView.getForeground());
+
+        this.asciiView.setSelectedTextColor(FOREGROUND_COLOR);
+        this.hexView.setSelectedTextColor(FOREGROUND_COLOR);
+
+        this.asciiView.setSelectionColor(Color.BLACK);
+        this.hexView.setSelectionColor(Color.BLACK);
+
         final Color selectionColor = this.hexView.getSelectionColor();
-        this.highlightColor = selectionColor;
+        this.highlightColor = Color.BLACK;//selectionColor;
         this.highlighterPainter = new DefaultHighlighter.DefaultHighlightPainter(this.highlightColor);
     }
 
@@ -90,7 +96,7 @@ public final class HexPanel extends JPanel implements CaretListener
 
     public HexPanel(final File file) {
         this(ByteBuffer.allocate(0), DEFAULT_BYTES_PER_LINE);
-        this.fillFromFile(file);
+        fillFromFile(file);
     }
 
     @Override
@@ -113,6 +119,7 @@ public final class HexPanel extends JPanel implements CaretListener
             if (this.asciiLastSelectionStart == startByte && this.asciiLastSelectionEnd == endByte) {
                 return;
             }
+
             this.setSelection(this.asciiLastSelectionStart = startByte, this.asciiLastSelectionEnd = endByte);
         }
         else if (e.getSource() == this.hexView) {
@@ -153,10 +160,10 @@ public final class HexPanel extends JPanel implements CaretListener
             inChannel.close();
             aFile.close();
             final ByteBuffer byteBuffer = buffer;
-            this.fillFromByteBuffer(byteBuffer);
-            this.asciiView.setCaretPosition(0);
-            this.hexView.setCaretPosition(0);
-            this.offsetView.setCaretPosition(0);
+            fillFromByteBuffer(byteBuffer);
+            asciiView.setCaretPosition(0);
+            hexView.setCaretPosition(0);
+            offsetView.setCaretPosition(0);
         }
         catch (Exception ex) {}
     }
@@ -225,10 +232,10 @@ public final class HexPanel extends JPanel implements CaretListener
     private final void setHighlight(final int startByte, final int endByte) {
         final int startRows = (startByte - startByte % this.bytesPerLine) / this.bytesPerLine;
         final int endRows = (endByte - endByte % this.bytesPerLine) / this.bytesPerLine;
-        this.clearHighlight();
+        clearHighlight();
         try {
-            this.asciiView.getHighlighter().addHighlight(startByte + startRows, endByte + endRows, this.highlighterPainter);
-            this.hexView.getHighlighter().addHighlight(startByte * 3 + startRows, endByte * 3 + endRows, this.highlighterPainter);
+            asciiView.getHighlighter().addHighlight(startByte + startRows, endByte + endRows, this.highlighterPainter);
+            hexView.getHighlighter().addHighlight(startByte * 3 + startRows, endByte * 3 + endRows, this.highlighterPainter);
         }
         catch (BadLocationException e1) {
             System.out.println((Object)"bad location");
@@ -255,11 +262,9 @@ public final class HexPanel extends JPanel implements CaretListener
             final String format3 = statusTemplate;
             final Object[] original2 = array2;
             final String format4 = String.format(format3, Arrays.copyOf(original2, original2.length));
-            label2.setFont(new Font("JetBrains Mono", 0, 16));
             label2.setText(format4);
         }
     }
-
 
     public static void openPanel(File file) {
         //HexPanel panel = new HexPanel(ByteBuffer.wrap("test".getBytes()));
@@ -279,6 +284,15 @@ public final class HexPanel extends JPanel implements CaretListener
     }
 
     public static final void main(final String[] args) {
+        try {
+            // Set System L&F
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (Exception e) {
+            // handle exception
+        }
+
         openPanel(new File("/home/bfarber/Desktop/Archive_1_2020_08_07.zip"));
     }
 }
