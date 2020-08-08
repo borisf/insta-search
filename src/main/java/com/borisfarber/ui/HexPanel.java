@@ -160,6 +160,7 @@ public final class HexPanel extends JPanel implements CaretListener {
             inChannel.close();
             aFile.close();
             final ByteBuffer byteBuffer = buffer;
+
             fillFromByteBuffer(byteBuffer);
             asciiView.setCaretPosition(0);
             hexView.setCaretPosition(0);
@@ -174,7 +175,14 @@ public final class HexPanel extends JPanel implements CaretListener {
         StringBuilder asciiText = new StringBuilder();
 
         bytes.position(0x0);
-        for (int i = 0; i < bytes.limit();i++) {
+
+        // for large files, out of memory error
+        int limit = bytes.limit();
+        if(limit >= 2048) {
+            limit = 2048;
+        }
+
+        for (int i = 0; i < limit;i++) {
             fillByteToTexts(bytes, offsetText, hexText, asciiText, i, bytesPerLine);
         }
 
