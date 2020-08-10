@@ -14,6 +14,10 @@
 package com.borisfarber.ui;
 
 import javax.swing.event.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -28,6 +32,8 @@ import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class HexPanel extends JPanel implements CaretListener {
     private static final int DEFAULT_BYTES_PER_LINE = 16;
+    private static final String HEX_FORMAT = "%02X ";
+
     private JTextComponent offsetView;
     private JTextComponent hexView;
     private JTextComponent asciiView;
@@ -39,6 +45,12 @@ public final class HexPanel extends JPanel implements CaretListener {
     private int asciiLastSelectionStart;
     private int asciiLastSelectionEnd;
     private int bytesPerLine;
+
+    private JPopupMenu copyPopupHex = new JPopupMenu();
+    private CopyPopupHexListener popupListenerHex = new CopyPopupHexListener();
+
+    private JPopupMenu copyPopupAscii = new JPopupMenu();
+    private CopyPopupAsciiListener popupListenerAscii = new CopyPopupAsciiListener();
 
     public HexPanel(final File file) {
         this(ByteBuffer.allocate(0), DEFAULT_BYTES_PER_LINE);
@@ -88,6 +100,17 @@ public final class HexPanel extends JPanel implements CaretListener {
         hexView.addCaretListener(this);
         asciiView.addCaretListener(this);
 
+        // copy paste hex
+        hexView.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        copyPopupHex.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        hexView.addMouseListener(popupListenerHex);
+
+        // copy paste ascii
+        asciiView.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        copyPopupAscii.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        asciiView.addMouseListener(popupListenerAscii);
+
+        // selection with proper highlighting
         asciiView.setSelectedTextColor(FOREGROUND_COLOR);
         hexView.setSelectedTextColor(FOREGROUND_COLOR);
 
@@ -221,13 +244,7 @@ public final class HexPanel extends JPanel implements CaretListener {
     }
 
     private final String byte2hex(final byte b) {
-
-        final String s = "%02X ";
-        final Object[] array = { b };
-        final String format = s;
-        final Object[] original = array;
-        final String result = String.format(format, Arrays.copyOf(original, original.length));
-
+        String result = String.format(HEX_FORMAT, b);
         return result;
     }
 
@@ -273,7 +290,49 @@ public final class HexPanel extends JPanel implements CaretListener {
         }
     }
 
-    public static void createHexWindow(File file) {
+    class CopyPopupHexListener extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                copyPopupHex.show(e.getComponent(),
+                        e.getX(), e.getY());
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(new StringSelection(hexView.getSelectedText()),
+                        null);
+            }
+        }
+    }
+
+    class CopyPopupAsciiListener extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                copyPopupAscii.show(e.getComponent(),
+                        e.getX(), e.getY());
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(new StringSelection(asciiView.getSelectedText()),
+                        null);
+            }
+        }
+    }
+
+    public static void createJFrameWithHexPanel(File file) {
         HexPanel panel = new HexPanel(file);
         panel.setPreferredSize(new Dimension(1200, 900));
 
@@ -299,6 +358,6 @@ public final class HexPanel extends JPanel implements CaretListener {
             // handle exception
         }
 
-        createHexWindow(new File("/home/bfarber/Development/Test/Archive_1_2020_08_07.zip"));
+        createJFrameWithHexPanel(new File("/home/bfarber/Development/Test/Archive_1_2020_08_07.zip"));
     }
 }

@@ -216,7 +216,7 @@ public final class Controller implements DocumentListener {
                 command = "nvim " + javaFile.getAbsolutePath();
                 Terminal.executeInLinux(command);
             } else {
-                HexPanel.createHexWindow(selectedPath.toFile());
+                HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
             }
         } catch (Exception e) {
             // follow up on various OSs where nvim not configured
