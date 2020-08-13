@@ -336,7 +336,7 @@ public final class HexPanel extends JPanel implements CaretListener {
         HexPanel panel = new HexPanel(file);
         panel.setPreferredSize(new Dimension(1200, 900));
 
-        JFrame jframe = new JFrame();
+        JFrame jframe = new JFrame(file.getName());
         jframe.setContentPane(panel);
 
         jframe.setVisible(true);
