@@ -20,8 +20,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
 
 import com.borisfarber.controllers.BuildVersion;
 import com.borisfarber.controllers.Controller;
