@@ -67,8 +67,7 @@
 
          Path pathString = file.toPath();
 
-         PathMatcher matcher =
-                 FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+         PathMatcher matcher = Controller.SOURCE_PATH_MATCHER;
 
          try {
              Files.walkFileTree(pathString, new SimpleFileVisitor<>() {

@@ -358,6 +358,6 @@ public final class HexPanel extends JPanel implements CaretListener {
             // handle exception
         }
 
-        createJFrameWithHexPanel(new File("/home/bfarber/Development/Test/Archive_1_2020_08_07.zip"));
+        createJFrameWithHexPanel(new File("/home/bfarber/Development/Test/export.bin"));
     }
 }
