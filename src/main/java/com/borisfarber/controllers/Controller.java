@@ -19,6 +19,7 @@ import com.borisfarber.search.GrepSearch;
 import com.borisfarber.search.MockSearch;
 import com.borisfarber.search.Search;
 import com.borisfarber.ui.Background;
+import com.borisfarber.ui.HexPanel;
 import com.borisfarber.ui.Highlighter;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;
@@ -32,7 +33,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -47,6 +50,16 @@ import static com.borisfarber.ui.Repl.repl;
 public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
     public static final int UI_VIEW_LIMIT = 50;
+
+    public static final PathMatcher SOURCE_PATH_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+
+    public static final PathMatcher CLASS_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{class}");
+
+    public static final PathMatcher ZIP_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{apk,zip,jar}");
+
     private static final Comparator<String> RESULTS_SORTER = new SearchResultsSorter();
 
     private final JTextField searchField;
@@ -148,8 +161,7 @@ public final class Controller implements DocumentListener {
             //return new FuzzySearch(this);
             return new GrepSearch(this);
         } else {
-            if (newFile.getName().endsWith("apk") || newFile.getName().endsWith("zip")
-                    || newFile.getName().endsWith("jar")) {
+            if (ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
                 return new ZipSearch(newFile, this);
             } else {
                 return new GrepSearch(this);
@@ -185,12 +197,12 @@ public final class Controller implements DocumentListener {
         try {
             String command;
 
-            if(PrivateFolder.INSTANCE.SOURCE_MATCHER.matches(selectedPath)) {
+            if(Controller.SOURCE_PATH_MATCHER.matches(selectedPath)) {
                 command = "nvim +\"set number\" +"
                         + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                         " " + selectedPath.toString();
                 Terminal.executeInLinux(command);
-            } else if(PrivateFolder.INSTANCE.CLASS_MATCHER.matches(selectedPath)) {
+            } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
                 String fileNameWithoutExt =
                         new File(selectedPath.toString()).
                                 getName().replaceFirst("[.][^.]+$", "");
@@ -215,7 +227,7 @@ public final class Controller implements DocumentListener {
                 command = "nvim " + javaFile.getAbsolutePath();
                 Terminal.executeInLinux(command);
             } else {
-                // not sure what to do here
+                HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
             }
         } catch (Exception e) {
             // follow up on various OSs where nvim not configured

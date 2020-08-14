@@ -15,10 +15,8 @@
 
  import java.io.File;
  import java.io.IOException;
- import java.nio.file.FileSystems;
  import java.nio.file.Files;
  import java.nio.file.Path;
- import java.nio.file.PathMatcher;
  import java.nio.file.attribute.PosixFileAttributes;
  import java.nio.file.attribute.PosixFilePermission;
  import java.util.Comparator;
@@ -27,12 +25,6 @@
  public enum PrivateFolder {
 
      INSTANCE;
-
-     public static final PathMatcher SOURCE_MATCHER =
-             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
-
-     public static final PathMatcher CLASS_MATCHER =
-             FileSystems.getDefault().getPathMatcher("glob:**.{class}");
 
      private String rootPath;
 

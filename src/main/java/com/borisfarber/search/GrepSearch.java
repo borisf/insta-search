@@ -135,8 +135,7 @@ public class GrepSearch implements Search {
 
     private File dumpFolderToFile(File file) {
         Path pathString = file.toPath();
-        PathMatcher matcher =
-                FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+       
         try {
             Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
 
@@ -152,7 +151,7 @@ public class GrepSearch implements Search {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                         throws IOException {
-                    if (matcher.matches(path)) {
+                    if (Controller.SOURCE_PATH_MATCHER.matches(path)) {
                         try {
                             List<String> allFileLines = Files.readAllLines(path);
                             preview.addAll(allFileLines);

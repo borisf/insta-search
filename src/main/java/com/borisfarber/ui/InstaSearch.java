@@ -25,6 +25,7 @@ import com.borisfarber.controllers.BuildVersion;
 import com.borisfarber.controllers.Controller;
 import com.borisfarber.controllers.FileTransfer;
 
+import static com.borisfarber.ui.HexPanel.createJFrameWithHexPanel;
 import static java.awt.event.KeyEvent.*;
 
 public final class InstaSearch extends JFrame {
@@ -247,6 +248,10 @@ public final class InstaSearch extends JFrame {
         }
     }
 
+    public static boolean isBinarySupported(String filePath) {
+        return Controller.ZIP_MATCHER.matches(new File(filePath).toPath());
+    }
+
     public static void main(final String[] args) {
         try {
             // Set System L&F
@@ -260,9 +265,14 @@ public final class InstaSearch extends JFrame {
         InstaSearch classySearch;
         if (args.length == 0) {
             classySearch = new InstaSearch(System.getProperty("user.dir"));
+            classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         } else {
-            classySearch = new InstaSearch(args[0]);
+            if (isBinarySupported(args[0])) {
+                classySearch = new InstaSearch(args[0]);
+                classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            } else {
+                createJFrameWithHexPanel(new File(args[0]));
+            }
         }
-        classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 }
