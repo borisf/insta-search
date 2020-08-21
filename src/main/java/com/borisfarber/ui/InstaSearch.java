@@ -248,8 +248,12 @@ public final class InstaSearch extends JFrame {
         }
     }
 
-    public static boolean isBinarySupported(String filePath) {
+    private static boolean isBinarySupported(String filePath) {
         return Controller.ZIP_MATCHER.matches(new File(filePath).toPath());
+    }
+
+    private static boolean isTextSupported(String filePath) {
+        return Controller.SOURCE_PATH_MATCHER.matches(new File(filePath).toPath());
     }
 
     public static void main(final String[] args) {
@@ -267,7 +271,7 @@ public final class InstaSearch extends JFrame {
             classySearch = new InstaSearch(System.getProperty("user.dir"));
             classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         } else {
-            if (isBinarySupported(args[0])) {
+            if (isBinarySupported(args[0]) || isTextSupported(args[0])) {
                 classySearch = new InstaSearch(args[0]);
                 classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             } else {
