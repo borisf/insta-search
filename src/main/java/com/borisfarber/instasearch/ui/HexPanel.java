@@ -11,7 +11,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.ui;
+package com.borisfarber.instasearch.ui;
 
 import javax.swing.event.*;
 import java.awt.datatransfer.Clipboard;
@@ -27,8 +27,8 @@ import javax.swing.border.*;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
-import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
+import static com.borisfarber.instasearch.ui.InstaSearch.BACKGROUND_COLOR;
+import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class HexPanel extends JPanel implements CaretListener {
     private static final int DEFAULT_BYTES_PER_LINE = 16;

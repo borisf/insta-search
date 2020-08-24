@@ -11,14 +11,14 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.ui;
+package com.borisfarber.instasearch.ui;
 
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import com.borisfarber.controllers.Controller;
+import com.borisfarber.instasearch.controllers.Controller;
 
 public class Repl {
 

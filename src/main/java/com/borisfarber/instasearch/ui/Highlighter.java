@@ -11,14 +11,11 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.ui;
+ package com.borisfarber.instasearch.ui;
 
  import javax.swing.*;
  import javax.swing.text.*;
  import java.awt.*;
-
- import static com.borisfarber.ui.InstaSearch.BACKGROUND_COLOR;
- import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
 
  public class Highlighter {
      public void highlightSearch(JTextPane textPane, String pattern, Color color) {
@@ -42,9 +39,9 @@
                  hilite.addHighlight(pos, pos + pattern.length(), previewHighlighter);
 
                  // back
-                 StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
+                 StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
                  doc1.setCharacterAttributes(pos, pos + pattern.length(), attrs, false);
-                 StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
+                 StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
                  doc1.setCharacterAttributes(pos + pattern.length(), text.length(),attrs, false);
                  // end back
 
@@ -79,9 +76,9 @@
              // back, UX less focus on the preview
              MutableAttributeSet attrs = previewTextPane.getInputAttributes();
              StyledDocument doc1 = previewTextPane.getStyledDocument();
-             StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
+             StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
              doc1.setCharacterAttributes(pos, pos + selectedLine.length(), attrs, false);
-             StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
+             StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
              doc1.setCharacterAttributes(pos + selectedLine.length(), text.length(),attrs, false);
              // end back
          } catch (final BadLocationException ble) {

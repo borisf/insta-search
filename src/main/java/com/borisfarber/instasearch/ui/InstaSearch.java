@@ -11,7 +11,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.ui;
+package com.borisfarber.instasearch.ui;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -21,11 +21,10 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
 
-import com.borisfarber.controllers.BuildVersion;
-import com.borisfarber.controllers.Controller;
-import com.borisfarber.controllers.FileTransfer;
+import com.borisfarber.instasearch.controllers.BuildVersion;
+import com.borisfarber.instasearch.controllers.Controller;
+import com.borisfarber.instasearch.controllers.FileTransfer;
 
-import static com.borisfarber.ui.HexPanel.createJFrameWithHexPanel;
 import static java.awt.event.KeyEvent.*;
 
 public final class InstaSearch extends JFrame {
@@ -114,8 +113,6 @@ public final class InstaSearch extends JFrame {
         aboutItem.addActionListener(actionEvent -> {
             JOptionPane.showMessageDialog(this,"Classy Shark Insta Search version " +
                     BuildVersion.getBuildVersion());
-
-
         });
         menu.add(aboutItem);
 
@@ -275,7 +272,7 @@ public final class InstaSearch extends JFrame {
                 classySearch = new InstaSearch(args[0]);
                 classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             } else {
-                createJFrameWithHexPanel(new File(args[0]));
+                HexPanel.createJFrameWithHexPanel(new File(args[0]));
             }
         }
     }
