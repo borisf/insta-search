@@ -28,11 +28,11 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.borisfarber.search;
+package com.borisfarber.instasearch.search;
 
-import com.borisfarber.controllers.Controller;
-import com.borisfarber.controllers.PrivateFolder;
-import com.borisfarber.data.Pair;
+import com.borisfarber.instasearch.controllers.Controller;
+import com.borisfarber.instasearch.controllers.PrivateFolder;
+import com.borisfarber.instasearch.data.Pair;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;

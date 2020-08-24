@@ -11,16 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.borisfarber.controllers;
+package com.borisfarber.instasearch.controllers;
 
-import com.borisfarber.data.Pair;
-import com.borisfarber.search.ZipSearch;
-import com.borisfarber.search.GrepSearch;
-import com.borisfarber.search.MockSearch;
-import com.borisfarber.search.Search;
-import com.borisfarber.ui.Background;
-import com.borisfarber.ui.HexPanel;
-import com.borisfarber.ui.Highlighter;
+import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.ui.Repl;
+import com.borisfarber.instasearch.search.ZipSearch;
+import com.borisfarber.instasearch.search.GrepSearch;
+import com.borisfarber.instasearch.search.MockSearch;
+import com.borisfarber.instasearch.search.Search;
+import com.borisfarber.instasearch.ui.Background;
+import com.borisfarber.instasearch.ui.HexPanel;
+import com.borisfarber.instasearch.ui.Highlighter;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;
 
@@ -43,9 +44,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.borisfarber.search.FuzzySearch.testLoad;
-import static com.borisfarber.ui.InstaSearch.FOREGROUND_COLOR;
-import static com.borisfarber.ui.Repl.repl;
+import static com.borisfarber.instasearch.search.FuzzySearch.testLoad;
+import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
@@ -372,6 +372,6 @@ public final class Controller implements DocumentListener {
     }
 
     public static void main(String[] args) {
-        repl();
+        Repl.repl();
     }
 }

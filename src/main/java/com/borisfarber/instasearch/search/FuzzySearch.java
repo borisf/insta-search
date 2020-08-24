@@ -11,10 +11,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.search;
+ package com.borisfarber.instasearch.search;
 
- import com.borisfarber.controllers.Controller;
- import com.borisfarber.data.Pair;
+ import com.borisfarber.instasearch.controllers.Controller;
+ import com.borisfarber.instasearch.data.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
  import javax.swing.*;

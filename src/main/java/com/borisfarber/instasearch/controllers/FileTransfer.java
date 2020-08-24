@@ -11,9 +11,9 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.controllers;
+ package com.borisfarber.instasearch.controllers;
 
- import com.borisfarber.ui.InstaSearch;
+ import com.borisfarber.instasearch.ui.InstaSearch;
 
  import javax.swing.*;
  import java.awt.datatransfer.DataFlavor;
@@ -21,7 +21,7 @@
  import java.util.List;
 
  public class FileTransfer extends TransferHandler {
-     private  InstaSearch instaSearch;
+     private InstaSearch instaSearch;
 
      public FileTransfer(InstaSearch instaSearch) {
          this.instaSearch = instaSearch;

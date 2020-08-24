@@ -12,7 +12,7 @@
   * limitations under the License.
   */
 
-package com.borisfarber.controllers;
+package com.borisfarber.instasearch.controllers;
 /**
  * Utility class for generating hexdumps from byte arrays. Mostly for debugging purposes.
  */

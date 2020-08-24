@@ -11,7 +11,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.controllers;
+package com.borisfarber.instasearch.controllers;
 import java.util.Comparator;
 
 public class SearchResultsSorter implements Comparator<String> {
