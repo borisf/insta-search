@@ -146,8 +146,7 @@ public final class Controller implements DocumentListener {
                 resultTextPane.setText(Background.INTRO);
                 previewTextPane.setText("");
                 resultCountLabel.setText("");
-
-                search = createSearch(newFile);
+                
                 crawl(newFile);
             }
         } catch (Exception e) {

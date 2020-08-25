@@ -23,7 +23,6 @@ import java.io.IOException;
         Process process = new ProcessBuilder(wrappedCommand)
                 .redirectErrorStream(true)
                 .start();
-
         return process.waitFor();
     }
 }
