@@ -78,9 +78,9 @@
                         srcFiles[0]++;
                      }
 
-                     if(path.endsWith(".txt")) {
-                         // no more than 50 KB
+                     if(path.getFileName().toString().endsWith(".txt")) {
                          if(Files.size(path) > 50 * 1000) {
+                             System.out.println("here 2");
                              largeTextFile[0] = true;
                          }
                      }
