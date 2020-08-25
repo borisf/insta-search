@@ -57,6 +57,7 @@
 
          final int[] allFiles = {0};
          final int[] srcFiles = {0};
+         final boolean[] largeTextFile = {false};
 
          try {
              Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
@@ -71,18 +72,27 @@
                  }
 
                  @Override
-                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
                      allFiles[0]++;
-                     // one thread, check exception by printing path
-                     // System.out.println("Thread:" + Thread.currentThread().getName());
                      if (matcher.matches(path)) {
                         srcFiles[0]++;
+                     }
+
+                     if(path.endsWith(".txt")) {
+                         // no more than 50 KB
+                         if(Files.size(path) > 50 * 1000) {
+                             largeTextFile[0] = true;
+                         }
                      }
                      return CONTINUE;
                  }
              });
          } catch (IOException e) {
              e.printStackTrace();
+         }
+
+         if(largeTextFile[0]) {
+             return false;
          }
 
          return srcFiles[0] > 0;
