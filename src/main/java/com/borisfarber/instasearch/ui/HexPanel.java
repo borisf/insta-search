@@ -348,7 +348,7 @@ public final class HexPanel extends JPanel implements CaretListener {
         jframe.pack();
     }
 
-    public static final void main(final String[] args) {
+    public static void main(final String[] args) {
         try {
             // Set System L&F
             UIManager.setLookAndFeel(

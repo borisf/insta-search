@@ -57,11 +57,11 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 public class GrepSearch implements Search {
-    private static Charset charset = Charset.forName("ISO-8859-15");
-    private static CharsetDecoder decoder = charset.newDecoder();
+    private static final Charset charset = Charset.forName("ISO-8859-15");
+    private static final CharsetDecoder decoder = charset.newDecoder();
 
     // Pattern used to parse lines
-    private static Pattern linePattern= Pattern.compile(".*\r?\n");
+    private static final Pattern linePattern= Pattern.compile(".*\r?\n");
 
     // The input pattern that we're looking for
     private static Pattern pattern;
@@ -72,14 +72,14 @@ public class GrepSearch implements Search {
     private CharBuffer cb2;
     private CharBuffer cb3;
     private CharBuffer cb4;
-    private TreeMap<String, Path> nameToPaths;
+    private final TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview= new ArrayList<>();
     private HashMap<String, LinkedList<Integer>> occurrences;
-    private ExecutorService executorService =
+    private final ExecutorService executorService =
             Executors.newFixedThreadPool(4);
 
-    private ConcurrentLinkedQueue<String> result =
+    private final ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
     private String query;
 
@@ -123,7 +123,7 @@ public class GrepSearch implements Search {
 
             StringBuilder builder = new StringBuilder();
             for(String str : preview.subList(0, upper)) {
-                builder.append(str + "\n");
+                builder.append(str).append("\n");
             }
 
             builder.append("...");
@@ -151,7 +151,7 @@ public class GrepSearch implements Search {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                         throws IOException {
-                    if (Controller.SOURCE_PATH_MATCHER.matches(path)) {
+                    if (Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(path)) {
                         try {
                             List<String> allFileLines = Files.readAllLines(path);
                             preview.addAll(allFileLines);
@@ -170,8 +170,8 @@ public class GrepSearch implements Search {
             File dumpFile = PrivateFolder.INSTANCE.getTempFile("dump.txt");
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(dumpFile));
 
-            for (int i = 0; i < preview.size(); i++) {
-                outputWriter.write(preview.get(i));
+            for (String s : preview) {
+                outputWriter.write(s);
                 outputWriter.newLine();
             }
 
@@ -244,7 +244,7 @@ public class GrepSearch implements Search {
         ArrayList<String> partialResults = grep(file, charBuffer);
         result.addAll(partialResults);
 
-        Runnable runnable = () -> controller.onUpdateGUI();
+        Runnable runnable = controller::onUpdateGUI;
         SwingUtilities.invokeLater(runnable);
     }
 

@@ -35,7 +35,7 @@
      private final Controller controller;
      private File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
-     private ExecutorService executorService =
+     private final ExecutorService executorService =
              Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
@@ -63,7 +63,7 @@
              }
 
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted(query, allLines, 50);
-             Runnable runnable = () -> controller.onUpdateGUI();
+             Runnable runnable = controller::onUpdateGUI;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -165,7 +165,7 @@
          Runnable runnable = () -> {
              StringBuilder builder = new StringBuilder();
              for (String fileName : allLines) {
-                 builder.append(fileName + "\n");
+                 builder.append(fileName).append("\n");
              }
 
              controller.resultTextPane.setText(builder.toString());

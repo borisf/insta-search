@@ -14,11 +14,8 @@
 package com.borisfarber.instasearch.controllers;
 
 import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Repl;
-import com.borisfarber.instasearch.search.ZipSearch;
-import com.borisfarber.instasearch.search.GrepSearch;
-import com.borisfarber.instasearch.search.MockSearch;
-import com.borisfarber.instasearch.search.Search;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
 import com.borisfarber.instasearch.ui.Highlighter;
@@ -51,7 +48,10 @@ public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
     public static final int UI_VIEW_LIMIT = 50;
 
-    public static final PathMatcher SOURCE_PATH_MATCHER =
+    public static final PathMatcher SOURCE_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
+
+    public static final PathMatcher SOURCE_OR_TEXT_PATH_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
 
     public static final PathMatcher CLASS_MATCHER =
@@ -67,13 +67,13 @@ public final class Controller implements DocumentListener {
     public JTextPane previewTextPane;
     private final JLabel resultCountLabel;
 
-    private ThreadPoolExecutor executor =
+    private final ThreadPoolExecutor executor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
     private String query;
     private Search search;
-    private Pair<String, Integer> editorFilenameAndPosition =
+    private final Pair<String, Integer> editorFilenameAndPosition =
             new Pair<>("test.txt",0);
-    private ArrayList<String> searchResults = new ArrayList<>();
+    private final ArrayList<String> searchResults = new ArrayList<>();
     private int selectedGuiIndex = 0;
     private int numLines = 0;
     private String selectedLine = "";
@@ -153,13 +153,15 @@ public final class Controller implements DocumentListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return;
     }
 
     private Search createSearch(File newFile) {
         if (newFile.isDirectory()) {
-            //return new FuzzySearch(this);
-            return new GrepSearch(this);
+            if(PrivateFolder.isSourceFolder(newFile)) {
+                return new FuzzySearch(this);
+            } else {
+                return new GrepSearch(this);
+            }
         } else {
             if (ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
                 return new ZipSearch(newFile, this);
@@ -197,7 +199,7 @@ public final class Controller implements DocumentListener {
         try {
             String command;
 
-            if(Controller.SOURCE_PATH_MATCHER.matches(selectedPath)) {
+            if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
                 command = "nvim +\"set number\" +"
                         + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
                         " " + selectedPath.toString();
@@ -255,12 +257,10 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    public String dump() {
+    public void dump() {
         System.out.println(search.getResults());
         System.out.println(search.getPreview(""));
         System.out.println(search.getResultSetCount());
-
-        return "";
     }
 
     private void runNewSearch(final Document searchQueryDoc) {
@@ -317,7 +317,7 @@ public final class Controller implements DocumentListener {
         StringBuilder builder = new StringBuilder();
         for (String str : searchResults) {
             if(previewLinesIndex == selectedGuiIndex) {
-                builder.append(SELECTOR + str);
+                builder.append(SELECTOR).append(str);
                 String[] parts  = str.split(":");
                 String fileName = parts[0];
                 String line = parts[1];

@@ -15,12 +15,15 @@
 
  import java.io.File;
  import java.io.IOException;
- import java.nio.file.Files;
- import java.nio.file.Path;
+ import java.nio.file.*;
+ import java.nio.file.attribute.BasicFileAttributes;
  import java.nio.file.attribute.PosixFileAttributes;
  import java.nio.file.attribute.PosixFilePermission;
  import java.util.Comparator;
  import java.util.Set;
+
+ import static java.nio.file.FileVisitResult.CONTINUE;
+ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public enum PrivateFolder {
 
@@ -46,6 +49,43 @@
          } catch(IOException e) {
 
          }
+     }
+
+     public static boolean isSourceFolder(File folder) {
+         Path pathString = folder.toPath();
+         PathMatcher matcher = Controller.SOURCE_MATCHER;
+
+         final int[] allFiles = {0};
+         final int[] srcFiles = {0};
+
+         try {
+             Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
+
+                 @Override
+                 public FileVisitResult preVisitDirectory(Path dir,
+                                                          BasicFileAttributes attrs) {
+                     if (dir.getFileName().toString().startsWith(".")) {
+                         return SKIP_SUBTREE;
+                     }
+                     return CONTINUE;
+                 }
+
+                 @Override
+                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+                     allFiles[0]++;
+                     // one thread, check exception by printing path
+                     // System.out.println("Thread:" + Thread.currentThread().getName());
+                     if (matcher.matches(path)) {
+                        srcFiles[0]++;
+                     }
+                     return CONTINUE;
+                 }
+             });
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+
+         return srcFiles[0] > 0;
      }
 
      public File getTempFile(String name, String ext) {
