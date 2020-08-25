@@ -34,23 +34,19 @@ public final class HexPanel extends JPanel implements CaretListener {
     private static final int DEFAULT_BYTES_PER_LINE = 16;
     private static final String HEX_FORMAT = "%02X ";
 
-    private JTextComponent offsetView;
-    private JTextComponent hexView;
-    private JTextComponent asciiView;
-    private JLabel statusLabel;
-    private Color highlightColor;
-    private DefaultHighlighter.DefaultHighlightPainter highlighterPainter;
+    private final JTextComponent offsetView;
+    private final JTextComponent hexView;
+    private final JTextComponent asciiView;
+    private final JLabel statusLabel;
+    private final DefaultHighlighter.DefaultHighlightPainter highlighterPainter;
     private int hexLastSelectionStart;
     private int hexLastSelectionEnd;
     private int asciiLastSelectionStart;
     private int asciiLastSelectionEnd;
-    private int bytesPerLine;
+    private final int bytesPerLine;
 
-    private JPopupMenu copyPopupHex = new JPopupMenu();
-    private CopyPopupHexListener popupListenerHex = new CopyPopupHexListener();
-
-    private JPopupMenu copyPopupAscii = new JPopupMenu();
-    private CopyPopupAsciiListener popupListenerAscii = new CopyPopupAsciiListener();
+    private final JPopupMenu copyPopupHex = new JPopupMenu();
+    private final JPopupMenu copyPopupAscii = new JPopupMenu();
 
     public HexPanel(final File file) {
         this(ByteBuffer.allocate(0), DEFAULT_BYTES_PER_LINE);
@@ -64,7 +60,7 @@ public final class HexPanel extends JPanel implements CaretListener {
     public HexPanel(final ByteBuffer bytes, final int bytesPerLine) {
         super(new BorderLayout());
         this.bytesPerLine = bytesPerLine;
-        final Font font = new Font("JetBrains Mono", 0, 23);
+        final Font font = new Font("JetBrains Mono", Font.PLAIN, 23);
         offsetView = new JTextArea();
         hexView = new JTextArea();
         asciiView = new JTextArea();
@@ -78,13 +74,13 @@ public final class HexPanel extends JPanel implements CaretListener {
         offsetView.setForeground(FOREGROUND_COLOR);
         hexView.setForeground(FOREGROUND_COLOR);
         asciiView.setForeground(FOREGROUND_COLOR);
-        statusView.setBorder(new BevelBorder(1));
+        statusView.setBorder(new BevelBorder(BevelBorder.LOWERED));
         add(statusView, "South");
         statusView.setPreferredSize(new Dimension(this.getWidth(), 18));
-        statusView.setLayout(new BoxLayout(statusView, 0));
+        statusView.setLayout(new BoxLayout(statusView, BoxLayout.X_AXIS));
         (this.statusLabel = new JLabel("")).setHorizontalAlignment(2);
         statusView.add(this.statusLabel);
-        final JSplitPane splitPane = new JSplitPane(1, this.hexView, this.asciiView);
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.hexView, this.asciiView);
         splitPane.setResizeWeight(0.5);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
@@ -103,11 +99,13 @@ public final class HexPanel extends JPanel implements CaretListener {
         // copy paste hex
         hexView.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
         copyPopupHex.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        CopyPopupHexListener popupListenerHex = new CopyPopupHexListener();
         hexView.addMouseListener(popupListenerHex);
 
         // copy paste ascii
         asciiView.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
         copyPopupAscii.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        CopyPopupAsciiListener popupListenerAscii = new CopyPopupAsciiListener();
         asciiView.addMouseListener(popupListenerAscii);
 
         // selection with proper highlighting
@@ -117,8 +115,8 @@ public final class HexPanel extends JPanel implements CaretListener {
         asciiView.setSelectionColor(Color.BLACK);
         hexView.setSelectionColor(Color.BLACK);
 
-        this.highlightColor = Color.BLACK;
-        this.highlighterPainter = new DefaultHighlighter.DefaultHighlightPainter(this.highlightColor);
+        Color highlightColor = Color.BLACK;
+        this.highlighterPainter = new DefaultHighlighter.DefaultHighlightPainter(highlightColor);
     }
 
     @Override
@@ -181,9 +179,8 @@ public final class HexPanel extends JPanel implements CaretListener {
             buffer.flip();
             inChannel.close();
             aFile.close();
-            final ByteBuffer byteBuffer = buffer;
 
-            fillFromByteBuffer(byteBuffer);
+            fillFromByteBuffer(buffer);
             asciiView.setCaretPosition(0);
             hexView.setCaretPosition(0);
             offsetView.setCaretPosition(0);
@@ -191,7 +188,7 @@ public final class HexPanel extends JPanel implements CaretListener {
         catch (Exception ex) {}
     }
 
-    private final void fillFromByteBuffer(final ByteBuffer bytes) {
+    private void fillFromByteBuffer(final ByteBuffer bytes) {
         StringBuilder offsetText = new StringBuilder();
         StringBuilder hexText = new StringBuilder();
         StringBuilder asciiText = new StringBuilder();
@@ -224,9 +221,7 @@ public final class HexPanel extends JPanel implements CaretListener {
         if (i % bytesPerLine == 0) {
             final String s = "0x%x  \n";
             final Object[] array = { i };
-            final String format = s;
-            final Object[] original = array;
-            final String format2 = String.format(format, Arrays.copyOf(original, original.length));
+            final String format2 = String.format(s, Arrays.copyOf(array, array.length));
             offsetText.append(format2);
         }
         final byte b = bytes.get();
@@ -243,17 +238,16 @@ public final class HexPanel extends JPanel implements CaretListener {
         }
     }
 
-    private final String byte2hex(final byte b) {
-        String result = String.format(HEX_FORMAT, b);
-        return result;
+    private String byte2hex(final byte b) {
+        return String.format(HEX_FORMAT, b);
     }
 
-    private final void clearHighlight() {
+    private void clearHighlight() {
         asciiView.getHighlighter().removeAllHighlights();
         hexView.getHighlighter().removeAllHighlights();
     }
 
-    private final void setHighlight(final int startByte, final int endByte) {
+    private void setHighlight(final int startByte, final int endByte) {
         final int startRows = (startByte - startByte % bytesPerLine) / bytesPerLine;
         final int endRows = (endByte - endByte % bytesPerLine) / bytesPerLine;
         clearHighlight();
@@ -266,27 +260,20 @@ public final class HexPanel extends JPanel implements CaretListener {
         }
     }
 
-    private final void setSelection(final int startByte, final int endByte) {
+    private void setSelection(final int startByte, final int endByte) {
         this.setHighlight(startByte, endByte);
         if (startByte != endByte) {
             final String statusTemplate = "Selection: %1$d to %2$d (len: %3$d) [0x%1$x to 0x%2$x (len: 0x%3$x)]";
             final JLabel statusLabel = this.statusLabel;
-            final Object[] array = { startByte, endByte, endByte - startByte };
-            final JLabel label = statusLabel;
-            final String format = statusTemplate;
-            final Object[] original = array;
-            final String format2 = String.format(format, Arrays.copyOf(original, original.length));
-            label.setText(format2);
+            final Object[] original = new Object[]{ startByte, endByte, endByte - startByte };
+            final String format2 = String.format(statusTemplate, Arrays.copyOf(original, original.length));
+            statusLabel.setText(format2);
         }
         else {
             final String statusTemplate = "Position: %1$d [0x%1$x]";
-            final JLabel statusLabel2 = this.statusLabel;
             final Object[] array2 = { startByte };
-            final JLabel label2 = statusLabel2;
-            final String format3 = statusTemplate;
-            final Object[] original2 = array2;
-            final String format4 = String.format(format3, Arrays.copyOf(original2, original2.length));
-            label2.setText(format4);
+            final String format4 = String.format(statusTemplate, Arrays.copyOf(array2, array2.length));
+            this.statusLabel.setText(format4);
         }
     }
 
@@ -358,6 +345,6 @@ public final class HexPanel extends JPanel implements CaretListener {
             // handle exception
         }
 
-        createJFrameWithHexPanel(new File("/home/bfarber/Development/Test/export.bin"));
+        createJFrameWithHexPanel(new File("/home/bfarber/Development/Test/public.pem"));
     }
 }
