@@ -58,6 +58,9 @@ task fatJar(type: Jar) {
                 'Implementation-Version': archiveVersion
     }
     archiveBaseName = 'insta-search'
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
+
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
