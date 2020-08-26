@@ -67,8 +67,8 @@
              int pos = text.indexOf(selectedLine);
 
              if(pos == -1) {
-                 // TODO
-                 System.err.println("wrong search index");
+                 // hex view in the preview, no reason to highlight
+                 //System.err.println("wrong search index");
                  return;
              }
 
