@@ -195,7 +195,7 @@ public final class Controller implements DocumentListener {
         Path selectedPath = search.getPathPerFileName(editorFilenameAndPosition.t);
 
         if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            DesktopAdaptor.openFileOnDesktop(selectedPath);
+            DesktopAdaptor.openFileOnDesktop(selectedPath, editorFilenameAndPosition.u);
         } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
             String fileNameWithoutExt =
                     new File(selectedPath.toString()).
@@ -217,7 +217,7 @@ public final class Controller implements DocumentListener {
                 }
 
                 previewTextPane.setText(content);
-                DesktopAdaptor.openFileOnDesktop(javaFile.toPath());
+                DesktopAdaptor.openFileOnDesktop(javaFile.toPath(), 0);
 
             } finally {
                 writer.flush();
