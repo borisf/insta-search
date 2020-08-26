@@ -34,18 +34,18 @@
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
      private List<ExtractedResult> resultSet;
-     private final TreeMap<String, Path> filenamesToPathes;
+     private final TreeMap<String, Path> filenamesToPaths;
      private final ArrayList<Pair<Integer, String>> numLinesToFilenames;
-     private HashMap<String, List<Integer>> occurrences;
+     private final HashMap<String, List<Integer>> occurrences;
 
-     private ExecutorService executorService =
+     private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
 
      public FuzzySearch(Controller controller) {
          this.controller = controller;
          allLines = new ArrayList<>();
          resultSet = new ArrayList<>();
-         filenamesToPathes = new TreeMap<>();
+         filenamesToPaths = new TreeMap<>();
          numLinesToFilenames = new ArrayList<>();
          occurrences = new HashMap<>();
      }
@@ -54,7 +54,7 @@
      public void crawl(File file) {
          allLines.clear();
          numLinesToFilenames.clear();
-         filenamesToPathes.clear();
+         filenamesToPaths.clear();
          occurrences.clear();
 
          if (file == null || !file.exists()) {
@@ -67,7 +67,7 @@
 
          Path pathString = file.toPath();
 
-         PathMatcher matcher = Controller.SOURCE_PATH_MATCHER;
+         PathMatcher matcher = Controller.SOURCE_OR_TEXT_PATH_MATCHER;
 
          try {
              Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
@@ -93,7 +93,7 @@
                              Pair<Integer, String> pair = new Pair<>(allFileLines.size(),
                                      path.getFileName().toString());
                              numLinesToFilenames.add(pair);
-                             filenamesToPathes.put(path.getFileName().toString(), path);
+                             filenamesToPaths.put(path.getFileName().toString(), path);
                          } catch (java.nio.charset.MalformedInputException e) {
                              System.out.println("Bad file format " + path.getFileName().toString());
                          }
@@ -103,7 +103,7 @@
              });
          } catch (IOException e) {
              e.printStackTrace();
-         };
+         }
 
          processDuplicates(allLines);
 
@@ -131,7 +131,7 @@
              }
 
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
-             Runnable runnable = () -> controller.onUpdateGUI();
+             Runnable runnable = controller::onUpdateGUI;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -164,8 +164,8 @@
       * result
       * 7 more lines
       *
-      * @param resultIndex
-      * @return
+      * @param resultLine the result string
+      * @return preview
       */
      @Override
      public String getPreview(String resultLine) {
@@ -201,7 +201,7 @@
          }
 
          for (int i = lower; i < upper; i++) {
-             builder.append(allLines.get(i) + "\n");
+             builder.append(allLines.get(i)).append("\n");
          }
 
          return builder.toString();
@@ -209,7 +209,7 @@
 
      @Override
      public Path getPathPerFileName(String fileName) {
-         return filenamesToPathes.get(fileName);
+         return filenamesToPaths.get(fileName);
      }
 
      @Override
@@ -252,8 +252,8 @@
      public void emptyQuery() {
          Runnable runnable = () -> {
              StringBuilder builder = new StringBuilder();
-             for (String fileName : filenamesToPathes.keySet()) {
-                 builder.append(fileName + "\n");
+             for (String fileName : filenamesToPaths.keySet()) {
+                 builder.append(fileName).append("\n");
              }
 
              controller.resultTextPane.setText(builder.toString());

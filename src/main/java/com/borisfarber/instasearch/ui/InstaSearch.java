@@ -33,10 +33,10 @@ public final class InstaSearch extends JFrame {
     private JTextPane resultTextPane;
     private JTextPane previewTextPane;
     private JLabel resultCountLabel;
-    private Controller controller;
+    private final Controller controller;
 
-    private JPopupMenu copyPopup = new JPopupMenu();
-    private CopyPopupListener popupListener = new CopyPopupListener();
+    private final JPopupMenu copyPopup = new JPopupMenu();
+    private final CopyPopupListener popupListener = new CopyPopupListener();
 
     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -48,7 +48,7 @@ public final class InstaSearch extends JFrame {
 
     public InstaSearch() {
         super("ClassyShark Insta Search");
-        textFont = new Font("JetBrains Mono", 0, 23);
+        textFont = new Font("JetBrains Mono", Font.PLAIN, 23);
         buildUI();
         controller =
                 new Controller(searchField, resultTextPane,
@@ -61,7 +61,7 @@ public final class InstaSearch extends JFrame {
         controller.onFileDragged(file);
     }
 
-    private final void buildUI() {
+    private void buildUI() {
         searchField = buildSearchField();
         searchField.setAlignmentX(0.0f);
         searchField.setMaximumSize(new Dimension(1400, 30));
@@ -73,12 +73,12 @@ public final class InstaSearch extends JFrame {
 
         resultCountLabel = new JLabel("...");
         JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, 0));
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
         resultCountLabel.setAlignmentX(0.5f);
         statusPanel.add(resultCountLabel);
         statusPanel.setAlignmentX(0.0f);
 
-        JSplitPane splitPane = new JSplitPane(0, showResultsScrolled, showFileScrolled);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, showResultsScrolled, showFileScrolled);
         splitPane.setDividerSize(20);
         splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         splitPane.setDividerLocation(400);
@@ -110,10 +110,10 @@ public final class InstaSearch extends JFrame {
 
         final JMenuItem aboutItem = new JMenuItem("About");
         aboutItem.setFont(textFont);
-        aboutItem.addActionListener(actionEvent -> {
-            JOptionPane.showMessageDialog(this,"Classy Shark Insta Search version " +
-                    BuildVersion.getBuildVersion());
-        });
+        aboutItem.addActionListener(
+                actionEvent -> JOptionPane.showMessageDialog(this,
+                        "Classy Shark Insta Search version " +
+                BuildVersion.getBuildVersion()));
         menu.add(aboutItem);
 
         final JMenuItem closeItem = new JMenuItem("Exit");
@@ -141,7 +141,7 @@ public final class InstaSearch extends JFrame {
         setVisible(true);
     }
 
-    private final JTextField buildSearchField() {
+    private JTextField buildSearchField() {
         final JTextField result = new JTextField();
         result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
@@ -182,7 +182,7 @@ public final class InstaSearch extends JFrame {
         return result;
     }
 
-    private final JTextPane buildResultTextPane() {
+    private JTextPane buildResultTextPane() {
         final JTextPane result = new JTextPane();
         result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
@@ -195,7 +195,7 @@ public final class InstaSearch extends JFrame {
         return result;
     }
 
-    private final JTextPane buildPreviewTextPane() {
+    private JTextPane buildPreviewTextPane() {
         final JTextPane result = new JTextPane();
         result.setFont(textFont);
         result.setBackground(BACKGROUND_COLOR);
@@ -210,7 +210,7 @@ public final class InstaSearch extends JFrame {
         return result;
     }
 
-    private final File open() {
+    private File open() {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setPreferredSize(new Dimension(700,500));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -250,7 +250,7 @@ public final class InstaSearch extends JFrame {
     }
 
     private static boolean isTextSupported(String filePath) {
-        return Controller.SOURCE_PATH_MATCHER.matches(new File(filePath).toPath());
+        return Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(new File(filePath).toPath());
     }
 
     public static void main(final String[] args) {

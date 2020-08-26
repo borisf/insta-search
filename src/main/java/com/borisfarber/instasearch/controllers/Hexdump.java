@@ -104,9 +104,7 @@ public final class Hexdump {
         int bytesWritten = lastByte - firstByte;
 
         int charsMissing = charsPerByte * (maxBytesPerLine - bytesWritten);
-        for (int i = 0; i < charsMissing; i++) {
-            out.append(' ');
-        }
+        out.append(" ".repeat(Math.max(0, charsMissing)));
     }
 
     private static void appendDisplayChars(byte[] bytes, int offset, int blockEnd, StringBuilder out) {

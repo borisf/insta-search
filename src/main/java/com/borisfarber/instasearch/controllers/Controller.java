@@ -14,11 +14,8 @@
 package com.borisfarber.instasearch.controllers;
 
 import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Repl;
-import com.borisfarber.instasearch.search.ZipSearch;
-import com.borisfarber.instasearch.search.GrepSearch;
-import com.borisfarber.instasearch.search.MockSearch;
-import com.borisfarber.instasearch.search.Search;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
 import com.borisfarber.instasearch.ui.Highlighter;
@@ -31,9 +28,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -51,7 +46,10 @@ public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
     public static final int UI_VIEW_LIMIT = 50;
 
-    public static final PathMatcher SOURCE_PATH_MATCHER =
+    public static final PathMatcher SOURCE_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
+
+    public static final PathMatcher SOURCE_OR_TEXT_PATH_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
 
     public static final PathMatcher CLASS_MATCHER =
@@ -67,13 +65,13 @@ public final class Controller implements DocumentListener {
     public JTextPane previewTextPane;
     private final JLabel resultCountLabel;
 
-    private ThreadPoolExecutor executor =
+    private final ThreadPoolExecutor executor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
     private String query;
     private Search search;
-    private Pair<String, Integer> editorFilenameAndPosition =
+    private final Pair<String, Integer> editorFilenameAndPosition =
             new Pair<>("test.txt",0);
-    private ArrayList<String> searchResults = new ArrayList<>();
+    private final ArrayList<String> searchResults = new ArrayList<>();
     private int selectedGuiIndex = 0;
     private int numLines = 0;
     private String selectedLine = "";
@@ -147,19 +145,20 @@ public final class Controller implements DocumentListener {
                 previewTextPane.setText("");
                 resultCountLabel.setText("");
 
-                search = createSearch(newFile);
                 crawl(newFile);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return;
     }
 
     private Search createSearch(File newFile) {
         if (newFile.isDirectory()) {
-            //return new FuzzySearch(this);
-            return new GrepSearch(this);
+            if(PrivateFolder.isSourceFolder(newFile)) {
+                return new FuzzySearch(this);
+            } else {
+                return new GrepSearch(this);
+            }
         } else {
             if (ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
                 return new ZipSearch(newFile, this);
@@ -176,6 +175,7 @@ public final class Controller implements DocumentListener {
 
         onUpdateGUIInternal();
     }
+
 
     public void downPressed() {
         if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
@@ -194,46 +194,36 @@ public final class Controller implements DocumentListener {
 
         Path selectedPath = search.getPathPerFileName(editorFilenameAndPosition.t);
 
-        try {
-            String command;
+        if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
+            DesktopAdaptor.openFileOnDesktop(selectedPath, editorFilenameAndPosition.u);
+        } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
+            String fileNameWithoutExt =
+                    new File(selectedPath.toString()).
+                            getName().replaceFirst("[.][^.]+$", "");
+            String ext = "java";
+            StringWriter writer = new StringWriter();
 
-            if(Controller.SOURCE_PATH_MATCHER.matches(selectedPath)) {
-                command = "nvim +\"set number\" +"
-                        + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
-                        " " + selectedPath.toString();
-                Terminal.executeInLinux(command);
-            } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
-                String fileNameWithoutExt =
-                        new File(selectedPath.toString()).
-                                getName().replaceFirst("[.][^.]+$", "");
-                String ext = "java";
-                StringWriter writer = new StringWriter();
-
-                try {
-                    PlainTextOutput pto = new PlainTextOutput(writer);
-                    Decompiler.decompile(selectedPath.toString(), pto);
-                } finally {
-                    writer.flush();
-                }
+            try {
+                PlainTextOutput pto = new PlainTextOutput(writer);
+                Decompiler.decompile(selectedPath.toString(), pto);
 
                 String content = writer.toString();
-                previewTextPane.setText(content);
 
                 File javaFile = PrivateFolder.INSTANCE.getTempFile(fileNameWithoutExt, ext);
                 try (PrintWriter out = new PrintWriter(javaFile)) {
                     out.println(content);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
 
-                command = "nvim " + javaFile.getAbsolutePath();
-                Terminal.executeInLinux(command);
-            } else {
-                HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
+                previewTextPane.setText(content);
+                DesktopAdaptor.openFileOnDesktop(javaFile.toPath(), 0);
+
+            } finally {
+                writer.flush();
             }
-        } catch (Exception e) {
-            // follow up on various OSs where nvim not configured
-            // Desktop desktop = Desktop.getDesktop();
-            // desktop.open(new File(selectedPath.toString())); --- will not work with zip
-            e.printStackTrace();
+        } else {
+            HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
         }
     }
 
@@ -255,12 +245,10 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    public String dump() {
+    public void dump() {
         System.out.println(search.getResults());
         System.out.println(search.getPreview(""));
         System.out.println(search.getResultSetCount());
-
-        return "";
     }
 
     private void runNewSearch(final Document searchQueryDoc) {
@@ -317,7 +305,7 @@ public final class Controller implements DocumentListener {
         StringBuilder builder = new StringBuilder();
         for (String str : searchResults) {
             if(previewLinesIndex == selectedGuiIndex) {
-                builder.append(SELECTOR + str);
+                builder.append(SELECTOR).append(str);
                 String[] parts  = str.split(":");
                 String fileName = parts[0];
                 String line = parts[1];

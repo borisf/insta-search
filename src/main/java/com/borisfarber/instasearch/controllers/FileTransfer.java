@@ -21,7 +21,7 @@
  import java.util.List;
 
  public class FileTransfer extends TransferHandler {
-     private InstaSearch instaSearch;
+     private final InstaSearch instaSearch;
 
      public FileTransfer(InstaSearch instaSearch) {
          this.instaSearch = instaSearch;

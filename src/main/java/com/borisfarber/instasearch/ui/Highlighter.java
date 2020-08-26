@@ -48,6 +48,7 @@
                  pos += pattern.length();
              }
          } catch (BadLocationException e) {
+             System.err.println("Ignored in highlight results");
          }
      }
 
@@ -66,7 +67,8 @@
              int pos = text.indexOf(selectedLine);
 
              if(pos == -1) {
-                 System.err.println("wrong search index");
+                 // hex view in the preview, no reason to highlight
+                 //System.err.println("wrong search index");
                  return;
              }
 
@@ -82,7 +84,7 @@
              doc1.setCharacterAttributes(pos + selectedLine.length(), text.length(),attrs, false);
              // end back
          } catch (final BadLocationException ble) {
-             System.err.println("Ignored in this example");
+             System.err.println("Ignored in highlight preview");
          }
      }
  }

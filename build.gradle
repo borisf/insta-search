@@ -27,6 +27,7 @@ dependencies {
     implementation 'com.jramoyo:indexed-file-reader:1.0'
     implementation 'org.zeroturnaround:zt-zip:1.14'
     implementation 'org.bitbucket.mstrobel:procyon-compilertools:0.5.36'
+    implementation 'com.dorkbox:Notify:3.7'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 }
 
@@ -57,6 +58,9 @@ task fatJar(type: Jar) {
                 'Implementation-Version': archiveVersion
     }
     archiveBaseName = 'insta-search'
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
+
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
