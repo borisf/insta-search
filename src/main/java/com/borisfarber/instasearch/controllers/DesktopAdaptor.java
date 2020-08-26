@@ -13,16 +13,18 @@
   */
 package com.borisfarber.instasearch.controllers;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
- public class Terminal {
-    static int executeInLinux(String command) throws IOException, InterruptedException {
-        final String[] wrappedCommand;
-        wrappedCommand = new String[]{ "gnome-terminal", "-e", command};
-
-        Process process = new ProcessBuilder(wrappedCommand)
-                .redirectErrorStream(true)
-                .start();
-        return process.waitFor();
-    }
-}
+ public class DesktopAdaptor {
+     static void openFileOnDesktop(Path path) {
+         try {
+             Desktop desktop = Desktop.getDesktop();
+             desktop.open(new File(path.toString()));
+         } catch (IOException ioException) {
+             ioException.printStackTrace();
+         }
+     }
+ }

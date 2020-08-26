@@ -28,9 +28,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -146,7 +144,7 @@ public final class Controller implements DocumentListener {
                 resultTextPane.setText(Background.INTRO);
                 previewTextPane.setText("");
                 resultCountLabel.setText("");
-                
+
                 crawl(newFile);
             }
         } catch (Exception e) {
@@ -178,6 +176,7 @@ public final class Controller implements DocumentListener {
         onUpdateGUIInternal();
     }
 
+
     public void downPressed() {
         if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
                 && selectedGuiIndex < (numLines - 1)) {
@@ -195,46 +194,36 @@ public final class Controller implements DocumentListener {
 
         Path selectedPath = search.getPathPerFileName(editorFilenameAndPosition.t);
 
-        try {
-            String command;
+        if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
+            DesktopAdaptor.openFileOnDesktop(selectedPath);
+        } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
+            String fileNameWithoutExt =
+                    new File(selectedPath.toString()).
+                            getName().replaceFirst("[.][^.]+$", "");
+            String ext = "java";
+            StringWriter writer = new StringWriter();
 
-            if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-                command = "nvim +\"set number\" +"
-                        + Integer.parseInt(String.valueOf(editorFilenameAndPosition.u)) +
-                        " " + selectedPath.toString();
-                Terminal.executeInLinux(command);
-            } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
-                String fileNameWithoutExt =
-                        new File(selectedPath.toString()).
-                                getName().replaceFirst("[.][^.]+$", "");
-                String ext = "java";
-                StringWriter writer = new StringWriter();
-
-                try {
-                    PlainTextOutput pto = new PlainTextOutput(writer);
-                    Decompiler.decompile(selectedPath.toString(), pto);
-                } finally {
-                    writer.flush();
-                }
+            try {
+                PlainTextOutput pto = new PlainTextOutput(writer);
+                Decompiler.decompile(selectedPath.toString(), pto);
 
                 String content = writer.toString();
-                previewTextPane.setText(content);
 
                 File javaFile = PrivateFolder.INSTANCE.getTempFile(fileNameWithoutExt, ext);
                 try (PrintWriter out = new PrintWriter(javaFile)) {
                     out.println(content);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
 
-                command = "nvim " + javaFile.getAbsolutePath();
-                Terminal.executeInLinux(command);
-            } else {
-                HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
+                previewTextPane.setText(content);
+                DesktopAdaptor.openFileOnDesktop(javaFile.toPath());
+
+            } finally {
+                writer.flush();
             }
-        } catch (Exception e) {
-            // follow up on various OSs where nvim not configured
-            // Desktop desktop = Desktop.getDesktop();
-            // desktop.open(new File(selectedPath.toString())); --- will not work with zip
-            e.printStackTrace();
+        } else {
+            HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
         }
     }
 
