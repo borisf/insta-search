@@ -64,10 +64,15 @@ public final class HexPanel extends JPanel implements CaretListener {
         offsetView = new JTextArea();
         hexView = new JTextArea();
         asciiView = new JTextArea();
+
+        offsetView.setEditable(false);
+        hexView.setEditable(false);
+        asciiView.setEditable(false);
+
         final JPanel statusView = new JPanel();
         statusView.setBackground(BACKGROUND_COLOR);
         statusView.setForeground(FOREGROUND_COLOR);
-
+        
         offsetView.setBackground(BACKGROUND_COLOR);
         hexView.setBackground(BACKGROUND_COLOR);
         asciiView.setBackground(BACKGROUND_COLOR);
