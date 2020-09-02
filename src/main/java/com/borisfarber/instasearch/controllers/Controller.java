@@ -44,7 +44,7 @@ import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
     public static final String SELECTOR = "==> ";
-    public static final int UI_VIEW_LIMIT = 50;
+    public static final int UI_VIEW_LIMIT = 1000;
 
     public static final PathMatcher SOURCE_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
@@ -336,14 +336,14 @@ public final class Controller implements DocumentListener {
             int selector = builder.toString().indexOf(SELECTOR);
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
+
+                if(query != null) {
+                    Highlighter highlighter = new Highlighter();
+                    highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
+                }
             }
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
-        }
-
-        if(query != null) {
-            Highlighter highlighter = new Highlighter();
-            highlighter.highlightSearch(resultTextPane, query, Color.ORANGE);
         }
     }
 

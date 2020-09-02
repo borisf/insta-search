@@ -14,6 +14,7 @@
 package com.borisfarber.instasearch.controllers;
 
 import dorkbox.notify.Notify;
+import dorkbox.notify.Pos;
 
 import java.awt.*;
 import java.io.File;
@@ -33,6 +34,7 @@ import java.nio.file.Path;
                      .title("Insta Search")
                      .text("Line " + line)
                      .hideCloseButton()
+                     .position(Pos.TOP_RIGHT)
                      .darkStyle()
                      .showInformation();
          } catch (IOException ioException) {

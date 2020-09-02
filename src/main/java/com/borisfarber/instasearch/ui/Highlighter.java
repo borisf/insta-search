@@ -18,7 +18,7 @@
  import java.awt.*;
 
  public class Highlighter {
-     public void highlightSearch(JTextPane textPane, String pattern, Color color) {
+     public void highlightSearch(JTextPane textPane, int from, String pattern, Color color) {
 
          DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
                  new DefaultHighlighter.DefaultHighlightPainter(color);
@@ -26,7 +26,12 @@
          try {
              javax.swing.text.Highlighter hilite = textPane.getHighlighter();
              Document doc = textPane.getDocument();
-             String text = doc.getText(0, doc.getLength());
+
+             int upperIndex = (from + 2500);
+             if (upperIndex > doc.getLength()) {
+                 upperIndex = doc.getLength();
+             }
+             String text = doc.getText(from, upperIndex);
 
              /// background
              MutableAttributeSet attrs = textPane.getInputAttributes();
@@ -35,14 +40,16 @@
 
              // Search for pattern
              while ((pos = text.indexOf(pattern, pos)) >= 0) {
+                 int startMatch = from + pos;
                  // Create highlighter using private painter and apply around pattern
-                 hilite.addHighlight(pos, pos + pattern.length(), previewHighlighter);
+                 hilite.addHighlight(startMatch, startMatch + pattern.length(), previewHighlighter);
 
                  // back
                  StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
-                 doc1.setCharacterAttributes(pos, pos + pattern.length(), attrs, false);
+                 doc1.setCharacterAttributes(startMatch, startMatch + pattern.length(), attrs, false);
                  StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
-                 doc1.setCharacterAttributes(pos + pattern.length(), text.length(),attrs, false);
+                 doc1.setCharacterAttributes(startMatch + pattern.length(),
+                         startMatch + text.length(),attrs, false);
                  // end back
 
                  pos += pattern.length();
