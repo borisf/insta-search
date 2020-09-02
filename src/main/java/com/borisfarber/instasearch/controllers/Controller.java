@@ -268,10 +268,17 @@ public final class Controller implements DocumentListener {
         boolean isViewLimit = false;
         LinkedList<Pair<String, Integer>> locations;
         searchResults.clear();
-
         List<String> rawResults = search.getResults();
+
         while ((resultCount < rawResults.size()) && !isViewLimit) {
             String rawLine = rawResults.get(resultCount);
+
+            if(rawLine == null) {
+                // if the UI is drawing the previous search results
+                // while the results are updated
+                return;
+            }
+
             locations = search.getFileNameAndPosition(rawLine);
 
             for(Pair<String, Integer> location : locations) {
@@ -296,7 +303,6 @@ public final class Controller implements DocumentListener {
 
         searchResults.sort(RESULTS_SORTER);
         numLines = resultCount;
-
         onUpdateGUIInternal();
     }
 

@@ -49,6 +49,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -78,6 +79,7 @@ public class GrepSearch implements Search {
     private HashMap<String, LinkedList<Integer>> occurrences;
     private final ExecutorService executorService =
             Executors.newFixedThreadPool(4);
+    static AtomicInteger finishedTasks = new AtomicInteger(0);
 
     private final ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
@@ -244,8 +246,13 @@ public class GrepSearch implements Search {
         ArrayList<String> partialResults = grep(file, charBuffer);
         result.addAll(partialResults);
 
-        Runnable runnable = controller::onUpdateGUI;
-        SwingUtilities.invokeLater(runnable);
+        int task = finishedTasks.incrementAndGet();
+
+        if(task == 4) {
+            Runnable runnable = () -> controller.onUpdateGUI();
+            SwingUtilities.invokeLater(runnable);
+            finishedTasks.getAndSet(0);
+        }
     }
 
     // Use the linePattern to break the given CharBuffer into lines, applying
@@ -342,8 +349,6 @@ public class GrepSearch implements Search {
                 }
 
                 String result =  builder.toString();
-
-
 
                 Runnable runnable = () -> {
                     controller.previewTextPane.setText(result);
