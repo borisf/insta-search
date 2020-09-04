@@ -1,16 +1,16 @@
-# ClassyShark Insta Search
+# Insta Search
 
 A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
 logs.  And a decent chunk of time spent reading, is actually spent on searching.
 
-ClassyShark Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) 
+Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) 
 search.
 
 With Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
 incrementally.
 
-![Image of ClassySearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
+![Image of InstaSearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
 
 ### Components
 * Search Line - the upper text box, where you type text that are you looking for
@@ -27,12 +27,19 @@ will be opened on the relevant line within your system defined editor
 The Insta Search supports incremental searching in both files and folders: 
 
 * Log File - Drag and drop your file into the results view
-* Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder 
+* Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder. 
 * APK/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
 Searching will result of filtering of the filenames. Going over the entries you see the preview.
 * Jar/Zip File with class files - Drag and drop your file into the results view. Insta Search 
 will show the entries. Searching will result of filtering of the filenames. Going over the entries 
-you see the binary preview. Pressing Enter will open a decompiled class view. 
+you see the binary preview. Pressing Enter will open a decompiled class view.
+* Binary File - InstaSearch will open its own hex editor in a separate window. 
+
+### File Menu
+When you click on File menu you will get the following:
+ * Open - will open a file selection dialog to open a window
+ * About - will show you the version
+ * Exit - exits the InstaSearch (or press ALT + F4)
 
 ### Command Line Arguments
 * No args - InstaSearch will crawl recursively the current working folder (pwd) 
