@@ -1,46 +1,51 @@
-# ClassyShark Insta Search
+# Insta Search
 
 A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
 logs.  And a decent chunk of time spent reading, is actually spent on searching.
 
-ClassyShark Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) search.
+Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) 
+search.
 
 With Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
 incrementally.
 
-![Image of ClassySearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
-
-## Flow
-The Insta Search supports the following modes: 
-
-* File - Drag and drop your file into the results view (Insta Search maps the file)
-* Folder - Open folder via the menu, or run Insta Search inside the relevant folder 
-(Insta Search dumps the files into one big text file and then maps that file)
-* APK/Zip file - Drag and drop your file into the results view. Insta Search will show the entries. 
-Searching will result of filtering of the filenames. Going over the entries you see the preview.
-* Jar/Zip file with class files - Drag and drop your file into the results view. Insta Search 
-will show the entries. Searching will result of filtering of the filenames. Going over the entries 
-you see the binary preview. Pressing Enter will open a decompiled class view. 
+![Image of InstaSearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
 
 ### Components
-* Search line - where you type text that are you looking for
+* Search Line - the upper text box, where you type text that are you looking for
 
-* Results view - where you see file set that include the text from
+* Results View - the middle list, where you see the filtered results
 the search line, use arrows to land to the relevant line
 
-* Preview view - shows the context near the selected line
+* Preview view - bottom text box, where you see the context near the selected line
 
 * Editor - once found the relevant line, press Enter, and the log file 
-will be opened on the relevant line within your defined
-editor
+will be opened on the relevant line within your system defined editor
 
-## Command Line Arguments
+### Howto
+The Insta Search supports incremental searching in both files and folders: 
 
+* Log File - Drag and drop your file into the results view
+* Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder. 
+* APK/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
+Searching will result of filtering of the filenames. Going over the entries you see the preview.
+* Jar/Zip File with class files - Drag and drop your file into the results view. Insta Search 
+will show the entries. Searching will result of filtering of the filenames. Going over the entries 
+you see the binary preview. Pressing Enter will open a decompiled class view.
+* Binary File - InstaSearch will open its own hex editor in a separate window. 
+
+### File Menu
+When you click on File menu you will get the following:
+ * Open - will open a file selection dialog to open a window
+ * About - will show you the version
+ * Exit - exits the InstaSearch (or press ALT + F4)
+
+### Command Line Arguments
 * No args - InstaSearch will crawl recursively the current working folder (pwd) 
-* File name - a large, usually log file to crawl
+* File name - a large log file to crawl
 
-## Download & Run
+### Download & Run
 To run, grab the [latest JAR](https://github.com/borisf/insta-search/releases)
 and run `java -jar insta-search.jar`
 

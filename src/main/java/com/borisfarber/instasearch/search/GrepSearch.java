@@ -49,6 +49,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -62,6 +63,7 @@ public class GrepSearch implements Search {
 
     // Pattern used to parse lines
     private static final Pattern linePattern= Pattern.compile(".*\r?\n");
+    public static final int NUMBER_OF_TASKS = 4;
 
     // The input pattern that we're looking for
     private static Pattern pattern;
@@ -77,7 +79,8 @@ public class GrepSearch implements Search {
     private List<String> preview= new ArrayList<>();
     private HashMap<String, LinkedList<Integer>> occurrences;
     private final ExecutorService executorService =
-            Executors.newFixedThreadPool(4);
+            Executors.newFixedThreadPool(NUMBER_OF_TASKS);
+    static AtomicInteger finishedTasks = new AtomicInteger(0);
 
     private final ConcurrentLinkedQueue<String> result =
             new ConcurrentLinkedQueue<>();
@@ -244,8 +247,13 @@ public class GrepSearch implements Search {
         ArrayList<String> partialResults = grep(file, charBuffer);
         result.addAll(partialResults);
 
-        Runnable runnable = controller::onUpdateGUI;
-        SwingUtilities.invokeLater(runnable);
+        int task = finishedTasks.incrementAndGet();
+
+        if(task == NUMBER_OF_TASKS) {
+            Runnable runnable = () -> controller.onUpdateGUI();
+            SwingUtilities.invokeLater(runnable);
+            finishedTasks.set(0);
+        }
     }
 
     // Use the linePattern to break the given CharBuffer into lines, applying
@@ -313,7 +321,6 @@ public class GrepSearch implements Search {
         }
 
         executorService.execute(() -> {
-
             try {
                 String[] parts  = resultLine.split(":");
                 String lineNum = parts[1];
@@ -342,8 +349,6 @@ public class GrepSearch implements Search {
                 }
 
                 String result =  builder.toString();
-
-
 
                 Runnable runnable = () -> {
                     controller.previewTextPane.setText(result);
