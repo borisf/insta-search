@@ -27,22 +27,29 @@ will be opened on the relevant line within your system defined editor
 The Insta Search supports incremental searching in both files and folders: 
 
 * Log File - Drag and drop your file into the results view
+
 * Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder. 
+
 * APK/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
 Searching will result of filtering of the filenames. Going over the entries you see the preview.
+
 * Jar/Zip File with class files - Drag and drop your file into the results view. Insta Search 
 will show the entries. Searching will result of filtering of the filenames. Going over the entries 
 you see the binary preview. Pressing Enter will open a decompiled class view.
+
 * Binary File - InstaSearch will open its own hex editor in a separate window. 
 
 ### File Menu
 When you click on File menu you will get the following:
- * Open - will open a file selection dialog to open a window
- * About - will show you the version
- * Exit - exits the InstaSearch (or press ALT + F4)
+* Open - will open a file selection dialog to open a window
+
+* About - will show you the version
+
+* Exit - exits the InstaSearch (or press ALT + F4)
 
 ### Command Line Arguments
 * No args - InstaSearch will crawl recursively the current working folder (pwd) 
+
 * File name - a large log file to crawl
 
 ### Download & Run
