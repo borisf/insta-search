@@ -63,6 +63,7 @@ public class GrepSearch implements Search {
 
     // Pattern used to parse lines
     private static final Pattern linePattern= Pattern.compile(".*\r?\n");
+    public static final int NUMBER_OF_TASKS = 4;
 
     // The input pattern that we're looking for
     private static Pattern pattern;
@@ -78,7 +79,7 @@ public class GrepSearch implements Search {
     private List<String> preview= new ArrayList<>();
     private HashMap<String, LinkedList<Integer>> occurrences;
     private final ExecutorService executorService =
-            Executors.newFixedThreadPool(4);
+            Executors.newFixedThreadPool(NUMBER_OF_TASKS);
     static AtomicInteger finishedTasks = new AtomicInteger(0);
 
     private final ConcurrentLinkedQueue<String> result =
@@ -248,7 +249,7 @@ public class GrepSearch implements Search {
 
         int task = finishedTasks.incrementAndGet();
 
-        if(task == 4) {
+        if(task == NUMBER_OF_TASKS) {
             Runnable runnable = () -> controller.onUpdateGUI();
             SwingUtilities.invokeLater(runnable);
             finishedTasks.getAndSet(0);
@@ -320,7 +321,6 @@ public class GrepSearch implements Search {
         }
 
         executorService.execute(() -> {
-
             try {
                 String[] parts  = resultLine.split(":");
                 String lineNum = parts[1];
