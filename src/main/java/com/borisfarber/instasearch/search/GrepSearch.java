@@ -252,7 +252,7 @@ public class GrepSearch implements Search {
         if(task == NUMBER_OF_TASKS) {
             Runnable runnable = () -> controller.onUpdateGUI();
             SwingUtilities.invokeLater(runnable);
-            finishedTasks.getAndSet(0);
+            finishedTasks.set(0);
         }
     }
 
