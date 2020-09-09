@@ -16,12 +16,11 @@ package com.borisfarber.instasearch.binary;
  * limitations under the License.
  */
 
+import com.borisfarber.instasearch.controllers.PrivateFolder;
 import com.google.common.io.LittleEndianDataInputStream;
+import org.zeroturnaround.zip.ZipUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInput;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -107,6 +106,22 @@ public class XmlDecompressor {
 
     static {
         Arrays.fill(SPACE_FILL, ' ');
+    }
+
+    public static File extractManifest(File file) {
+        File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
+        byte[] bytes = ZipUtil.unpackEntry(file, "AndroidManifest.xml");
+
+        try (PrintWriter out = new PrintWriter(man)) {
+            XmlDecompressor xmlDecompressor = new XmlDecompressor();
+            String content = xmlDecompressor.decompressXml(bytes);
+            out.println(content);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return man;
     }
 
     public void setAppendNamespaces(boolean appendNamespaces) {

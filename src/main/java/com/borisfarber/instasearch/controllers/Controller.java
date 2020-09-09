@@ -17,11 +17,10 @@ import com.borisfarber.instasearch.binary.Clazz;
 import com.borisfarber.instasearch.binary.XmlDecompressor;
 import com.borisfarber.instasearch.data.Pair;
 import com.borisfarber.instasearch.search.*;
-import com.borisfarber.instasearch.ui.Repl;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
 import com.borisfarber.instasearch.ui.Highlighter;
-import org.zeroturnaround.zip.ZipUtil;
+import com.borisfarber.instasearch.ui.Repl;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -29,7 +28,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -188,7 +187,6 @@ public final class Controller implements DocumentListener {
         onUpdateGUIInternal();
     }
 
-
     public void downPressed() {
         if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
                 && selectedGuiIndex < (numLines - 1)) {
@@ -218,21 +216,11 @@ public final class Controller implements DocumentListener {
                 SwingUtilities.invokeLater(runnable);
             });
         } else if(selectedPath.toString().contains("AndroidManifest.xml")) {
-
-
-
-
-            File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
-            byte[] bytes = ZipUtil.unpackEntry(file, "AndroidManifest.xml");
-
-            try (PrintWriter out = new PrintWriter(man)) {
-                XmlDecompressor xmlDecompressor = new XmlDecompressor();
-                String content = xmlDecompressor.decompressXml(bytes);
-                out.println(content);
-                DesktopAdaptor.openFileOnDesktop(man.toPath(), 0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            previewTasksExecutor.execute(() -> {
+                File manifest = XmlDecompressor.extractManifest(file);
+                Runnable runnable = () -> DesktopAdaptor.openFileOnDesktop(manifest.toPath(), 0);
+                SwingUtilities.invokeLater(runnable);
+            });
         }
         else {
             HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
