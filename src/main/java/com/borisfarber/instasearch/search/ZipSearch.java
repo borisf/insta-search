@@ -39,8 +39,8 @@
              Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
-     public ZipSearch(File newFile, Controller controller) {
-         this.zipFile = newFile;
+     public ZipSearch(File zipFile, Controller controller) {
+         this.zipFile = zipFile;
          this.controller = controller;
          allLines.clear();
      }

@@ -14,12 +14,14 @@
 package com.borisfarber.instasearch.controllers;
 
 import com.borisfarber.instasearch.binary.Clazz;
+import com.borisfarber.instasearch.binary.XmlDecompressor;
 import com.borisfarber.instasearch.data.Pair;
 import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Repl;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
 import com.borisfarber.instasearch.ui.Highlighter;
+import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -73,8 +75,6 @@ public final class Controller implements DocumentListener {
     private final ThreadPoolExecutor previewTasksExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
-
-
     private String query;
     private Search search;
     private final Pair<String, Integer> editorFilenameAndPosition =
@@ -83,6 +83,7 @@ public final class Controller implements DocumentListener {
     private int selectedGuiIndex = 0;
     private int numLines = 0;
     private String selectedLine = "";
+    private File file;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -101,6 +102,7 @@ public final class Controller implements DocumentListener {
             return;
         }
 
+        this.file = file;
         search = createSearch(file);
         search.crawl(file);
     }
@@ -215,7 +217,24 @@ public final class Controller implements DocumentListener {
                 };
                 SwingUtilities.invokeLater(runnable);
             });
-        } else {
+        } else if(selectedPath.toString().contains("AndroidManifest.xml")) {
+
+
+
+
+            File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
+            byte[] bytes = ZipUtil.unpackEntry(file, "AndroidManifest.xml");
+
+            try (PrintWriter out = new PrintWriter(man)) {
+                XmlDecompressor xmlDecompressor = new XmlDecompressor();
+                String content = xmlDecompressor.decompressXml(bytes);
+                out.println(content);
+                DesktopAdaptor.openFileOnDesktop(man.toPath(), 0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
             HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
         }
     }

@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class APKSearch extends ZipSearch {
-    public APKSearch(File newFile, Controller controller) {
-        super(newFile, controller);
+    public APKSearch(File zipFile, Controller controller) {
+        super(zipFile, controller);
     }
 
     @Override
