@@ -229,13 +229,6 @@
      }
 
      @Override
-     public void testCrawl(ArrayList<String> testLoad) {
-         allLines.clear();
-         allLines.addAll(testLoad);
-         numLinesToFilenames.clear();
-     }
-
-     @Override
      public void close() {
          Runtime.getRuntime().addShutdownHook(new Thread(() -> {
              try {

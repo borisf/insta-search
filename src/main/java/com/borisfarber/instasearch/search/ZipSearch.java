@@ -148,12 +148,7 @@
 
          return Path.of(tempFile.toURI());
      }
-
-     @Override
-     public void testCrawl(ArrayList<String> testLoad) {
-
-     }
-
+     
      @Override
      public void close() {
          executorService.shutdown();

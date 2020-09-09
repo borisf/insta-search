@@ -382,11 +382,6 @@ public class GrepSearch implements Search {
     }
 
     @Override
-    public void testCrawl(ArrayList<String> testLoad) {
-
-    }
-
-    @Override
     public void close() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {

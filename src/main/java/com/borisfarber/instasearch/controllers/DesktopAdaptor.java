@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
- public class DesktopAdaptor {
+public class DesktopAdaptor {
      static void openFileOnDesktop(Path path, int line) {
          try {
              Desktop desktop = Desktop.getDesktop();

@@ -23,8 +23,6 @@ public interface Search {
 
     Path getPathPerFileName(String fileName);
 
-    void testCrawl(ArrayList<String> testLoad);
-
     void close();
 
     void emptyQuery();

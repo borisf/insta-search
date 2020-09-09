@@ -95,11 +95,6 @@ public class MockSearch implements Search {
     }
 
     @Override
-    public void testCrawl(ArrayList<String> testLoad) {
-
-    }
-
-    @Override
     public void close() {
 
     }
