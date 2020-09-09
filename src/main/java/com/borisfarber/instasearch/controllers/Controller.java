@@ -13,8 +13,8 @@
  */
 package com.borisfarber.instasearch.controllers;
 
-import com.borisfarber.instasearch.binary.Clazz;
-import com.borisfarber.instasearch.binary.XmlDecompressor;
+import com.borisfarber.instasearch.formats.Clazz;
+import com.borisfarber.instasearch.formats.XmlDecompressor;
 import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;

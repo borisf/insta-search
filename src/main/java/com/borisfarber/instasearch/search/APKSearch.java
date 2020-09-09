@@ -1,6 +1,6 @@
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.binary.XmlDecompressor;
+import com.borisfarber.instasearch.formats.XmlDecompressor;
 import com.borisfarber.instasearch.controllers.Controller;
 import com.borisfarber.instasearch.ui.Hexdump;
 import org.zeroturnaround.zip.ZipUtil;
