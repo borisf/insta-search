@@ -32,10 +32,10 @@
  import java.util.concurrent.ThreadPoolExecutor;
 
  public class ZipSearch implements Search {
-     private final Controller controller;
-     private File zipFile;
+     protected final Controller controller;
+     protected File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
-     private final ExecutorService executorService =
+     protected final ExecutorService executorService =
              Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
