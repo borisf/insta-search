@@ -31,11 +31,13 @@ The Insta Search supports incremental searching in both files and folders:
 * Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder. 
 
 * APK/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
-Searching will result of filtering of the filenames. Going over the entries you see the preview.
+Searching will result of filtering of the filenames. Going over the entries with app/down arrows will
+show the selected entry in the preview. You will see AndroidManifest as text, and other binary files 
+as a hex dump.
 
 * Jar/Zip File with class files - Drag and drop your file into the results view. Insta Search 
 will show the entries. Searching will result of filtering of the filenames. Going over the entries 
-you see the binary preview. Pressing Enter will open a decompiled class view.
+with app/down arrow will show the binary preview. Pressing Enter will open a decompiled class view.
 
 * Binary File - InstaSearch will open its own hex editor in a separate window. 
 
