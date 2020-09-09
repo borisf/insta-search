@@ -2,7 +2,7 @@ package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.binary.XmlDecompressor;
 import com.borisfarber.instasearch.controllers.Controller;
-import com.borisfarber.instasearch.controllers.Hexdump;
+import com.borisfarber.instasearch.ui.Hexdump;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;

@@ -15,12 +15,10 @@ package com.borisfarber.instasearch.controllers;
 
 import com.borisfarber.instasearch.binary.Clazz;
 import com.borisfarber.instasearch.binary.XmlDecompressor;
-import com.borisfarber.instasearch.data.Pair;
 import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
 import com.borisfarber.instasearch.ui.Highlighter;
-import com.borisfarber.instasearch.ui.Repl;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -39,7 +37,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.borisfarber.instasearch.search.FuzzySearch.testLoad;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
@@ -104,10 +101,6 @@ public final class Controller implements DocumentListener {
         this.file = file;
         search = createSearch(file);
         search.crawl(file);
-    }
-
-    public void testCrawl() {
-        search.testCrawl(testLoad());
     }
 
     @Override
@@ -221,8 +214,7 @@ public final class Controller implements DocumentListener {
                 Runnable runnable = () -> DesktopAdaptor.openFileOnDesktop(manifest.toPath(), 0);
                 SwingUtilities.invokeLater(runnable);
             });
-        }
-        else {
+        } else {
             HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
         }
     }
@@ -243,12 +235,6 @@ public final class Controller implements DocumentListener {
         if(waitingTasksCount < 1) {
             searchTasksExecutor.submit(runnableTask);
         }
-    }
-
-    public void dump() {
-        System.out.println(search.getResults());
-        System.out.println(search.getPreview(""));
-        System.out.println(search.getResultSetCount());
     }
 
     private void runNewSearch(final Document searchQueryDoc) {
@@ -365,9 +351,5 @@ public final class Controller implements DocumentListener {
             Highlighter highlighter = new Highlighter();
             highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
         }
-    }
-
-    public static void main(String[] args) {
-        Repl.repl();
     }
 }

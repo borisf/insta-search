@@ -14,7 +14,7 @@
  package com.borisfarber.instasearch.search;
 
  import com.borisfarber.instasearch.controllers.Controller;
- import com.borisfarber.instasearch.data.Pair;
+ import com.borisfarber.instasearch.controllers.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
  import javax.swing.*;
@@ -266,19 +266,6 @@
              System.out.println(res);
          }
          return "";
-     }
-
-     public static ArrayList<String> testLoad() {
-         ArrayList<String> allLines = new ArrayList<>();
-
-         allLines.add("Something ....");
-         allLines.add("Something else....");
-         allLines.add("Incremental Search ....");
-         allLines.add("Incremental Search with Preview");
-         allLines.add("Something .... other than else");
-         allLines.add("Something .... clear");
-
-         return allLines;
      }
 
      public static void main(String[] args) {

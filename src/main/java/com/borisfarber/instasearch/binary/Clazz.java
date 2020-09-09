@@ -11,11 +11,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package com.borisfarber.instasearch.binary;
 
 import com.borisfarber.instasearch.controllers.PrivateFolder;
-import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.controllers.Pair;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;
 

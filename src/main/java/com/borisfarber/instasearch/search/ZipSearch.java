@@ -14,9 +14,9 @@
  package com.borisfarber.instasearch.search;
 
  import com.borisfarber.instasearch.controllers.Controller;
- import com.borisfarber.instasearch.controllers.Hexdump;
+ import com.borisfarber.instasearch.ui.Hexdump;
  import com.borisfarber.instasearch.controllers.PrivateFolder;
- import com.borisfarber.instasearch.data.Pair;
+ import com.borisfarber.instasearch.controllers.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 

@@ -1,5 +1,3 @@
-package com.borisfarber.instasearch.binary;
-
 /*
  * Copyright 2015 Google, Inc.
  *
@@ -15,6 +13,7 @@ package com.borisfarber.instasearch.binary;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.borisfarber.instasearch.binary;
 
 import com.borisfarber.instasearch.controllers.PrivateFolder;
 import com.google.common.io.LittleEndianDataInputStream;
@@ -26,7 +25,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 
 /**
  * Decompresses an Android binary xml file. It is not the same as the original file, but should
