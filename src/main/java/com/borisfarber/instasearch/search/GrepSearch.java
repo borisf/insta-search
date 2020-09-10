@@ -32,7 +32,7 @@ package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.controllers.Controller;
 import com.borisfarber.instasearch.controllers.PrivateFolder;
-import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.controllers.Pair;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -379,11 +379,6 @@ public class GrepSearch implements Search {
     @Override
     public Path getPathPerFileName(String fileName) {
         return nameToPaths.get(fileName);
-    }
-
-    @Override
-    public void testCrawl(ArrayList<String> testLoad) {
-
     }
 
     @Override

@@ -14,9 +14,9 @@
  package com.borisfarber.instasearch.search;
 
  import com.borisfarber.instasearch.controllers.Controller;
- import com.borisfarber.instasearch.controllers.Hexdump;
+ import com.borisfarber.instasearch.ui.Hexdump;
  import com.borisfarber.instasearch.controllers.PrivateFolder;
- import com.borisfarber.instasearch.data.Pair;
+ import com.borisfarber.instasearch.controllers.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 
@@ -32,15 +32,15 @@
  import java.util.concurrent.ThreadPoolExecutor;
 
  public class ZipSearch implements Search {
-     private final Controller controller;
-     private File zipFile;
+     protected final Controller controller;
+     protected File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
-     private final ExecutorService executorService =
+     protected final ExecutorService executorService =
              Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
 
-     public ZipSearch(File newFile, Controller controller) {
-         this.zipFile = newFile;
+     public ZipSearch(File zipFile, Controller controller) {
+         this.zipFile = zipFile;
          this.controller = controller;
          allLines.clear();
      }
@@ -147,11 +147,6 @@
          ZipUtil.unpackEntry(zipFile, fileName, tempFile);
 
          return Path.of(tempFile.toURI());
-     }
-
-     @Override
-     public void testCrawl(ArrayList<String> testLoad) {
-
      }
 
      @Override

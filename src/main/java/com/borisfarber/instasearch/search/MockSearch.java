@@ -31,7 +31,7 @@
 package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.controllers.Controller;
-import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.controllers.Pair;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -92,11 +92,6 @@ public class MockSearch implements Search {
     @Override
     public Path getPathPerFileName(String fileName) {
         return null;
-    }
-
-    @Override
-    public void testCrawl(ArrayList<String> testLoad) {
-
     }
 
     @Override

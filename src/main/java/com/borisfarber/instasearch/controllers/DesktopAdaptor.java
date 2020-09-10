@@ -21,22 +21,24 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
- public class DesktopAdaptor {
+public class DesktopAdaptor {
      static void openFileOnDesktop(Path path, int line) {
          try {
              Desktop desktop = Desktop.getDesktop();
              desktop.open(new File(path.toString()));
 
-             Notify.TITLE_TEXT_FONT = "Source Code Pro BOLD 22";
-             Notify.MAIN_TEXT_FONT = "Source Code Pro BOLD 22";
+             if(line > 0) {
+                 Notify.TITLE_TEXT_FONT = "Source Code Pro BOLD 22";
+                 Notify.MAIN_TEXT_FONT = "Source Code Pro BOLD 22";
 
-             Notify.create()
-                     .title("Insta Search")
-                     .text("Line " + line)
-                     .hideCloseButton()
-                     .position(Pos.TOP_RIGHT)
-                     .darkStyle()
-                     .showInformation();
+                 Notify.create()
+                         .title("Insta Search")
+                         .text("Line " + line)
+                         .hideCloseButton()
+                         .position(Pos.TOP_RIGHT)
+                         .darkStyle()
+                         .showInformation();
+             }
          } catch (IOException ioException) {
              ioException.printStackTrace();
          }

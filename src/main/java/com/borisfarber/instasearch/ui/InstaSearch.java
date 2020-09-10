@@ -255,12 +255,10 @@ public final class InstaSearch extends JFrame {
 
     public static void main(final String[] args) {
         try {
-            // Set System L&F
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
         }
         catch (Exception e) {
-            // handle exception
         }
 
         InstaSearch classySearch;

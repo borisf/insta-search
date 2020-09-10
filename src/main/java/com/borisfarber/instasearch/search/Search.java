@@ -1,6 +1,6 @@
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.data.Pair;
+import com.borisfarber.instasearch.controllers.Pair;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -22,8 +22,6 @@ public interface Search {
     String getResultSetCount();
 
     Path getPathPerFileName(String fileName);
-
-    void testCrawl(ArrayList<String> testLoad);
 
     void close();
 
