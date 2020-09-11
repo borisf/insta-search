@@ -27,23 +27,28 @@
              javax.swing.text.Highlighter hilite = textPane.getHighlighter();
              Document doc = textPane.getDocument();
 
-             int upperIndex = (from + 2500);
-             if (upperIndex > doc.getLength()) {
-                 upperIndex = doc.getLength();
+             // borders to highlight
+             from = from - 1000;
+             if(from < 0) {
+                 from = 0;
              }
-             String text = doc.getText(from, upperIndex);
+
+             int to = (from + 1000);
+             if (to > doc.getLength()) {
+                 to = doc.getLength();
+             }
+             String text = doc.getText(from, to);
 
              /// background
              MutableAttributeSet attrs = textPane.getInputAttributes();
              StyledDocument doc1 = textPane.getStyledDocument();
              int pos = 0;
 
-             // Search for pattern
-             // TODO stopped here
-             String textL = text.toLowerCase();
-             String patternL = pattern.toLowerCase();
+             // Search for the pattern
+             String textLowercase = text.toLowerCase();
+             String patternLowercase = pattern.toLowerCase();
 
-             while ((pos = textL.indexOf(patternL, pos)) >= 0) {
+             while ((pos = textLowercase.indexOf(patternLowercase, pos)) >= 0) {
                  int startMatch = from + pos;
                  // Create highlighter using private painter and apply around pattern
                  hilite.addHighlight(startMatch, startMatch + pattern.length(), previewHighlighter);
@@ -75,7 +80,7 @@
              Document doc = previewTextPane.getDocument();
              String text = doc.getText(0, doc.getLength());
 
-             int pos = text.indexOf(selectedLine);
+             int pos = text.toLowerCase().indexOf(selectedLine.toLowerCase());
 
              if(pos == -1) {
                  // hex view in the preview, no reason to highlight

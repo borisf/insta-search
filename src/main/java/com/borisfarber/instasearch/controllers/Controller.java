@@ -316,6 +316,7 @@ public final class Controller implements DocumentListener {
         if(searchResults.size() > 0) {
             previewTextPane.setText
                     (search.getPreview(searchResults.get(selectedGuiIndex)));
+            highlightPreview();
         }
 
         if(searchResults.size() > UI_VIEW_LIMIT) {

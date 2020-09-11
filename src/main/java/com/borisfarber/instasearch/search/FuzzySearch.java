@@ -15,7 +15,6 @@
 
  import com.borisfarber.instasearch.controllers.Controller;
  import com.borisfarber.instasearch.controllers.Pair;
- import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
  import javax.swing.*;
  import java.io.File;
@@ -34,7 +33,6 @@
      private final Controller controller;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
-     private List<ExtractedResult> resultSet;
      private final TreeMap<String, Path> filenamesToPaths;
      private final ArrayList<Pair<Integer, String>> numLinesToFilenames;
      private final HashMap<String, List<Integer>> occurrences;
@@ -46,7 +44,7 @@
      public FuzzySearch(Controller controller) {
          this.controller = controller;
          allLines = new ArrayList<>();
-         resultSet = new ArrayList<>();
+         matchedSet = new TreeMap<>();
          filenamesToPaths = new TreeMap<>();
          numLinesToFilenames = new ArrayList<>();
          occurrences = new HashMap<>();
@@ -128,7 +126,6 @@
      public void search(String query) {
          executorService.execute(() -> {
              if(allLines.isEmpty()) {
-                 resultSet = new LinkedList<>();
                  return;
              }
 
@@ -216,7 +213,7 @@
 
      @Override
      public List<String> getResults() {
-         ArrayList<String> result = new ArrayList<>(resultSet.size());
+         ArrayList<String> result = new ArrayList<>(matchedSet.size());
 
          for (String ms : matchedSet.keySet()) {
                  result.add(ms);
@@ -266,16 +263,5 @@
              System.out.println(res);
          }
          return "";
-     }
-
-     public static void main(String[] args) {
-         /*
-         System.out.println("Search");
-         FuzzySearch search = new FuzzySearch();
-         search.testCrawl(testLoad());
-         search.search("set");
-         System.out.println(search.getResults());
-         System.out.println(search.getPreview(0));
-         System.out.println(search.getResultSetCount());*/
      }
  }
