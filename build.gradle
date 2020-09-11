@@ -4,11 +4,12 @@ plugins {
 }
 
 group 'com.borisfarber'
-version '5.0'
+version '5.1'
 
 repositories {
     mavenCentral()
     jcenter()
+    maven { url 'https://jitpack.io' }
 }
 
 apply plugin : "java"
@@ -30,6 +31,7 @@ dependencies {
     implementation 'com.dorkbox:Notify:3.7'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     implementation group: 'com.google.guava', name: 'guava', version: '23.5-jre'
+    implementation 'com.github.EugeneLesnov:fuzzy-search:0.5'
 }
 
 allprojects {

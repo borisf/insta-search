@@ -26,6 +26,7 @@
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
 
+ import static com.github.eugenelesnov.NgramSearch.ngramSearch;
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
@@ -40,6 +41,7 @@
 
      private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
+     private Map<String, Float> matchedSet;
 
      public FuzzySearch(Controller controller) {
          this.controller = controller;
@@ -130,7 +132,7 @@
                  return;
              }
 
-             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractTop(query, allLines, 50);
+             matchedSet = ngramSearch(3,50, query, allLines, String::toString);
              Runnable runnable = controller::onUpdateGUI;
              SwingUtilities.invokeLater(runnable);
          });
@@ -216,8 +218,8 @@
      public List<String> getResults() {
          ArrayList<String> result = new ArrayList<>(resultSet.size());
 
-         for (ExtractedResult er : resultSet) {
-             result.add(er.getString());
+         for (String ms : matchedSet.keySet()) {
+                 result.add(ms);
          }
 
          return result;
@@ -252,6 +254,11 @@
              controller.resultTextPane.setText(builder.toString());
          };
          SwingUtilities.invokeLater(runnable);
+     }
+
+     @Override
+     public Comparator<String> getResultsSorter() {
+         return (s, t1) -> 1;
      }
 
      public String toString() {

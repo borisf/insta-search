@@ -287,7 +287,7 @@ public final class Controller implements DocumentListener {
             }
         }
 
-        searchResults.sort(RESULTS_SORTER);
+        searchResults.sort(search.getResultsSorter());
         numLines = resultCount;
         onUpdateGUIInternal();
     }

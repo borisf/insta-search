@@ -14,6 +14,7 @@
  package com.borisfarber.instasearch.search;
 
  import com.borisfarber.instasearch.controllers.Controller;
+ import com.borisfarber.instasearch.controllers.SearchResultsSorter;
  import com.borisfarber.instasearch.ui.Hexdump;
  import com.borisfarber.instasearch.controllers.PrivateFolder;
  import com.borisfarber.instasearch.controllers.Pair;
@@ -23,10 +24,7 @@
  import javax.swing.*;
  import java.io.File;
  import java.nio.file.Path;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.LinkedList;
- import java.util.List;
+ import java.util.*;
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
  import java.util.concurrent.ThreadPoolExecutor;
@@ -166,6 +164,11 @@
              controller.resultTextPane.setText(builder.toString());
          };
          SwingUtilities.invokeLater(runnable);
+     }
+
+     @Override
+     public Comparator<String> getResultsSorter() {
+         return new SearchResultsSorter();
      }
 
      public static void main(String[] args) {

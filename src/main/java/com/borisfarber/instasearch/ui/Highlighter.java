@@ -39,7 +39,11 @@
              int pos = 0;
 
              // Search for pattern
-             while ((pos = text.indexOf(pattern, pos)) >= 0) {
+             // TODO stopped here
+             String textL = text.toLowerCase();
+             String patternL = pattern.toLowerCase();
+
+             while ((pos = textL.indexOf(patternL, pos)) >= 0) {
                  int startMatch = from + pos;
                  // Create highlighter using private painter and apply around pattern
                  hilite.addHighlight(startMatch, startMatch + pattern.length(), previewHighlighter);
