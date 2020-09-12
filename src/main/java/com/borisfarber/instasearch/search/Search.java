@@ -5,6 +5,7 @@ import com.borisfarber.instasearch.controllers.Pair;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface Search {
     void close();
 
     void emptyQuery();
+
+    Comparator<String> getResultsSorter();
 }

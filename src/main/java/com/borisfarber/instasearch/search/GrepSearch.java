@@ -33,6 +33,7 @@ package com.borisfarber.instasearch.search;
 import com.borisfarber.instasearch.controllers.Controller;
 import com.borisfarber.instasearch.controllers.PrivateFolder;
 import com.borisfarber.instasearch.controllers.Pair;
+import com.borisfarber.instasearch.controllers.SearchResultsSorter;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -397,6 +398,11 @@ public class GrepSearch implements Search {
     @Override
     public void emptyQuery() {
 
+    }
+
+    @Override
+    public Comparator<String> getResultsSorter() {
+        return new SearchResultsSorter();
     }
 
     // Compile the pattern from the command line

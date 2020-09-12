@@ -32,10 +32,12 @@ package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.controllers.Controller;
 import com.borisfarber.instasearch.controllers.Pair;
+import com.borisfarber.instasearch.controllers.SearchResultsSorter;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -102,5 +104,10 @@ public class MockSearch implements Search {
     @Override
     public void emptyQuery() {
 
+    }
+
+    @Override
+    public Comparator<String> getResultsSorter() {
+        return new SearchResultsSorter();
     }
 }
