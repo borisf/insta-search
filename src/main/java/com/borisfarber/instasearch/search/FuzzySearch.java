@@ -66,7 +66,6 @@
          }
 
          Path pathString = file.toPath();
-
          PathMatcher matcher = Controller.SOURCE_OR_TEXT_PATH_MATCHER;
 
          try {

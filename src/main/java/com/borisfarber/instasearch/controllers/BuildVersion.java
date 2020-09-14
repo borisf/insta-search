@@ -14,7 +14,13 @@
 package com.borisfarber.instasearch.controllers;
 
 public class BuildVersion {
-    public static String getBuildVersion(){
-        return BuildVersion.class.getPackage().getImplementationVersion();
+    public static String getBuildVersion() {
+        String result = BuildVersion.class.getPackage().getImplementationVersion();
+
+        if (result == null) {
+            result = "Development Version";
+        }
+
+        return result;
     }
 }
