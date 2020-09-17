@@ -330,13 +330,24 @@ public final class Controller implements DocumentListener {
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
 
-                if(query != null) {
-                    Highlighter highlighter = new Highlighter();
-                    highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
-                }
+                highlightResults(selector);
             }
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
+        }
+    }
+
+    public void highlightResults(int selector) {
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
+        }
+    }
+
+    public void highlightPreview() {
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
         }
     }
 
@@ -347,10 +358,4 @@ public final class Controller implements DocumentListener {
         previewTasksExecutor.shutdown();
     }
 
-    public void highlightPreview() {
-        if(query != null) {
-            Highlighter highlighter = new Highlighter();
-            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
-        }
-    }
 }

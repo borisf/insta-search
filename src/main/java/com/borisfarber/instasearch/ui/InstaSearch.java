@@ -68,6 +68,25 @@ public final class InstaSearch extends JFrame {
 
         resultTextPane = buildResultTextPane();
         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
+
+        showResultsScrolled.addMouseWheelListener(new MouseWheelListener() {
+
+            int currentAnchor = 0;
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
+                int notches = mouseWheelEvent.getWheelRotation();
+                currentAnchor +=notches;
+                controller.highlightResults(currentAnchor * 1000);
+            }
+        });
+
+        // copy paste
+        resultTextPane.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        HexPanel.CopyPopupListener popupListenerHex =
+                new HexPanel.CopyPopupListener(resultTextPane, copyPopup);
+        resultTextPane.addMouseListener(popupListenerHex);
+
         previewTextPane = buildPreviewTextPane();
         JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
 

@@ -104,13 +104,13 @@ public final class HexPanel extends JPanel implements CaretListener {
         // copy paste hex
         hexView.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
         copyPopupHex.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
-        CopyPopupHexListener popupListenerHex = new CopyPopupHexListener();
+        CopyPopupListener popupListenerHex = new CopyPopupListener(hexView, copyPopupHex);
         hexView.addMouseListener(popupListenerHex);
 
         // copy paste ascii
         asciiView.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
         copyPopupAscii.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
-        CopyPopupAsciiListener popupListenerAscii = new CopyPopupAsciiListener();
+        CopyPopupListener popupListenerAscii = new CopyPopupListener(asciiView, copyPopupAscii);
         asciiView.addMouseListener(popupListenerAscii);
 
         // selection with proper highlighting
@@ -282,7 +282,16 @@ public final class HexPanel extends JPanel implements CaretListener {
         }
     }
 
-    class CopyPopupHexListener extends MouseAdapter {
+    public static class CopyPopupListener extends MouseAdapter {
+
+        private JPopupMenu copyPopupMenu;
+        private JTextComponent textComponent;
+
+        public CopyPopupListener(JTextComponent textComponent, JPopupMenu copyPopupMenu) {
+            this.copyPopupMenu = copyPopupMenu;
+            this.textComponent = textComponent;
+        }
+
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
@@ -293,32 +302,11 @@ public final class HexPanel extends JPanel implements CaretListener {
 
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                copyPopupHex.show(e.getComponent(),
+                copyPopupMenu.show(e.getComponent(),
                         e.getX(), e.getY());
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(new StringSelection(hexView.getSelectedText()),
-                        null);
-            }
-        }
-    }
-
-    class CopyPopupAsciiListener extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                copyPopupAscii.show(e.getComponent(),
-                        e.getX(), e.getY());
-
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(new StringSelection(asciiView.getSelectedText()),
+                clipboard.setContents(new StringSelection(textComponent.getSelectedText()),
                         null);
             }
         }

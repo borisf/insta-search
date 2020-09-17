@@ -68,6 +68,7 @@
          }
      }
 
+     // TODO think of better preview look
      public void highlightPreview(JTextPane previewTextPane, String selectedLine, Color color) {
          if(selectedLine.endsWith("\n\n")) {
              selectedLine = selectedLine.substring(0, selectedLine.length() - 2);
