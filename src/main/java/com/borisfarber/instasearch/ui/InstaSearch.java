@@ -36,7 +36,6 @@ public final class InstaSearch extends JFrame {
     private final Controller controller;
 
     private final JPopupMenu copyPopup = new JPopupMenu();
-    private final CopyPopupListener popupListener = new CopyPopupListener();
 
     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -76,7 +75,13 @@ public final class InstaSearch extends JFrame {
             public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
                 int notches = mouseWheelEvent.getWheelRotation();
                 currentAnchor +=notches;
-                controller.highlightResults(currentAnchor * 1000);
+
+                if(currentAnchor < 0) {
+                    currentAnchor = 0;
+                }
+
+                // each notch contibutes ~3 lines with say 80 chars each
+                controller.highlightResults(currentAnchor * 240 + 1000);
             }
         });
 
@@ -222,8 +227,12 @@ public final class InstaSearch extends JFrame {
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
 
+        HexPanel.CopyPopupListener popupListenerHex =
+                new HexPanel.CopyPopupListener(result, copyPopup);
+        result.addMouseListener(popupListenerHex);
+
         copyPopup.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
-        result.addMouseListener(popupListener);
+        result.addMouseListener(popupListenerHex);
 
         return result;
     }
@@ -242,26 +251,7 @@ public final class InstaSearch extends JFrame {
         return null;
     }
 
-    class CopyPopupListener extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
 
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                copyPopup.show(e.getComponent(),
-                        e.getX(), e.getY());
-
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(new StringSelection(previewTextPane.getSelectedText()),
-                        null);
-            }
-        }
-    }
 
     private static boolean isBinarySupported(String filePath) {
         return Controller.ZIP_MATCHER.matches(new File(filePath).toPath());
