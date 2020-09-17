@@ -70,7 +70,6 @@ public final class InstaSearch extends JFrame {
         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
 
         showResultsScrolled.addMouseWheelListener(new MouseWheelListener() {
-
             int currentAnchor = 0;
 
             @Override

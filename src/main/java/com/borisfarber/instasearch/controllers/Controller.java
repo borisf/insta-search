@@ -31,7 +31,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -57,8 +56,6 @@ public final class Controller implements DocumentListener {
 
     public static final PathMatcher APK_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{apk}");
-
-    private static final Comparator<String> RESULTS_SORTER = new SearchResultsSorter();
 
     private final JTextField searchField;
     public JTextPane resultTextPane;
@@ -300,11 +297,13 @@ public final class Controller implements DocumentListener {
                 builder.append(SELECTOR).append(str);
                 String[] parts  = str.split(":");
                 String fileName = parts[0];
-                String line = parts[1];
-                this.selectedLine = parts[2];
+                String position = parts[1];
+
+                // the text line starts after 2 :s
+                this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
 
                 editorFilenameAndPosition.t = fileName;
-                editorFilenameAndPosition.u = Integer.parseInt(line);
+                editorFilenameAndPosition.u = Integer.parseInt(position);
             } else {
                 builder.append(str);
             }
@@ -357,5 +356,4 @@ public final class Controller implements DocumentListener {
 
         previewTasksExecutor.shutdown();
     }
-
 }
