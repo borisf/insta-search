@@ -80,16 +80,10 @@ public final class InstaSearch extends JFrame {
                     currentAnchor = 0;
                 }
 
-                // each notch contibutes ~3 lines with say 80 chars each
+                // each notch contributes ~3 lines with say 80 chars each
                 controller.highlightResults(currentAnchor * 240 + 1000);
             }
         });
-
-        // copy paste
-        resultTextPane.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
-        HexPanel.CopyPopupListener popupListenerHex =
-                new HexPanel.CopyPopupListener(resultTextPane, copyPopup);
-        resultTextPane.addMouseListener(popupListenerHex);
 
         previewTextPane = buildPreviewTextPane();
         JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
@@ -215,6 +209,12 @@ public final class InstaSearch extends JFrame {
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
 
+        // copy paste
+        result.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        HexPanel.CopyPopupListener popupListener =
+                new HexPanel.CopyPopupListener(result, copyPopup);
+        result.addMouseListener(popupListener);
+
         return result;
     }
 
@@ -227,12 +227,12 @@ public final class InstaSearch extends JFrame {
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
 
-        HexPanel.CopyPopupListener popupListenerHex =
+        HexPanel.CopyPopupListener popupListener=
                 new HexPanel.CopyPopupListener(result, copyPopup);
-        result.addMouseListener(popupListenerHex);
+        result.addMouseListener(popupListener);
 
         copyPopup.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
-        result.addMouseListener(popupListenerHex);
+        result.addMouseListener(popupListener);
 
         return result;
     }
@@ -250,9 +250,7 @@ public final class InstaSearch extends JFrame {
 
         return null;
     }
-
-
-
+    
     private static boolean isBinarySupported(String filePath) {
         return Controller.ZIP_MATCHER.matches(new File(filePath).toPath());
     }
