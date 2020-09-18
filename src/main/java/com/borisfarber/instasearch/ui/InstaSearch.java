@@ -16,8 +16,6 @@ package com.borisfarber.instasearch.ui;
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
 
@@ -33,9 +31,8 @@ public final class InstaSearch extends JFrame {
     private JTextPane resultTextPane;
     private JTextPane previewTextPane;
     private JLabel resultCountLabel;
-    private final Controller controller;
-
     private final JPopupMenu copyPopup = new JPopupMenu();
+    private final Controller controller;
 
     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -250,7 +247,7 @@ public final class InstaSearch extends JFrame {
 
         return null;
     }
-    
+
     private static boolean isBinarySupported(String filePath) {
         return Controller.ZIP_MATCHER.matches(new File(filePath).toPath());
     }

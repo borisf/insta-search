@@ -13,13 +13,6 @@
  */
 package com.borisfarber.instasearch.controllers;
 
-import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.XmlDecompressor;
-import com.borisfarber.instasearch.search.*;
-import com.borisfarber.instasearch.ui.Background;
-import com.borisfarber.instasearch.ui.HexPanel;
-import com.borisfarber.instasearch.ui.Highlighter;
-
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -35,6 +28,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import com.borisfarber.instasearch.formats.Clazz;
+import com.borisfarber.instasearch.formats.XmlDecompressor;
+import com.borisfarber.instasearch.search.*;
+import com.borisfarber.instasearch.ui.Background;
+import com.borisfarber.instasearch.ui.HexPanel;
+import com.borisfarber.instasearch.ui.Highlighter;
 
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
