@@ -16,8 +16,6 @@ package com.borisfarber.instasearch.ui;
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
 
@@ -33,10 +31,8 @@ public final class InstaSearch extends JFrame {
     private JTextPane resultTextPane;
     private JTextPane previewTextPane;
     private JLabel resultCountLabel;
-    private final Controller controller;
-
     private final JPopupMenu copyPopup = new JPopupMenu();
-    private final CopyPopupListener popupListener = new CopyPopupListener();
+    private final Controller controller;
 
     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -68,6 +64,24 @@ public final class InstaSearch extends JFrame {
 
         resultTextPane = buildResultTextPane();
         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
+
+        showResultsScrolled.addMouseWheelListener(new MouseWheelListener() {
+            int currentAnchor = 0;
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
+                int notches = mouseWheelEvent.getWheelRotation();
+                currentAnchor +=notches;
+
+                if(currentAnchor < 0) {
+                    currentAnchor = 0;
+                }
+
+                // each notch contributes ~3 lines with say 80 chars each
+                controller.highlightResults(currentAnchor * 240 + 1000);
+            }
+        });
+
         previewTextPane = buildPreviewTextPane();
         JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
 
@@ -192,6 +206,12 @@ public final class InstaSearch extends JFrame {
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
 
+        // copy paste
+        result.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
+        HexPanel.CopyPopupListener popupListener =
+                new HexPanel.CopyPopupListener(result, copyPopup);
+        result.addMouseListener(popupListener);
+
         return result;
     }
 
@@ -203,6 +223,10 @@ public final class InstaSearch extends JFrame {
         result.setDragEnabled(true);
         result.setTransferHandler(new FileTransfer(this));
         result.setEditable(false);
+
+        HexPanel.CopyPopupListener popupListener=
+                new HexPanel.CopyPopupListener(result, copyPopup);
+        result.addMouseListener(popupListener);
 
         copyPopup.add(new JMenuItem(new DefaultEditorKit.CopyAction()));
         result.addMouseListener(popupListener);
@@ -222,27 +246,6 @@ public final class InstaSearch extends JFrame {
         }
 
         return null;
-    }
-
-    class CopyPopupListener extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                copyPopup.show(e.getComponent(),
-                        e.getX(), e.getY());
-
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(new StringSelection(previewTextPane.getSelectedText()),
-                        null);
-            }
-        }
     }
 
     private static boolean isBinarySupported(String filePath) {

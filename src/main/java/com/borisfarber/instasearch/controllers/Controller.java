@@ -13,13 +13,6 @@
  */
 package com.borisfarber.instasearch.controllers;
 
-import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.XmlDecompressor;
-import com.borisfarber.instasearch.search.*;
-import com.borisfarber.instasearch.ui.Background;
-import com.borisfarber.instasearch.ui.HexPanel;
-import com.borisfarber.instasearch.ui.Highlighter;
-
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -31,11 +24,17 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import com.borisfarber.instasearch.formats.Clazz;
+import com.borisfarber.instasearch.formats.XmlDecompressor;
+import com.borisfarber.instasearch.search.*;
+import com.borisfarber.instasearch.ui.Background;
+import com.borisfarber.instasearch.ui.HexPanel;
+import com.borisfarber.instasearch.ui.Highlighter;
 
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
@@ -57,8 +56,6 @@ public final class Controller implements DocumentListener {
 
     public static final PathMatcher APK_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{apk}");
-
-    private static final Comparator<String> RESULTS_SORTER = new SearchResultsSorter();
 
     private final JTextField searchField;
     public JTextPane resultTextPane;
@@ -300,11 +297,13 @@ public final class Controller implements DocumentListener {
                 builder.append(SELECTOR).append(str);
                 String[] parts  = str.split(":");
                 String fileName = parts[0];
-                String line = parts[1];
-                this.selectedLine = parts[2];
+                String position = parts[1];
+
+                // the text line starts after 2 :s
+                this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
 
                 editorFilenameAndPosition.t = fileName;
-                editorFilenameAndPosition.u = Integer.parseInt(line);
+                editorFilenameAndPosition.u = Integer.parseInt(position);
             } else {
                 builder.append(str);
             }
@@ -330,13 +329,24 @@ public final class Controller implements DocumentListener {
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
 
-                if(query != null) {
-                    Highlighter highlighter = new Highlighter();
-                    highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
-                }
+                highlightResults(selector);
             }
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
+        }
+    }
+
+    public void highlightResults(int selector) {
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
+        }
+    }
+
+    public void highlightPreview() {
+        if(query != null) {
+            Highlighter highlighter = new Highlighter();
+            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
         }
     }
 
@@ -345,12 +355,5 @@ public final class Controller implements DocumentListener {
         search.close();
 
         previewTasksExecutor.shutdown();
-    }
-
-    public void highlightPreview() {
-        if(query != null) {
-            Highlighter highlighter = new Highlighter();
-            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
-        }
     }
 }

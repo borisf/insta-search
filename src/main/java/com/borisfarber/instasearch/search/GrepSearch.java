@@ -300,6 +300,11 @@ public class GrepSearch implements Search {
         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
 
         if(!occurrences.containsKey(strkey)) {
+            String awkMessage =
+                    "awk 'BEGIN{RS=\"\\1\";ORS=\"\";getline;gsub(\"\\r\",\"\");" +
+                            "print>ARGV[1]}' logcat.txt";
+            System.err.println("Wrong new line formatting of the text file. If you are on linux and " +
+                    "the file was generated with Windows use this:" + awkMessage);
             Pair<String, Integer> pair = new Pair<>(file.getName(), 0);
             result.add(pair);
             return result;
