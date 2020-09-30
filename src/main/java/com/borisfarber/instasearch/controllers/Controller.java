@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.XmlDecompressor;
+import com.borisfarber.instasearch.formats.Dex;
 import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
@@ -56,6 +56,9 @@ public final class Controller implements DocumentListener {
 
     public static final PathMatcher APK_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{apk}");
+
+    public static final PathMatcher
+            DEX_MATCHER = FileSystems.getDefault().getPathMatcher("glob:**.{dex}");
 
     private final JTextField searchField;
     public JTextPane resultTextPane;
@@ -205,10 +208,22 @@ public final class Controller implements DocumentListener {
                 };
                 SwingUtilities.invokeLater(runnable);
             });
-        } else if(selectedPath.toString().contains("AndroidManifest.xml")) {
+        } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
-                File manifest = XmlDecompressor.extractManifest(file);
-                Runnable runnable = () -> DesktopAdaptor.openFileOnDesktop(manifest.toPath(), 0);
+                Pair<File, String> result = Clazz.decompile(selectedPath);
+                Runnable runnable = () -> {
+                    previewTextPane.setText(result.u);
+                    DesktopAdaptor.openFileOnDesktop(result.t.toPath(), 0);
+                };
+                SwingUtilities.invokeLater(runnable);
+            });
+        } else if(Controller.DEX_MATCHER.matches(selectedPath)) {
+            previewTasksExecutor.execute(() -> {
+                Pair<File, String> result = Dex.decompile(file.toPath());
+                Runnable runnable = () -> {
+                    previewTextPane.setText(result.u);
+                    DesktopAdaptor.openFileOnDesktop(result.t.toPath(), 0);
+                };
                 SwingUtilities.invokeLater(runnable);
             });
         } else {
@@ -339,7 +354,9 @@ public final class Controller implements DocumentListener {
     public void highlightResults(int selector) {
         if(query != null) {
             Highlighter highlighter = new Highlighter();
-            highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
+
+            // TODO uncomment, still stuck with results
+            //highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
         }
     }
 
