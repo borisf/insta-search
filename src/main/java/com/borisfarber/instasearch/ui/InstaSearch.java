@@ -78,7 +78,7 @@
                  }
 
                  // each notch contributes ~3 lines with say 80 chars each
-                 controller.highlightResults(currentAnchor * 240, 1000);
+                 controller.highlightResults(currentAnchor * 240, ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
              }
          });
 
@@ -213,6 +213,9 @@
          result.addMouseListener(popupListener);
 
          result.addMouseListener(new MouseAdapter() {
+
+             String previousLine = "";
+
              public void mouseClicked(MouseEvent me) {
                      int offset = result.viewToModel2D(me.getPoint());
                      Rectangle rect = null;
@@ -225,11 +228,12 @@
                      int startRow = result.viewToModel2D(new Point(0, rect.y));
                      int endRow = result.viewToModel2D(new Point(result.getWidth(), rect.y));
                      result.select(startRow, endRow);
-
-                 if (me.getClickCount() == 2) {
+                     String line = result.getSelectedText();
+                 if(line.equals(previousLine)) {
                      controller.mouseClickedOnResults(result.getSelectedText());
                  } else {
                      controller.showPreview(result.getSelectedText());
+                     previousLine = line;
                  }
              }
          });

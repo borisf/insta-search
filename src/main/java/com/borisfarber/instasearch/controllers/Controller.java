@@ -181,7 +181,7 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex--;
         }
 
-        onUpdateGUIInternal(100);
+        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void downPressed() {
@@ -190,7 +190,7 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex++;
         }
 
-        onUpdateGUIInternal(100);
+        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void showPreview(String selectedText) {
@@ -203,7 +203,7 @@ public final class Controller implements DocumentListener {
         }
 
         selectedGuiIndex = index;
-        onUpdateGUIInternal(100);
+        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void mouseClickedOnResults(String selectedText) {
@@ -211,8 +211,16 @@ public final class Controller implements DocumentListener {
         String fileName = parts[0];
         String position = parts[1];
 
-        searchResultsFilenameAndPosition.t = fileName;
+        // remove the selector "==> "
+
+        // TODO add logic trunc first 4 chars if the line starts from selector
+
+        searchResultsFilenameAndPosition.t = fileName.substring(4);
         searchResultsFilenameAndPosition.u = Integer.parseInt(position);
+
+        System.out.println("filename" + searchResultsFilenameAndPosition.t);
+
+        // TODO stopped here, fuzzy search file name
 
         enterPressed();
     }
@@ -329,10 +337,10 @@ public final class Controller implements DocumentListener {
 
         searchResults.sort(search.getResultsSorter());
         numLines = resultCount;
-        onUpdateGUIInternal(1000);
+        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
-    private void onUpdateGUIInternal(int highlightInterval) {
+    private void onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN span) {
         int previewLinesIndex = 0;
         StringBuilder builder = new StringBuilder();
         for (String str : searchResults) {
@@ -371,7 +379,7 @@ public final class Controller implements DocumentListener {
             int selector = builder.toString().indexOf(SELECTOR);
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
-                highlightResults(selector, highlightInterval);
+                highlightResults(selector, span);
 
             }
         } catch (IllegalArgumentException iae) {
@@ -379,9 +387,9 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    public void highlightResults(int selector, int interval) {
+    public void highlightResults(int selector, ResultsHighlighter.HIGHLIGHT_SPAN span) {
         if(query != null) {
-            resultsHighlighter.highlightSearch(selector, interval, query);
+            resultsHighlighter.highlightSearch(selector, span, query);
         }
     }
 

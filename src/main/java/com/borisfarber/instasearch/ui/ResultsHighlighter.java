@@ -12,15 +12,31 @@
   * limitations under the License.
   */
  package com.borisfarber.instasearch.ui;
+
  import javax.swing.*;
- import javax.swing.text.*;
+ import javax.swing.text.BadLocationException;
+ import javax.swing.text.DefaultHighlighter;
+ import javax.swing.text.Document;
+ import javax.swing.text.Highlighter;
  import java.awt.*;
 
  public class ResultsHighlighter {
-     private Document doc;
+
+     public enum HIGHLIGHT_SPAN {
+         LONG(1000),
+         SHORT(100);
+
+         private final int value;
+
+         HIGHLIGHT_SPAN(int value) {
+             this.value = value;
+         }
+     }
+
+     private final Document doc;
      private final Highlighter hilite;
 
-     private DefaultHighlighter.DefaultHighlightPainter previewHighlighter;
+     private final DefaultHighlighter.DefaultHighlightPainter previewHighlighter;
 
      public ResultsHighlighter(JTextPane textPane, Color color) {
          this.previewHighlighter =
@@ -30,9 +46,9 @@
          this.doc = textPane.getDocument();
      }
 
-     // TODO change interval to enum - long short
-     public void highlightSearch(int from, int interval , String pattern) {
+     public void highlightSearch(int from, HIGHLIGHT_SPAN span , String pattern) {
          try {
+             int interval = span.value;
              // borders to highlight
              from = from - interval;
              if(from < 0) {
