@@ -17,8 +17,7 @@
  import javax.swing.text.*;
  import java.awt.*;
 
- // TODO change name
- public class Highlighter {
+ public class PreviewHighlighter {
 
      public void highlightPreview(JTextPane previewTextPane, String selectedLine, Color color) {
          if(selectedLine.endsWith("\n\n")) {
