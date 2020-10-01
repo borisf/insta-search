@@ -65,7 +65,6 @@
 
          resultTextPane = buildResultTextPane();
          JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
-
          showResultsScrolled.addMouseWheelListener(new MouseWheelListener() {
              int currentAnchor = 0;
 
@@ -213,10 +212,8 @@
                  new HexPanel.CopyPopupListener(result, copyPopup);
          result.addMouseListener(popupListener);
 
-         result.addMouseListener(new MouseAdapter()
-         {
+         result.addMouseListener(new MouseAdapter() {
              public void mouseClicked(MouseEvent me) {
-                 if (me.getClickCount() == 2) {
                      int offset = result.viewToModel2D(me.getPoint());
                      Rectangle rect = null;
                      try {
@@ -227,13 +224,12 @@
 
                      int startRow = result.viewToModel2D(new Point(0, rect.y));
                      int endRow = result.viewToModel2D(new Point(result.getWidth(), rect.y));
-
-                     System.out.printf("Selected Offsets: [%d, %d]%n", startRow, endRow);
-
                      result.select(startRow, endRow);
-                     System.out.println(result.getSelectedText());
 
+                 if (me.getClickCount() == 2) {
                      controller.mouseClickedOnResults(result.getSelectedText());
+                 } else {
+                     controller.showPreview(result.getSelectedText());
                  }
              }
          });

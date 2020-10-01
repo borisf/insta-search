@@ -81,7 +81,7 @@ public final class Controller implements DocumentListener {
     private int numLines = 0;
     private String selectedLine = "";
     private File file;
-    private ResultsHighlighter searchHighlighter;
+    private ResultsHighlighter resultsHighlighter;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -94,7 +94,7 @@ public final class Controller implements DocumentListener {
 
         search = new MockSearch(this);
 
-        this.searchHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
+        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
     }
 
     public void crawl(final File file) {
@@ -190,6 +190,19 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex++;
         }
 
+        onUpdateGUIInternal(100);
+    }
+
+    public void showPreview(String selectedText) {
+        int index = searchResults.indexOf((selectedText + "\n"));
+
+        if(index == -1) {
+            // hack when the ui screen is small and the selected line
+            // is smaller than the result line
+            return;
+        }
+
+        selectedGuiIndex = index;
         onUpdateGUIInternal(100);
     }
 
@@ -368,7 +381,7 @@ public final class Controller implements DocumentListener {
 
     public void highlightResults(int selector, int interval) {
         if(query != null) {
-            searchHighlighter.highlightSearch(selector, interval, query);
+            resultsHighlighter.highlightSearch(selector, interval, query);
         }
     }
 
