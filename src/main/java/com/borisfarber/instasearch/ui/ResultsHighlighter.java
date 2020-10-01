@@ -12,18 +12,13 @@
   * limitations under the License.
   */
  package com.borisfarber.instasearch.ui;
-
  import javax.swing.*;
- import javax.swing.text.BadLocationException;
- import javax.swing.text.DefaultHighlighter;
- import javax.swing.text.Document;
- import javax.swing.text.StyledDocument;
+ import javax.swing.text.*;
  import java.awt.*;
 
  public class ResultsHighlighter {
      private Document doc;
-     private final javax.swing.text.Highlighter hilite;
-     StyledDocument doc1;
+     private final Highlighter hilite;
 
      private DefaultHighlighter.DefaultHighlightPainter previewHighlighter;
 
@@ -33,9 +28,9 @@
 
          this.hilite = textPane.getHighlighter();
          this.doc = textPane.getDocument();
-         this.doc1 = textPane.getStyledDocument();
      }
 
+     // TODO change interval to enum - long short
      public void highlightSearch(int from, int interval , String pattern) {
          try {
              // borders to highlight

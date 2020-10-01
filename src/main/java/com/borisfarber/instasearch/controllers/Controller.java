@@ -13,6 +13,14 @@
  */
 package com.borisfarber.instasearch.controllers;
 
+import com.borisfarber.instasearch.formats.Clazz;
+import com.borisfarber.instasearch.formats.Dex;
+import com.borisfarber.instasearch.search.*;
+import com.borisfarber.instasearch.ui.Background;
+import com.borisfarber.instasearch.ui.HexPanel;
+import com.borisfarber.instasearch.ui.PreviewHighlighter;
+import com.borisfarber.instasearch.ui.ResultsHighlighter;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -28,14 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.Dex;
-import com.borisfarber.instasearch.search.*;
-import com.borisfarber.instasearch.ui.Background;
-import com.borisfarber.instasearch.ui.HexPanel;
-import com.borisfarber.instasearch.ui.Highlighter;
-import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
@@ -74,7 +74,7 @@ public final class Controller implements DocumentListener {
 
     private String query;
     private Search search;
-    private final Pair<String, Integer> editorFilenameAndPosition =
+    private final Pair<String, Integer> searchResultsFilenameAndPosition =
             new Pair<>("test.txt",0);
     private final ArrayList<String> searchResults = new ArrayList<>();
     private int selectedGuiIndex = 0;
@@ -193,16 +193,27 @@ public final class Controller implements DocumentListener {
         onUpdateGUIInternal(100);
     }
 
+    public void mouseClickedOnResults(String selectedText) {
+        String[] parts  = selectedText.split(":");
+        String fileName = parts[0];
+        String position = parts[1];
+
+        searchResultsFilenameAndPosition.t = fileName;
+        searchResultsFilenameAndPosition.u = Integer.parseInt(position);
+
+        enterPressed();
+    }
+
     public void enterPressed() {
-        if(search.getPathPerFileName(editorFilenameAndPosition.t) == null) {
+        if(search.getPathPerFileName(searchResultsFilenameAndPosition.t) == null) {
             // garbage files
             return;
         }
 
-        Path selectedPath = search.getPathPerFileName(editorFilenameAndPosition.t);
+        Path selectedPath = search.getPathPerFileName(searchResultsFilenameAndPosition.t);
 
         if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            DesktopAdaptor.openFileOnDesktop(selectedPath, editorFilenameAndPosition.u);
+            DesktopAdaptor.openFileOnDesktop(selectedPath, searchResultsFilenameAndPosition.u);
         } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Clazz.decompile(selectedPath);
@@ -264,7 +275,7 @@ public final class Controller implements DocumentListener {
             ex.printStackTrace();
         }
     }
-    
+
     public void onUpdateGUI() {
         int resultCount = 0;
         boolean isViewLimit = false;
@@ -321,8 +332,8 @@ public final class Controller implements DocumentListener {
                 // the text line starts after 2 :s
                 this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
 
-                editorFilenameAndPosition.t = fileName;
-                editorFilenameAndPosition.u = Integer.parseInt(position);
+                searchResultsFilenameAndPosition.t = fileName;
+                searchResultsFilenameAndPosition.u = Integer.parseInt(position);
             } else {
                 builder.append(str);
             }
@@ -363,7 +374,7 @@ public final class Controller implements DocumentListener {
 
     public void highlightPreview() {
         if(query != null) {
-            Highlighter highlighter = new Highlighter();
+            PreviewHighlighter highlighter = new PreviewHighlighter();
             highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
         }
     }
