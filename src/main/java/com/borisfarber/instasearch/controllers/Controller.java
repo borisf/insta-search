@@ -211,16 +211,12 @@ public final class Controller implements DocumentListener {
         String fileName = parts[0];
         String position = parts[1];
 
-        // remove the selector "==> "
+        if(fileName.startsWith(SELECTOR)) {
+            fileName = fileName.substring(4);
+        }
 
-        // TODO add logic trunc first 4 chars if the line starts from selector
-
-        searchResultsFilenameAndPosition.t = fileName.substring(4);
+        searchResultsFilenameAndPosition.t = fileName;
         searchResultsFilenameAndPosition.u = Integer.parseInt(position);
-
-        System.out.println("filename" + searchResultsFilenameAndPosition.t);
-
-        // TODO stopped here, fuzzy search file name
 
         enterPressed();
     }
