@@ -35,6 +35,7 @@ import com.borisfarber.instasearch.search.*;
 import com.borisfarber.instasearch.ui.Background;
 import com.borisfarber.instasearch.ui.HexPanel;
 import com.borisfarber.instasearch.ui.Highlighter;
+import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
@@ -80,6 +81,7 @@ public final class Controller implements DocumentListener {
     private int numLines = 0;
     private String selectedLine = "";
     private File file;
+    private ResultsHighlighter searchHighlighter;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -91,6 +93,8 @@ public final class Controller implements DocumentListener {
         this.resultCountLabel = resultCountLabel;
 
         search = new MockSearch(this);
+
+        this.searchHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
     }
 
     public void crawl(final File file) {
@@ -177,7 +181,7 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex--;
         }
 
-        onUpdateGUIInternal();
+        onUpdateGUIInternal(100);
     }
 
     public void downPressed() {
@@ -186,7 +190,7 @@ public final class Controller implements DocumentListener {
             selectedGuiIndex++;
         }
 
-        onUpdateGUIInternal();
+        onUpdateGUIInternal(100);
     }
 
     public void enterPressed() {
@@ -260,7 +264,7 @@ public final class Controller implements DocumentListener {
             ex.printStackTrace();
         }
     }
-
+    
     public void onUpdateGUI() {
         int resultCount = 0;
         boolean isViewLimit = false;
@@ -301,10 +305,10 @@ public final class Controller implements DocumentListener {
 
         searchResults.sort(search.getResultsSorter());
         numLines = resultCount;
-        onUpdateGUIInternal();
+        onUpdateGUIInternal(1000);
     }
 
-    private void onUpdateGUIInternal() {
+    private void onUpdateGUIInternal(int highlightInterval) {
         int previewLinesIndex = 0;
         StringBuilder builder = new StringBuilder();
         for (String str : searchResults) {
@@ -343,20 +347,17 @@ public final class Controller implements DocumentListener {
             int selector = builder.toString().indexOf(SELECTOR);
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
+                highlightResults(selector, highlightInterval);
 
-                highlightResults(selector);
             }
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
         }
     }
 
-    public void highlightResults(int selector) {
+    public void highlightResults(int selector, int interval) {
         if(query != null) {
-            Highlighter highlighter = new Highlighter();
-
-            // TODO uncomment, still stuck with results
-            //highlighter.highlightSearch(resultTextPane, selector, query, Color.ORANGE);
+            searchHighlighter.highlightSearch(selector, interval, query);
         }
     }
 

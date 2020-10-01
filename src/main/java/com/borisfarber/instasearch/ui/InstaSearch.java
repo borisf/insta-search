@@ -14,6 +14,7 @@
 package com.borisfarber.instasearch.ui;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.event.*;
@@ -78,7 +79,28 @@ public final class InstaSearch extends JFrame {
                 }
 
                 // each notch contributes ~3 lines with say 80 chars each
-                controller.highlightResults(currentAnchor * 240 + 1000);
+                controller.highlightResults(currentAnchor * 240, 1000);
+            }
+        });
+
+        resultTextPane.addMouseListener(new MouseAdapter()
+        {
+            public void mouseClicked(MouseEvent me) {
+                int offset = resultTextPane.viewToModel2D(me.getPoint());
+                Rectangle rect = null;
+                try {
+                    rect = (Rectangle) resultTextPane.modelToView2D(offset);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+
+                int startRow = resultTextPane.viewToModel2D(new Point(0, rect.y));
+                int endRow = resultTextPane.viewToModel2D(new Point(resultTextPane.getWidth(), rect.y));
+
+                System.out.printf("Selected Offsets: [%d, %d]%n", startRow, endRow);
+
+                resultTextPane.select(startRow, endRow);
+                System.out.println(resultTextPane.getSelectedText());
             }
         });
 

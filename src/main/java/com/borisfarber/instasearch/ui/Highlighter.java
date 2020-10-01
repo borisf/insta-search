@@ -18,55 +18,6 @@
  import java.awt.*;
 
  public class Highlighter {
-     public void highlightSearch(JTextPane textPane, int from, String pattern, Color color) {
-
-         DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
-                 new DefaultHighlighter.DefaultHighlightPainter(color);
-
-         try {
-             javax.swing.text.Highlighter hilite = textPane.getHighlighter();
-             Document doc = textPane.getDocument();
-
-             // borders to highlight
-             from = from - 1000;
-             if(from < 0) {
-                 from = 0;
-             }
-
-             int to = (from + 1000);
-             if (to > doc.getLength()) {
-                 to = doc.getLength();
-             }
-             String text = doc.getText(from, to);
-
-             /// background
-             MutableAttributeSet attrs = textPane.getInputAttributes();
-             StyledDocument doc1 = textPane.getStyledDocument();
-             int pos = 0;
-
-             // Search for the pattern
-             String textLowercase = text.toLowerCase();
-             String patternLowercase = pattern.toLowerCase();
-
-             while ((pos = textLowercase.indexOf(patternLowercase, pos)) >= 0) {
-                 int startMatch = from + pos;
-                 // Create highlighter using private painter and apply around pattern
-                 hilite.addHighlight(startMatch, startMatch + pattern.length(), previewHighlighter);
-
-                 // back
-                 StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
-                 doc1.setCharacterAttributes(startMatch, startMatch + pattern.length(), attrs, false);
-                 StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
-                 doc1.setCharacterAttributes(startMatch + pattern.length(),
-                         startMatch + text.length(),attrs, false);
-                 // end back
-
-                 pos += pattern.length();
-             }
-         } catch (BadLocationException e) {
-             System.err.println("Ignored in highlight results");
-         }
-     }
 
      public void highlightPreview(JTextPane previewTextPane, String selectedLine, Color color) {
          if(selectedLine.endsWith("\n\n")) {

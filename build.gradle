@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.borisfarber'
-version '5.1'
+version '5.2'
 
 repositories {
     mavenCentral()
