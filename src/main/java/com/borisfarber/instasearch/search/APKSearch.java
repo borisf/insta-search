@@ -16,10 +16,9 @@
 
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.controllers.SearchResultsSorter;
 import com.borisfarber.instasearch.formats.XmlDecompressor;
 import com.borisfarber.instasearch.controllers.Controller;
-import com.borisfarber.instasearch.ui.Hexdump;
+import com.borisfarber.instasearch.ui.HexDump;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;
@@ -78,14 +77,13 @@ public class APKSearch extends ZipSearch {
 
                 String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
                 result = header + "\n...\n" +
-                        Hexdump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
+                        HexDump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
                         "\n...\n";
             }
 
             String finalResult = result;
             Runnable runnable = () -> {
-                controller.previewTextPane.setText(finalResult);
-                controller.highlightPreview();
+                controller.onUpdatePreview(finalResult);
             };
 
             SwingUtilities.invokeLater(runnable);

@@ -15,6 +15,7 @@
 
  import com.borisfarber.instasearch.controllers.Controller;
  import com.borisfarber.instasearch.controllers.Pair;
+ import com.borisfarber.instasearch.controllers.PathMatchers;
 
  import javax.swing.*;
  import java.io.File;
@@ -66,7 +67,7 @@
          }
 
          Path pathString = file.toPath();
-         PathMatcher matcher = Controller.SOURCE_OR_TEXT_PATH_MATCHER;
+         PathMatcher matcher = PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER;
 
          try {
              Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
@@ -129,7 +130,7 @@
              }
 
              matchedSet = ngramSearch(3,50, query, allLines, String::toString);
-             Runnable runnable = controller::onUpdateGUI;
+             Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -247,7 +248,7 @@
                  builder.append(fileName).append("\n");
              }
 
-             controller.resultTextPane.setText(builder.toString());
+             controller.onCrawlFinish(builder.toString());
          };
          SwingUtilities.invokeLater(runnable);
      }

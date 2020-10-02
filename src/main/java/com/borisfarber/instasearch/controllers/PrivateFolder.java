@@ -53,7 +53,7 @@
 
      public static boolean isSourceFolder(File folder) {
          Path pathString = folder.toPath();
-         PathMatcher matcher = Controller.SOURCE_MATCHER;
+         PathMatcher matcher = PathMatchers.SOURCE_MATCHER;
 
          final int[] allFiles = {0};
          final int[] srcFiles = {0};

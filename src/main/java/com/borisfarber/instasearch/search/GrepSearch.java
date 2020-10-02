@@ -30,10 +30,7 @@
  */
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.controllers.Controller;
-import com.borisfarber.instasearch.controllers.PrivateFolder;
-import com.borisfarber.instasearch.controllers.Pair;
-import com.borisfarber.instasearch.controllers.SearchResultsSorter;
+import com.borisfarber.instasearch.controllers.*;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -131,7 +128,7 @@ public class GrepSearch implements Search {
             }
 
             builder.append("...");
-            controller.resultTextPane.setText(builder.toString());
+            controller.onCrawlFinish(builder.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,7 +152,7 @@ public class GrepSearch implements Search {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                         throws IOException {
-                    if (Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(path)) {
+                    if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(path)) {
                         try {
                             List<String> allFileLines = Files.readAllLines(path);
                             preview.addAll(allFileLines);
@@ -251,7 +248,7 @@ public class GrepSearch implements Search {
         int task = finishedTasks.incrementAndGet();
 
         if(task == NUMBER_OF_TASKS) {
-            Runnable runnable = () -> controller.onUpdateGUI();
+            Runnable runnable = () -> controller.onSearchFinish();
             SwingUtilities.invokeLater(runnable);
             finishedTasks.set(0);
         }
@@ -357,8 +354,7 @@ public class GrepSearch implements Search {
                 String result =  builder.toString();
 
                 Runnable runnable = () -> {
-                    controller.previewTextPane.setText(result);
-                    controller.highlightPreview();
+                    controller.onUpdatePreview(result);
                 };
 
                 SwingUtilities.invokeLater(runnable);

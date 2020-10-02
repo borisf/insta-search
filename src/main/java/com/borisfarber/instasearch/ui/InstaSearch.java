@@ -16,6 +16,7 @@
  import com.borisfarber.instasearch.controllers.BuildVersion;
  import com.borisfarber.instasearch.controllers.Controller;
  import com.borisfarber.instasearch.controllers.FileTransfer;
+ import com.borisfarber.instasearch.controllers.PathMatchers;
 
  import javax.swing.*;
  import javax.swing.text.BadLocationException;
@@ -40,7 +41,7 @@
 
      public InstaSearch(String file) {
          this();
-         controller.fileOpened(new File(file));
+         controller.onFileOpened(new File(file));
      }
 
      public InstaSearch() {
@@ -78,7 +79,7 @@
                  }
 
                  // each notch contributes ~3 lines with say 80 chars each
-                 controller.highlightResults(currentAnchor * 240, ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
+                 controller.onMouseScrolled(currentAnchor * 240, ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
              }
          });
 
@@ -115,7 +116,7 @@
          openFolderItem.addActionListener(actionEvent -> {
              try {
                  File newFile = open();
-                 controller.fileOpened(newFile);
+                 controller.onFileOpened(newFile);
              } catch (Exception e) {
                  e.printStackTrace();
              }
@@ -133,7 +134,7 @@
          final JMenuItem closeItem = new JMenuItem("Exit");
          closeItem.setFont(textFont);
          closeItem.addActionListener(actionEvent -> {
-             controller.close();
+             controller.onClose();
              System.exit(0);
          });
          menu.add(closeItem);
@@ -142,7 +143,7 @@
          addWindowListener(new WindowAdapter() {
              @Override
              public void windowClosing(WindowEvent windowEvent) {
-                 controller.close();
+                 controller.onClose();
                  System.exit(0);
              }
          });
@@ -172,17 +173,17 @@
              @Override
              public void keyPressed(KeyEvent keyEvent) {
                  if (keyEvent.getKeyCode() == VK_UP) {
-                     controller.upPressed();
+                     controller.onUpPressed();
                      return;
                  }
 
                  if (keyEvent.getKeyCode() == VK_DOWN) {
-                     controller.downPressed();
+                     controller.onDownPressed();
                      return;
                  }
 
                  if (keyEvent.getKeyCode() == VK_ENTER) {
-                     controller.enterPressed();
+                     controller.onEnterPressed();
                      return;
                  }
              }
@@ -217,22 +218,27 @@
              String previousLine = "";
 
              public void mouseClicked(MouseEvent me) {
-                     int offset = result.viewToModel2D(me.getPoint());
-                     Rectangle rect = null;
-                     try {
-                         rect = (Rectangle) result.modelToView2D(offset);
-                     } catch (BadLocationException e) {
-                         e.printStackTrace();
-                     }
+                 int offset = result.viewToModel2D(me.getPoint());
+                 Rectangle rect = null;
+                 try {
+                     rect = (Rectangle) result.modelToView2D(offset);
+                 } catch (BadLocationException e) {
+                     e.printStackTrace();
+                 }
 
-                     int startRow = result.viewToModel2D(new Point(0, rect.y));
-                     int endRow = result.viewToModel2D(new Point(result.getWidth(), rect.y));
-                     result.select(startRow, endRow);
-                     String line = result.getSelectedText();
+                 int startRow = result.viewToModel2D(new Point(0, rect.y));
+                 int endRow = result.viewToModel2D(new Point(result.getWidth(), rect.y));
+                 result.select(startRow, endRow);
+                 String line = result.getSelectedText();
+
+                 if(line == null) {
+                     return;
+                 }
+
                  if(line.equals(previousLine)) {
-                     controller.mouseClickedOnResults(result.getSelectedText());
+                     controller.onMouseDoubleClick(result.getSelectedText());
                  } else {
-                     controller.showPreview(result.getSelectedText());
+                     controller.onMouseSingleClick(result.getSelectedText());
                      previousLine = line;
                  }
              }
@@ -275,11 +281,11 @@
      }
 
      private static boolean isBinarySupported(String filePath) {
-         return Controller.ZIP_MATCHER.matches(new File(filePath).toPath());
+         return PathMatchers.ZIP_MATCHER.matches(new File(filePath).toPath());
      }
 
      private static boolean isTextSupported(String filePath) {
-         return Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(new File(filePath).toPath());
+         return PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(new File(filePath).toPath());
      }
 
      public static void main(final String[] args) {

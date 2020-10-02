@@ -28,9 +28,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.File;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,48 +38,30 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
-    public static final String SELECTOR = "==> ";
-    public static final int UI_VIEW_LIMIT = 1000;
-
-    public static final PathMatcher SOURCE_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
-
-    public static final PathMatcher SOURCE_OR_TEXT_PATH_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
-
-    public static final PathMatcher CLASS_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{class}");
-
-    public static final PathMatcher ZIP_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
-
-    public static final PathMatcher APK_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{apk}");
-
-    public static final PathMatcher
-            DEX_MATCHER = FileSystems.getDefault().getPathMatcher("glob:**.{dex}");
+    private static final String SELECTOR = "==> ";
+    private static final int UI_VIEW_LIMIT = 1000;
 
     private final JTextField searchField;
-    public JTextPane resultTextPane;
-    public JTextPane previewTextPane;
+    private final JTextPane resultTextPane;
+    private final JTextPane previewTextPane;
     private final JLabel resultCountLabel;
+    private final ResultsHighlighter resultsHighlighter;
+    private final PreviewHighlighter previewHighlighter;
+    private File file;
+    private String query;
+    private Search search;
+    private final ArrayList<String> searchResults = new ArrayList<>();
+    private int searchResultsCount = 0;
+    private final Pair<String, Integer> selectedFilenameAndPosition =
+            new Pair<>("test.txt",0);
+    private int selectedSearchResultIndex = 0;
+    private String selectedLine = "";
 
     private final ThreadPoolExecutor searchTasksExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
     private final ThreadPoolExecutor previewTasksExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
-
-    private String query;
-    private Search search;
-    private final Pair<String, Integer> searchResultsFilenameAndPosition =
-            new Pair<>("test.txt",0);
-    private final ArrayList<String> searchResults = new ArrayList<>();
-    private int selectedGuiIndex = 0;
-    private int numLines = 0;
-    private String selectedLine = "";
-    private File file;
-    private ResultsHighlighter resultsHighlighter;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -91,13 +71,35 @@ public final class Controller implements DocumentListener {
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
         this.resultCountLabel = resultCountLabel;
-
-        search = new MockSearch(this);
-
+        this.search = new MockSearch(this);
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
+        this.previewHighlighter = new PreviewHighlighter();
     }
 
-    public void crawl(final File file) {
+    // region Open file events
+    public void onFileOpened(File newFile) {
+        try {
+            if(newFile != null) {
+                searchField.setText("");
+                resultTextPane.setText(Background.INTRO);
+                previewTextPane.setText("");
+                resultCountLabel.setText("");
+
+                crawl(newFile);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onFileDragged(File file) {
+        searchField.setText("");
+        resultTextPane.setText(Background.INTRO);
+        previewTextPane.setText("");
+        crawl(file);
+    }
+
+    private void crawl(final File file) {
         if (file == null || !file.exists()) {
             return;
         }
@@ -107,6 +109,26 @@ public final class Controller implements DocumentListener {
         search.crawl(file);
     }
 
+    private Search createSearch(File newFile) {
+        if (newFile.isDirectory()) {
+            if(PrivateFolder.isSourceFolder(newFile)) {
+                return new FuzzySearch(this);
+            } else {
+                return new GrepSearch(this);
+            }
+        } else {
+            if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
+                return new ZipSearch(newFile, this);
+            } else if (PathMatchers.APK_MATCHER.matches(Path.of(newFile.toURI()))) {
+                return new APKSearch(newFile, this);
+            } else {
+                return new GrepSearch(this);
+            }
+        }
+    }
+    // endregion
+
+    // region Input events
     @Override
     public void insertUpdate(final DocumentEvent evt) {
         // letter
@@ -143,57 +165,25 @@ public final class Controller implements DocumentListener {
         runNewSearch(document);
     }
 
-    public void fileOpened(File newFile) {
-        try {
-            if(newFile != null) {
-                searchField.setText("");
-                resultTextPane.setText(Background.INTRO);
-                previewTextPane.setText("");
-                resultCountLabel.setText("");
-
-                crawl(newFile);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Search createSearch(File newFile) {
-        if (newFile.isDirectory()) {
-            if(PrivateFolder.isSourceFolder(newFile)) {
-                return new FuzzySearch(this);
-            } else {
-                return new GrepSearch(this);
-            }
-        } else {
-            if (ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
-                return new ZipSearch(newFile, this);
-            } else if (APK_MATCHER.matches(Path.of(newFile.toURI()))) {
-                return new APKSearch(newFile, this);
-            } else {
-                return new GrepSearch(this);
-            }
-        }
-    }
-
-    public void upPressed() {
-        if(selectedGuiIndex > 0) {
-            selectedGuiIndex--;
+    public void onUpPressed() {
+        if(selectedSearchResultIndex > 0) {
+            selectedSearchResultIndex--;
         }
 
-        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
+        updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
-    public void downPressed() {
-        if((selectedGuiIndex < (Integer.parseInt(search.getResultSetCount()) - 1))
-                && selectedGuiIndex < (numLines - 1)) {
-            selectedGuiIndex++;
+    public void onDownPressed() {
+        if((selectedSearchResultIndex <
+                (Integer.parseInt(search.getResultSetCount()) - 1))
+                && selectedSearchResultIndex < (searchResultsCount - 1)) {
+            selectedSearchResultIndex++;
         }
 
-        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
+        updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
-    public void showPreview(String selectedText) {
+    public void onMouseSingleClick(String selectedText) {
         int index = searchResults.indexOf((selectedText + "\n"));
 
         if(index == -1) {
@@ -202,11 +192,11 @@ public final class Controller implements DocumentListener {
             return;
         }
 
-        selectedGuiIndex = index;
-        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
+        selectedSearchResultIndex = index;
+        updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
-    public void mouseClickedOnResults(String selectedText) {
+    public void onMouseDoubleClick(String selectedText) {
         String[] parts  = selectedText.split(":");
         String fileName = parts[0];
         String position = parts[1];
@@ -215,23 +205,27 @@ public final class Controller implements DocumentListener {
             fileName = fileName.substring(4);
         }
 
-        searchResultsFilenameAndPosition.t = fileName;
-        searchResultsFilenameAndPosition.u = Integer.parseInt(position);
+        selectedFilenameAndPosition.t = fileName;
+        selectedFilenameAndPosition.u = Integer.parseInt(position);
 
-        enterPressed();
+        onEnterPressed();
     }
 
-    public void enterPressed() {
-        if(search.getPathPerFileName(searchResultsFilenameAndPosition.t) == null) {
+    public void onMouseScrolled(int from, ResultsHighlighter.HIGHLIGHT_SPAN span) {
+        highlightResults(from, span);
+    }
+
+    public void onEnterPressed() {
+        if(search.getPathPerFileName(selectedFilenameAndPosition.t) == null) {
             // garbage files
             return;
         }
 
-        Path selectedPath = search.getPathPerFileName(searchResultsFilenameAndPosition.t);
+        Path selectedPath = search.getPathPerFileName(selectedFilenameAndPosition.t);
 
-        if(Controller.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            DesktopAdaptor.openFileOnDesktop(selectedPath, searchResultsFilenameAndPosition.u);
-        } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
+        if(PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
+            DesktopAdaptor.openFileOnDesktop(selectedPath, selectedFilenameAndPosition.u);
+        } else if(PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Clazz.decompile(selectedPath);
                 Runnable runnable = () -> {
@@ -240,7 +234,7 @@ public final class Controller implements DocumentListener {
                 };
                 SwingUtilities.invokeLater(runnable);
             });
-        } else if(Controller.CLASS_MATCHER.matches(selectedPath)) {
+        } else if(PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Clazz.decompile(selectedPath);
                 Runnable runnable = () -> {
@@ -249,7 +243,7 @@ public final class Controller implements DocumentListener {
                 };
                 SwingUtilities.invokeLater(runnable);
             });
-        } else if(Controller.DEX_MATCHER.matches(selectedPath)) {
+        } else if(PathMatchers.DEX_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Dex.decompile(file.toPath());
                 Runnable runnable = () -> {
@@ -260,24 +254,6 @@ public final class Controller implements DocumentListener {
             });
         } else {
             HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
-        }
-    }
-
-    public void onFileDragged(File file) {
-        searchField.setText("");
-        resultTextPane.setText(Background.INTRO);
-        previewTextPane.setText("");
-        crawl(file);
-    }
-
-    public void search(String query) {
-        selectedGuiIndex = 0;
-        this.query = query;
-
-        Runnable runnableTask = () -> search.search(query);
-        long waitingTasksCount = searchTasksExecutor.getActiveCount();
-        if(waitingTasksCount < 1) {
-            searchTasksExecutor.submit(runnableTask);
         }
     }
 
@@ -293,14 +269,27 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    public void onUpdateGUI() {
+    private void search(String query) {
+        selectedSearchResultIndex = 0;
+        this.query = query;
+
+        Runnable runnableTask = () -> search.search(query);
+        long waitingTasksCount = searchTasksExecutor.getActiveCount();
+        if(waitingTasksCount < 1) {
+            searchTasksExecutor.submit(runnableTask);
+        }
+    }
+    // endregion
+
+    // region Search events
+    public void onSearchFinish() {
         int resultCount = 0;
-        boolean isViewLimit = false;
+        boolean isViewLimitReached = false;
         LinkedList<Pair<String, Integer>> locations;
         searchResults.clear();
         List<String> rawResults = search.getResults();
 
-        while ((resultCount < rawResults.size()) && !isViewLimit) {
+        while ((resultCount < rawResults.size()) && !isViewLimitReached) {
             String rawLine = rawResults.get(resultCount);
 
             if(rawLine == null) {
@@ -325,22 +314,22 @@ public final class Controller implements DocumentListener {
                 resultCount++;
 
                 if(resultCount >= UI_VIEW_LIMIT) {
-                    isViewLimit = true;
+                    isViewLimitReached = true;
                     break;
                 }
             }
         }
 
         searchResults.sort(search.getResultsSorter());
-        numLines = resultCount;
-        onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
+        searchResultsCount = resultCount;
+        updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
-    private void onUpdateGUIInternal(ResultsHighlighter.HIGHLIGHT_SPAN span) {
+    private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
         int previewLinesIndex = 0;
         StringBuilder builder = new StringBuilder();
         for (String str : searchResults) {
-            if(previewLinesIndex == selectedGuiIndex) {
+            if(previewLinesIndex == selectedSearchResultIndex) {
                 builder.append(SELECTOR).append(str);
                 String[] parts  = str.split(":");
                 String fileName = parts[0];
@@ -349,8 +338,8 @@ public final class Controller implements DocumentListener {
                 // the text line starts after 2 :s
                 this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
 
-                searchResultsFilenameAndPosition.t = fileName;
-                searchResultsFilenameAndPosition.u = Integer.parseInt(position);
+                selectedFilenameAndPosition.t = fileName;
+                selectedFilenameAndPosition.u = Integer.parseInt(position);
             } else {
                 builder.append(str);
             }
@@ -361,14 +350,14 @@ public final class Controller implements DocumentListener {
 
         if(searchResults.size() > 0) {
             previewTextPane.setText
-                    (search.getPreview(searchResults.get(selectedGuiIndex)));
+                    (search.getPreview(searchResults.get(selectedSearchResultIndex)));
             highlightPreview();
         }
 
         if(searchResults.size() > UI_VIEW_LIMIT) {
             resultCountLabel.setText("...");
         } else {
-            resultCountLabel.setText(String.valueOf(numLines));
+            resultCountLabel.setText(String.valueOf(searchResultsCount));
         }
 
         try {
@@ -383,23 +372,32 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    public void highlightResults(int selector, ResultsHighlighter.HIGHLIGHT_SPAN span) {
+    public void onCrawlFinish(String toString) {
+        resultTextPane.setText(toString);
+    }
+
+    private void highlightResults(int from, ResultsHighlighter.HIGHLIGHT_SPAN span) {
         if(query != null) {
-            resultsHighlighter.highlightSearch(selector, span, query);
+            resultsHighlighter.highlightSearch(from, span, query);
         }
     }
 
-    public void highlightPreview() {
-        if(query != null) {
-            PreviewHighlighter highlighter = new PreviewHighlighter();
-            highlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
-        }
+    public void onUpdatePreview(String result) {
+        previewTextPane.setText(result);
+        highlightPreview();
     }
 
-    public void close() {
+    private void highlightPreview() {
+        if(query != null) {
+            previewHighlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
+        }
+    }
+    // endregion
+
+    public void onClose() {
         searchTasksExecutor.shutdown();
-        search.close();
-
         previewTasksExecutor.shutdown();
+        search.close();
+        PrivateFolder.INSTANCE.shutdown();
     }
 }
