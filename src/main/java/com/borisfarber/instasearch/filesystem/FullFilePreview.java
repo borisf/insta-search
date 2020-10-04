@@ -11,11 +11,12 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.controllers;
+package com.borisfarber.instasearch.filesystem;
 
 import com.borisfarber.instasearch.formats.Clazz;
 import com.borisfarber.instasearch.formats.Dex;
 import com.borisfarber.instasearch.search.Search;
+import com.borisfarber.instasearch.textblocks.Pair;
 import com.borisfarber.instasearch.ui.HexPanel;
 import dorkbox.notify.Notify;
 import dorkbox.notify.Pos;

@@ -16,8 +16,8 @@
 
 package com.borisfarber.instasearch.formats;
 
-import com.borisfarber.instasearch.controllers.Pair;
-import com.borisfarber.instasearch.controllers.PrivateFolder;
+import com.borisfarber.instasearch.textblocks.Pair;
+import com.borisfarber.instasearch.filesystem.PrivateFolder;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;

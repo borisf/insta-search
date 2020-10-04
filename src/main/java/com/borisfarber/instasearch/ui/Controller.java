@@ -11,14 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.borisfarber.instasearch.controllers;
+package com.borisfarber.instasearch.ui;
 
-import com.borisfarber.instasearch.search.MockSearch;
+import com.borisfarber.instasearch.textblocks.Pair;
+import com.borisfarber.instasearch.filesystem.PrivateFolder;
 import com.borisfarber.instasearch.search.Search;
 import com.borisfarber.instasearch.search.SearchFactory;
 import com.borisfarber.instasearch.textblocks.Background;
-import com.borisfarber.instasearch.ui.PreviewHighlighter;
-import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -33,7 +32,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.borisfarber.instasearch.controllers.FullFilePreview.fullFilePreview;
+import static com.borisfarber.instasearch.filesystem.FullFilePreview.fullFilePreview;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
@@ -70,7 +69,7 @@ public final class Controller implements DocumentListener {
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
         this.resultCountLabel = resultCountLabel;
-        this.search = new MockSearch(this);
+        this.search = SearchFactory.INSTANCE.createMockSearch(this);
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
         this.previewHighlighter = new PreviewHighlighter();
     }

@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.ui;
 
- import com.borisfarber.instasearch.controllers.*;
+ import com.borisfarber.instasearch.filesystem.*;
  import com.borisfarber.instasearch.textblocks.Background;
  import com.borisfarber.instasearch.textblocks.BuildVersion;
 

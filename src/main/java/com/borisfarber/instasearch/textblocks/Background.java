@@ -13,9 +13,7 @@
  */
 package com.borisfarber.instasearch.textblocks;
 
- import com.borisfarber.instasearch.textblocks.BuildVersion;
-
- public class Background {
+public class Background {
 
     public final static String INTRO =
             "\n\n\n\n\n\n\n\n                          ClassyShark Insta Search ver."

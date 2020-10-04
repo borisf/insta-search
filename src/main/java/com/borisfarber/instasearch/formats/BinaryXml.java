@@ -15,7 +15,7 @@
  */
 package com.borisfarber.instasearch.formats;
 
-import com.borisfarber.instasearch.controllers.PrivateFolder;
+import com.borisfarber.instasearch.filesystem.PrivateFolder;
 import com.google.common.io.LittleEndianDataInputStream;
 import org.zeroturnaround.zip.ZipUtil;
 

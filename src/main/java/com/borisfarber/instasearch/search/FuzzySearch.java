@@ -13,9 +13,9 @@
   */
  package com.borisfarber.instasearch.search;
 
- import com.borisfarber.instasearch.controllers.Controller;
- import com.borisfarber.instasearch.controllers.Pair;
- import com.borisfarber.instasearch.controllers.PathMatchers;
+ import com.borisfarber.instasearch.ui.Controller;
+ import com.borisfarber.instasearch.textblocks.Pair;
+ import com.borisfarber.instasearch.filesystem.PathMatchers;
 
  import javax.swing.*;
  import java.io.File;

@@ -11,7 +11,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.controllers;
+package com.borisfarber.instasearch.textblocks;
 
 // value class to represent pairs data structure
 public class Pair<T, U> {

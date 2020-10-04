@@ -12,7 +12,7 @@
   * limitations under the License.
   */
 
-package com.borisfarber.instasearch.controllers;
+package com.borisfarber.instasearch.filesystem;
 
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;

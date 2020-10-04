@@ -13,9 +13,9 @@
  */
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.controllers.Controller;
-import com.borisfarber.instasearch.controllers.PathMatchers;
-import com.borisfarber.instasearch.controllers.PrivateFolder;
+import com.borisfarber.instasearch.ui.Controller;
+import com.borisfarber.instasearch.filesystem.PathMatchers;
+import com.borisfarber.instasearch.filesystem.PrivateFolder;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -23,6 +23,10 @@ import java.nio.file.Path;
 public enum SearchFactory {
 
     INSTANCE;
+
+    public Search createMockSearch(Controller controller) {
+        return new MockSearch(controller);
+    }
 
     public Search createSearch(File newFile, Controller controller) {
         if (newFile.isDirectory()) {
