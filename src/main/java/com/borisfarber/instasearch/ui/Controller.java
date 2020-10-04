@@ -224,6 +224,10 @@ public final class Controller implements DocumentListener {
     // endregion
 
     // region Search events
+    public void onCrawlFinish(String toString) {
+        resultTextPane.setText(toString);
+    }
+
     public void onSearchFinish() {
         int resultCount = 0;
         boolean isViewLimitReached = false;
@@ -312,10 +316,6 @@ public final class Controller implements DocumentListener {
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
         }
-    }
-
-    public void onCrawlFinish(String toString) {
-        resultTextPane.setText(toString);
     }
 
     private void highlightResults(int from, ResultsHighlighter.HIGHLIGHT_SPAN span) {
