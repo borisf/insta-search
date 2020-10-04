@@ -31,6 +31,7 @@
 package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.controllers.*;
+import com.borisfarber.instasearch.textblocks.SearchResultsSorter;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;

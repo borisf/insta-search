@@ -13,11 +13,10 @@
  */
 package com.borisfarber.instasearch.controllers;
 
-import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.Dex;
-import com.borisfarber.instasearch.search.*;
-import com.borisfarber.instasearch.ui.Background;
-import com.borisfarber.instasearch.ui.HexPanel;
+import com.borisfarber.instasearch.search.MockSearch;
+import com.borisfarber.instasearch.search.Search;
+import com.borisfarber.instasearch.search.SearchFactory;
+import com.borisfarber.instasearch.textblocks.Background;
 import com.borisfarber.instasearch.ui.PreviewHighlighter;
 import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
@@ -28,13 +27,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static com.borisfarber.instasearch.controllers.FullFilePreview.fullFilePreview;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
@@ -105,26 +104,8 @@ public final class Controller implements DocumentListener {
         }
 
         this.file = file;
-        search = createSearch(file);
+        search = SearchFactory.INSTANCE.createSearch(file, this);
         search.crawl(file);
-    }
-
-    private Search createSearch(File newFile) {
-        if (newFile.isDirectory()) {
-            if(PrivateFolder.isSourceFolder(newFile)) {
-                return new FuzzySearch(this);
-            } else {
-                return new GrepSearch(this);
-            }
-        } else {
-            if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
-                return new ZipSearch(newFile, this);
-            } else if (PathMatchers.APK_MATCHER.matches(Path.of(newFile.toURI()))) {
-                return new APKSearch(newFile, this);
-            } else {
-                return new GrepSearch(this);
-            }
-        }
     }
     // endregion
 
@@ -216,45 +197,7 @@ public final class Controller implements DocumentListener {
     }
 
     public void onEnterPressed() {
-        if(search.getPathPerFileName(selectedFilenameAndPosition.t) == null) {
-            // garbage files
-            return;
-        }
-
-        Path selectedPath = search.getPathPerFileName(selectedFilenameAndPosition.t);
-
-        if(PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            DesktopAdaptor.openFileOnDesktop(selectedPath, selectedFilenameAndPosition.u);
-        } else if(PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
-            previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedPath);
-                Runnable runnable = () -> {
-                    previewTextPane.setText(result.u);
-                    DesktopAdaptor.openFileOnDesktop(result.t.toPath(), 0);
-                };
-                SwingUtilities.invokeLater(runnable);
-            });
-        } else if(PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
-            previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedPath);
-                Runnable runnable = () -> {
-                    previewTextPane.setText(result.u);
-                    DesktopAdaptor.openFileOnDesktop(result.t.toPath(), 0);
-                };
-                SwingUtilities.invokeLater(runnable);
-            });
-        } else if(PathMatchers.DEX_MATCHER.matches(selectedPath)) {
-            previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Dex.decompile(file.toPath());
-                Runnable runnable = () -> {
-                    previewTextPane.setText(result.u);
-                    DesktopAdaptor.openFileOnDesktop(result.t.toPath(), 0);
-                };
-                SwingUtilities.invokeLater(runnable);
-            });
-        } else {
-            HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
-        }
+        fullFilePreview(search, selectedFilenameAndPosition, previewTasksExecutor, previewTextPane, file);
     }
 
     private void runNewSearch(final Document searchQueryDoc) {

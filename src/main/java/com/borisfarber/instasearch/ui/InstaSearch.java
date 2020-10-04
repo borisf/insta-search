@@ -13,10 +13,9 @@
   */
  package com.borisfarber.instasearch.ui;
 
- import com.borisfarber.instasearch.controllers.BuildVersion;
- import com.borisfarber.instasearch.controllers.Controller;
- import com.borisfarber.instasearch.controllers.FileTransfer;
- import com.borisfarber.instasearch.controllers.PathMatchers;
+ import com.borisfarber.instasearch.controllers.*;
+ import com.borisfarber.instasearch.textblocks.Background;
+ import com.borisfarber.instasearch.textblocks.BuildVersion;
 
  import javax.swing.*;
  import javax.swing.text.BadLocationException;
@@ -204,7 +203,7 @@
          result.setForeground(FOREGROUND_COLOR);
          result.setText(Background.INTRO);
          result.setDragEnabled(true);
-         result.setTransferHandler(new FileTransfer(this));
+         result.setTransferHandler(new FileDragAndDrop(this));
          result.setEditable(false);
 
          // copy paste
@@ -253,7 +252,7 @@
          result.setBackground(BACKGROUND_COLOR);
          result.setForeground(FOREGROUND_COLOR);
          result.setDragEnabled(true);
-         result.setTransferHandler(new FileTransfer(this));
+         result.setTransferHandler(new FileDragAndDrop(this));
          result.setEditable(false);
 
          HexPanel.CopyPopupListener popupListener=

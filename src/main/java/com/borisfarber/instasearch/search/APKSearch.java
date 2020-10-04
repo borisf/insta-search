@@ -16,9 +16,9 @@
 
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.formats.XmlDecompressor;
+import com.borisfarber.instasearch.formats.BinaryXml;
 import com.borisfarber.instasearch.controllers.Controller;
-import com.borisfarber.instasearch.ui.HexDump;
+import com.borisfarber.instasearch.textblocks.HexDump;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;
@@ -63,10 +63,10 @@ public class APKSearch extends ZipSearch {
 
             // or any other interesting APK components
             if(fileName.equals("AndroidManifest.xml")) {
-                XmlDecompressor xmlDecompressor = new XmlDecompressor();
+                BinaryXml binaryXml = new BinaryXml();
 
                 try {
-                    result = xmlDecompressor.decompressXml(bytes);
+                    result = binaryXml.decompressXml(bytes);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

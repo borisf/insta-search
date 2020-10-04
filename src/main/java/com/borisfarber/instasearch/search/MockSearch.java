@@ -32,7 +32,7 @@ package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.controllers.Controller;
 import com.borisfarber.instasearch.controllers.Pair;
-import com.borisfarber.instasearch.controllers.SearchResultsSorter;
+import com.borisfarber.instasearch.textblocks.SearchResultsSorter;
 
 import java.io.File;
 import java.nio.file.Path;

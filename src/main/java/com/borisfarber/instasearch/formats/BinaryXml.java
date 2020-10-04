@@ -41,7 +41,7 @@ import java.util.List;
  *  - https://android.googlesource.com/platform/frameworks/base/+/master/libs/androidfw/
  *  ResourceTypes.cpp
  */
-public class XmlDecompressor {
+public class BinaryXml {
     //Identifiers for XML Chunk Types
     private static final int PACKED_XML_IDENTIFIER = 0x00080003;
     private static final int END_DOC_TAG = 0x0101;
@@ -111,8 +111,8 @@ public class XmlDecompressor {
         byte[] bytes = ZipUtil.unpackEntry(file, "AndroidManifest.xml");
 
         try (PrintWriter out = new PrintWriter(man)) {
-            XmlDecompressor xmlDecompressor = new XmlDecompressor();
-            String content = xmlDecompressor.decompressXml(bytes);
+            BinaryXml binaryXml = new BinaryXml();
+            String content = binaryXml.decompressXml(bytes);
             out.println(content);
 
         } catch (IOException e) {

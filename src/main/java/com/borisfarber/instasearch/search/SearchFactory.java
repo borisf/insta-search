@@ -1,0 +1,44 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.borisfarber.instasearch.search;
+
+import com.borisfarber.instasearch.controllers.Controller;
+import com.borisfarber.instasearch.controllers.PathMatchers;
+import com.borisfarber.instasearch.controllers.PrivateFolder;
+
+import java.io.File;
+import java.nio.file.Path;
+
+public enum SearchFactory {
+
+    INSTANCE;
+
+    public Search createSearch(File newFile, Controller controller) {
+        if (newFile.isDirectory()) {
+            if(PrivateFolder.isSourceFolder(newFile)) {
+                return new FuzzySearch(controller);
+            } else {
+                return new GrepSearch(controller);
+            }
+        } else {
+            if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
+                return new ZipSearch(newFile, controller);
+            } else if (PathMatchers.APK_MATCHER.matches(Path.of(newFile.toURI()))) {
+                return new APKSearch(newFile, controller);
+            } else {
+                return new GrepSearch(controller);
+            }
+        }
+    }
+}

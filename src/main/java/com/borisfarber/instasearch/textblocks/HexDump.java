@@ -12,7 +12,7 @@
   * limitations under the License.
   */
 
-package com.borisfarber.instasearch.ui;
+package com.borisfarber.instasearch.textblocks;
 /**
  * Utility class for generating hexdumps from byte arrays. Mostly for debugging purposes.
  */
