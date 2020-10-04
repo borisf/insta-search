@@ -16,7 +16,7 @@ package com.borisfarber.instasearch.filesystem;
 import com.borisfarber.instasearch.formats.Clazz;
 import com.borisfarber.instasearch.formats.Dex;
 import com.borisfarber.instasearch.search.Search;
-import com.borisfarber.instasearch.textblocks.Pair;
+import com.borisfarber.instasearch.model.Pair;
 import com.borisfarber.instasearch.ui.HexPanel;
 import dorkbox.notify.Notify;
 import dorkbox.notify.Pos;

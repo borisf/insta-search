@@ -14,10 +14,10 @@
  package com.borisfarber.instasearch.search;
 
  import com.borisfarber.instasearch.ui.Controller;
- import com.borisfarber.instasearch.textblocks.SearchResultsSorter;
- import com.borisfarber.instasearch.textblocks.HexDump;
+ import com.borisfarber.instasearch.model.SearchResultsSorter;
+ import com.borisfarber.instasearch.model.HexDump;
  import com.borisfarber.instasearch.filesystem.PrivateFolder;
- import com.borisfarber.instasearch.textblocks.Pair;
+ import com.borisfarber.instasearch.model.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 

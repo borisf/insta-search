@@ -13,11 +13,11 @@
  */
 package com.borisfarber.instasearch.ui;
 
-import com.borisfarber.instasearch.textblocks.Pair;
 import com.borisfarber.instasearch.filesystem.PrivateFolder;
+import com.borisfarber.instasearch.model.ResultModel;
 import com.borisfarber.instasearch.search.Search;
 import com.borisfarber.instasearch.search.SearchFactory;
-import com.borisfarber.instasearch.textblocks.Background;
+import com.borisfarber.instasearch.model.Background;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -26,9 +26,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -36,8 +33,7 @@ import static com.borisfarber.instasearch.filesystem.FullFilePreview.fullFilePre
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
-    private static final String SELECTOR = "==> ";
-    private static final int UI_VIEW_LIMIT = 1000;
+    public static final int UI_VIEW_LIMIT = 1000;
 
     private final JTextField searchField;
     private final JTextPane resultTextPane;
@@ -48,12 +44,7 @@ public final class Controller implements DocumentListener {
     private File file;
     private String query;
     private Search search;
-    private final ArrayList<String> searchResults = new ArrayList<>();
-    private int searchResultsCount = 0;
-    private final Pair<String, Integer> selectedFilenameAndPosition =
-            new Pair<>("test.txt",0);
-    private int selectedSearchResultIndex = 0;
-    private String selectedLine = "";
+    private ResultModel resultModel;
 
     private final ThreadPoolExecutor searchTasksExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
@@ -72,21 +63,17 @@ public final class Controller implements DocumentListener {
         this.search = SearchFactory.INSTANCE.createMockSearch(this);
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
         this.previewHighlighter = new PreviewHighlighter();
+        this.resultModel = new ResultModel();
     }
 
-    // region Open file events
     public void onFileOpened(File newFile) {
-        try {
-            if(newFile != null) {
-                searchField.setText("");
-                resultTextPane.setText(Background.INTRO);
-                previewTextPane.setText("");
-                resultCountLabel.setText("");
+        if(newFile != null) {
+            searchField.setText("");
+            resultTextPane.setText(Background.INTRO);
+            previewTextPane.setText("");
+            resultCountLabel.setText("");
 
-                crawl(newFile);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            crawl(newFile);
         }
     }
 
@@ -106,9 +93,7 @@ public final class Controller implements DocumentListener {
         search = SearchFactory.INSTANCE.createSearch(file, this);
         search.crawl(file);
     }
-    // endregion
 
-    // region Input events
     @Override
     public void insertUpdate(final DocumentEvent evt) {
         // letter
@@ -146,48 +131,22 @@ public final class Controller implements DocumentListener {
     }
 
     public void onUpPressed() {
-        if(selectedSearchResultIndex > 0) {
-            selectedSearchResultIndex--;
-        }
-
+        resultModel.selectedLineUp();
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onDownPressed() {
-        if((selectedSearchResultIndex <
-                (Integer.parseInt(search.getResultSetCount()) - 1))
-                && selectedSearchResultIndex < (searchResultsCount - 1)) {
-            selectedSearchResultIndex++;
-        }
-
+        resultModel.selectedLineDown(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onMouseSingleClick(String selectedText) {
-        int index = searchResults.indexOf((selectedText + "\n"));
-
-        if(index == -1) {
-            // hack when the ui screen is small and the selected line
-            // is smaller than the result line
-            return;
-        }
-
-        selectedSearchResultIndex = index;
+        resultModel.lineSelected(selectedText);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onMouseDoubleClick(String selectedText) {
-        String[] parts  = selectedText.split(":");
-        String fileName = parts[0];
-        String position = parts[1];
-
-        if(fileName.startsWith(SELECTOR)) {
-            fileName = fileName.substring(4);
-        }
-
-        selectedFilenameAndPosition.t = fileName;
-        selectedFilenameAndPosition.u = Integer.parseInt(position);
-
+        resultModel.lineClicked(selectedText);
         onEnterPressed();
     }
 
@@ -196,7 +155,12 @@ public final class Controller implements DocumentListener {
     }
 
     public void onEnterPressed() {
-        fullFilePreview(search, selectedFilenameAndPosition, previewTasksExecutor, previewTextPane, file);
+        fullFilePreview(
+                search,
+                resultModel.selectedFilenameAndPosition,
+                previewTasksExecutor,
+                previewTextPane,
+                file);
     }
 
     private void runNewSearch(final Document searchQueryDoc) {
@@ -212,7 +176,7 @@ public final class Controller implements DocumentListener {
     }
 
     private void search(String query) {
-        selectedSearchResultIndex = 0;
+        resultModel.selectedSearchResultIndex = 0;
         this.query = query;
 
         Runnable runnableTask = () -> search.search(query);
@@ -221,97 +185,39 @@ public final class Controller implements DocumentListener {
             searchTasksExecutor.submit(runnableTask);
         }
     }
-    // endregion
 
-    // region Search events
+    // TODO probably pass string builder
     public void onCrawlFinish(String toString) {
+        // todo move result to result model
+        resultModel.setCrawl(toString);
         resultTextPane.setText(toString);
     }
 
     public void onSearchFinish() {
-        int resultCount = 0;
-        boolean isViewLimitReached = false;
-        LinkedList<Pair<String, Integer>> locations;
-        searchResults.clear();
-        List<String> rawResults = search.getResults();
-
-        while ((resultCount < rawResults.size()) && !isViewLimitReached) {
-            String rawLine = rawResults.get(resultCount);
-
-            if(rawLine == null) {
-                // if the UI is drawing the previous search results
-                // while the results are updated
-                return;
-            }
-
-            locations = search.getFileNameAndPosition(rawLine);
-
-            for(Pair<String, Integer> location : locations) {
-                String result = location.t + ":" + location.u +":"
-                        + rawLine;
-
-                if(!rawLine.endsWith("\n")) {
-                    // optimization GrepSearch lines come with \n
-                    // don't want to change the logic there for performance
-                    result += "\n";
-                }
-
-                searchResults.add(result);
-                resultCount++;
-
-                if(resultCount >= UI_VIEW_LIMIT) {
-                    isViewLimitReached = true;
-                    break;
-                }
-            }
-        }
-
-        searchResults.sort(search.getResultsSorter());
-        searchResultsCount = resultCount;
+        resultModel.prepareResults(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
     private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
-        int previewLinesIndex = 0;
-        StringBuilder builder = new StringBuilder();
-        for (String str : searchResults) {
-            if(previewLinesIndex == selectedSearchResultIndex) {
-                builder.append(SELECTOR).append(str);
-                String[] parts  = str.split(":");
-                String fileName = parts[0];
-                String position = parts[1];
+        resultModel.updateSelection();
+        resultTextPane.setText(resultModel.builder.toString());
 
-                // the text line starts after 2 :s
-                this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
-
-                selectedFilenameAndPosition.t = fileName;
-                selectedFilenameAndPosition.u = Integer.parseInt(position);
-            } else {
-                builder.append(str);
-            }
-            previewLinesIndex++;
-        }
-
-        resultTextPane.setText(builder.toString());
-
-        if(searchResults.size() > 0) {
-            previewTextPane.setText
-                    (search.getPreview(searchResults.get(selectedSearchResultIndex)));
+        if(resultModel.resultSize() > 0) {
+            previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
             highlightPreview();
         }
 
-        if(searchResults.size() > UI_VIEW_LIMIT) {
+        if(resultModel.resultSize() > UI_VIEW_LIMIT) {
             resultCountLabel.setText("...");
         } else {
-            resultCountLabel.setText(String.valueOf(searchResultsCount));
+            resultCountLabel.setText(String.valueOf(resultModel.getResultCount()));
         }
 
         try {
-            int selector = builder.toString().indexOf(SELECTOR);
+            int selector = resultModel.getSelectorIndex();
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
                 highlightResults(selector, span);
-
             }
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
@@ -331,10 +237,10 @@ public final class Controller implements DocumentListener {
 
     private void highlightPreview() {
         if(query != null) {
-            previewHighlighter.highlightPreview(previewTextPane, selectedLine, FOREGROUND_COLOR);
+            previewHighlighter.highlightPreview(previewTextPane,
+                    resultModel.getSelectedLine(), FOREGROUND_COLOR);
         }
     }
-    // endregion
 
     public void onClose() {
         searchTasksExecutor.shutdown();

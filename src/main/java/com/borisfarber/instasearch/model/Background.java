@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.borisfarber.instasearch.textblocks;
+package com.borisfarber.instasearch.model;
 
 public class Background {
 
