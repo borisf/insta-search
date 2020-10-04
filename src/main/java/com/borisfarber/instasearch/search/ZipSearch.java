@@ -13,11 +13,11 @@
   */
  package com.borisfarber.instasearch.search;
 
- import com.borisfarber.instasearch.controllers.Controller;
- import com.borisfarber.instasearch.controllers.SearchResultsSorter;
- import com.borisfarber.instasearch.ui.Hexdump;
- import com.borisfarber.instasearch.controllers.PrivateFolder;
- import com.borisfarber.instasearch.controllers.Pair;
+ import com.borisfarber.instasearch.ui.Controller;
+ import com.borisfarber.instasearch.textblocks.SearchResultsSorter;
+ import com.borisfarber.instasearch.textblocks.HexDump;
+ import com.borisfarber.instasearch.filesystem.PrivateFolder;
+ import com.borisfarber.instasearch.textblocks.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 
@@ -61,7 +61,7 @@
              }
 
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted(query, allLines, 50);
-             Runnable runnable = controller::onUpdateGUI;
+             Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -108,12 +108,11 @@
 
              String header = new String(Arrays.copyOfRange(bytes, 0, headerSize));
              String result = header +  "\n...\n" +
-                     Hexdump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
+                     HexDump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
                      "\n...\n";
 
              Runnable runnable = () -> {
-                 controller.previewTextPane.setText(result);
-                 controller.highlightPreview();
+                 controller.onUpdatePreview(result);
              };
 
              SwingUtilities.invokeLater(runnable);
@@ -150,7 +149,6 @@
      @Override
      public void close() {
          executorService.shutdown();
-         PrivateFolder.INSTANCE.shutdown();
      }
 
      @Override
@@ -161,7 +159,7 @@
                  builder.append(fileName).append("\n");
              }
 
-             controller.resultTextPane.setText(builder.toString());
+             controller.onCrawlFinish(builder.toString());
          };
          SwingUtilities.invokeLater(runnable);
      }

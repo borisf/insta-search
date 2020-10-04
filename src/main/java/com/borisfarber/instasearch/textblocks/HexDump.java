@@ -12,18 +12,18 @@
   * limitations under the License.
   */
 
-package com.borisfarber.instasearch.ui;
+package com.borisfarber.instasearch.textblocks;
 /**
  * Utility class for generating hexdumps from byte arrays. Mostly for debugging purposes.
  */
-public final class Hexdump {
+public final class HexDump {
 
     private static final char[] HEX =
             new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
     public static final char NON_PRINTABLE = '.'; // WHITE SQUARE □
 
-    private Hexdump() {
+    private HexDump() {
     }
 
     /**
@@ -82,7 +82,7 @@ public final class Hexdump {
         int x = offset;
         for (int i = 0; i < 4; i++) {
             x = Integer.rotateLeft(x, 8);
-            Hexdump.appendHexChars((byte) (x & 0xFF), out);
+            HexDump.appendHexChars((byte) (x & 0xFF), out);
         }
     }
 

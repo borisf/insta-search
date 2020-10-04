@@ -11,16 +11,19 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.controllers;
+package com.borisfarber.instasearch.textblocks;
+import java.util.Comparator;
 
-public class BuildVersion {
-    public static String getBuildVersion() {
-        String result = BuildVersion.class.getPackage().getImplementationVersion();
+public class SearchResultsSorter implements Comparator<String> {
+    //  "log.txt:2424:something";
 
-        if (result == null) {
-            result = "Development Version";
+    @Override
+    public int compare(String s1, String s2) {
+        String[] s1Parts = s1.split(":");
+        String[] s2Parts = s2.split(":");
+        if(!s1Parts[0].equals(s2Parts[0])) {
+            return s1Parts[0].compareTo(s2Parts[0]);
         }
-
-        return result;
+        return Integer.valueOf(s1Parts[1]).compareTo(Integer.valueOf(s2Parts[1]));
     }
 }
