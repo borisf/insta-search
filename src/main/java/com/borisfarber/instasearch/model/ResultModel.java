@@ -16,6 +16,7 @@
  import com.borisfarber.instasearch.search.Search;
 
  import java.util.ArrayList;
+ import java.util.Arrays;
  import java.util.LinkedList;
  import java.util.List;
  import static com.borisfarber.instasearch.ui.Controller.UI_VIEW_LIMIT;
@@ -25,15 +26,16 @@
      private static final String SELECTOR = "==> ";
 
      private final ArrayList<String> searchResults = new ArrayList<>();
+     private StringBuilder builder;
      private int searchResultsCount = 0;
      public final Pair<String, Integer> selectedFilenameAndPosition =
              new Pair<>("test.txt",0);
      public int selectedSearchResultIndex = 0;
-     private String selectedLine = "";
+     private boolean isFullSearch = false;
+     private String selectedLine;
 
-     // TODO from here external ones
+     // TODO big thing, fix all search previews for non : lines
 
-     public StringBuilder builder;
 
      public ResultModel() {
 
@@ -47,16 +49,17 @@
 
      // TODO may be convert search to a field, fits the empty query
      public void selectedLineDown(Search search) {
-         if((selectedSearchResultIndex <
+
+         // TODO fix the lower limit
+         if((/*selectedSearchResultIndex <
                  (Integer.parseInt(search.getResultSetCount()) - 1))
-                 && selectedSearchResultIndex < (
-                 searchResultsCount - 1)) {
+                 &&*/ selectedSearchResultIndex < (
+                 searchResultsCount - 1))) {
              selectedSearchResultIndex++;
          }
      }
 
      public void lineSelected(String selectedText) {
-
          int index = searchResults.indexOf((selectedText + "\n"));
 
          if(index == -1) {
@@ -82,13 +85,27 @@
          selectedFilenameAndPosition.u = Integer.parseInt(position);
      }
 
-     public void setCrawl(String toString) {
-         // search finishes crawling
+     public void crawlFinished(List<String> crawlResults) {
+         isFullSearch = false;
+         searchResults.clear();
 
-         // todo add stuff to search results
+         int pageLimit = 100;
+
+         if(pageLimit > crawlResults.size()) {
+             pageLimit = crawlResults.size();
+         }
+
+         for(int i = 0 ;i < pageLimit; i++) {
+             searchResults.add(crawlResults.get(i) + "\n");
+         }
+
+         Arrays.sort(searchResults.toArray());
+         searchResultsCount = pageLimit;
      }
 
-     public void prepareResults(Search search) {
+     public void searchFinished(Search search) {
+         isFullSearch = true;
+
          int resultCount = 0;
          boolean isViewLimitReached = false;
          LinkedList<Pair<String, Integer>> locations;
@@ -130,21 +147,30 @@
          searchResultsCount = resultCount;
      }
 
-     public void updateSelection() {
+     public void generateResultView() {
          int previewLinesIndex = 0;
          builder = new StringBuilder();
          for (String str : searchResults) {
              if (previewLinesIndex == selectedSearchResultIndex) {
                  builder.append(SELECTOR).append(str);
-                 String[] parts = str.split(":");
-                 String fileName = parts[0];
-                 String position = parts[1];
 
-                 // the text line starts after 2 :s
-                 this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
+                 // todo isFillSearch == true
+                 if(str.indexOf(":") > 0) {
 
-                 selectedFilenameAndPosition.t = fileName;
-                 selectedFilenameAndPosition.u = Integer.parseInt(position);
+                     String[] parts = str.split(":");
+                     String fileName = parts[0];
+                     String position = parts[1];
+
+                     // the text line starts after 2 :s
+                     this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
+
+                     selectedFilenameAndPosition.t = fileName;
+                     selectedFilenameAndPosition.u = Integer.parseInt(position);
+                 } else {
+                     this.selectedLine = str;
+                     selectedFilenameAndPosition.t = str;
+                     selectedFilenameAndPosition.u = 0;
+                 }
              } else {
                  builder.append(str);
              }
@@ -152,7 +178,11 @@
          }
      }
 
-     public int getSelectorIndex() {
+     public String getResultView() {
+         return builder.toString();
+     }
+
+     public int getSelectionIndex() {
          return builder.toString().indexOf(SELECTOR);
      }
 

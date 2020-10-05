@@ -159,7 +159,7 @@
                  builder.append(fileName).append("\n");
              }
 
-             controller.onCrawlFinish(builder.toString());
+             controller.onCrawlFinish(allLines);
          };
          SwingUtilities.invokeLater(runnable);
      }

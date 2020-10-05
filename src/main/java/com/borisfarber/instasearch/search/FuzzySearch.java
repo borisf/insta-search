@@ -172,6 +172,10 @@
              return "";
          }
 
+         if(resultLine.indexOf(":") < 0) {
+             return resultLine;
+         }
+
          String[] parts  = resultLine.split(":");
          String fileName = parts[0];
          String line = parts[1];
@@ -243,12 +247,15 @@
      @Override
      public void emptyQuery() {
          Runnable runnable = () -> {
+             ArrayList<String> mmm = new ArrayList<>();
+
              StringBuilder builder = new StringBuilder();
              for (String fileName : filenamesToPaths.keySet()) {
                  builder.append(fileName).append("\n");
+                 mmm.add(fileName);
              }
 
-             controller.onCrawlFinish(builder.toString());
+             controller.onCrawlFinish(mmm);
          };
          SwingUtilities.invokeLater(runnable);
      }

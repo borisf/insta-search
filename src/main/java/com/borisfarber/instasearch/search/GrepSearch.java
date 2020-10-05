@@ -131,7 +131,7 @@ public class GrepSearch implements Search {
             }
 
             builder.append("...");
-            controller.onCrawlFinish(builder.toString());
+            controller.onCrawlFinish(preview.subList(0,upper));
         } catch (Exception e) {
             e.printStackTrace();
         }

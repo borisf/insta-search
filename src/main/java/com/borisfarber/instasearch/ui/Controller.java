@@ -186,21 +186,20 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    // TODO probably pass string builder
-    public void onCrawlFinish(String toString) {
-        // todo move result to result model
-        resultModel.setCrawl(toString);
-        resultTextPane.setText(toString);
+    public void onCrawlFinish(java.util.List<String> toString) {
+        resultModel.crawlFinished(toString);
+        resultModel.generateResultView();
+        resultTextPane.setText(resultModel.getResultView());
     }
 
     public void onSearchFinish() {
-        resultModel.prepareResults(search);
+        resultModel.searchFinished(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
     private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
-        resultModel.updateSelection();
-        resultTextPane.setText(resultModel.builder.toString());
+        resultModel.generateResultView();
+        resultTextPane.setText(resultModel.getResultView());
 
         if(resultModel.resultSize() > 0) {
             previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
@@ -214,7 +213,7 @@ public final class Controller implements DocumentListener {
         }
 
         try {
-            int selector = resultModel.getSelectorIndex();
+            int selector = resultModel.getSelectionIndex();
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
                 highlightResults(selector, span);
