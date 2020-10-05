@@ -11,7 +11,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.instasearch.model;
+ package com.borisfarber.instasearch.textmodels;
 
  import com.borisfarber.instasearch.search.Search;
 
@@ -19,30 +19,28 @@
  import java.util.Arrays;
  import java.util.LinkedList;
  import java.util.List;
+
  import static com.borisfarber.instasearch.ui.Controller.UI_VIEW_LIMIT;
 
  // line format: name, line num, line  and selection with ==>
  public class ResultModel {
      private static final String SELECTOR = "==> ";
-
+     private final Pair<String, Integer> selectedFilenameAndPosition =
+             new Pair<>("test.txt", 0);
      private final ArrayList<String> searchResults = new ArrayList<>();
+     public int selectedSearchResultIndex = 0;
      private StringBuilder builder;
      private int searchResultsCount = 0;
-     public final Pair<String, Integer> selectedFilenameAndPosition =
-             new Pair<>("test.txt",0);
-     public int selectedSearchResultIndex = 0;
      private boolean isFullSearch = false;
      private String selectedLine;
 
      // TODO big thing, fix all search previews for non : lines
-
-
      public ResultModel() {
 
      }
 
      public void selectedLineUp() {
-         if(selectedSearchResultIndex > 0) {
+         if (selectedSearchResultIndex > 0) {
              selectedSearchResultIndex--;
          }
      }
@@ -51,7 +49,7 @@
      public void selectedLineDown(Search search) {
 
          // TODO fix the lower limit
-         if((/*selectedSearchResultIndex <
+         if ((/*selectedSearchResultIndex <
                  (Integer.parseInt(search.getResultSetCount()) - 1))
                  &&*/ selectedSearchResultIndex < (
                  searchResultsCount - 1))) {
@@ -62,7 +60,7 @@
      public void lineSelected(String selectedText) {
          int index = searchResults.indexOf((selectedText + "\n"));
 
-         if(index == -1) {
+         if (index == -1) {
              //TODO clean up
              // hack when the ui screen is small and the selected line
              // is smaller than the result line
@@ -73,11 +71,27 @@
      }
 
      public void lineClicked(String selectedText) {
-         String[] parts  = selectedText.split(":");
+         if(selectedText.endsWith("\n")) {
+             selectedText = selectedText.substring(0, selectedText.length() - 1);
+         }
+
+         if (selectedText.indexOf(":") < 0) {
+
+             String fileName = selectedText;
+             if (selectedText.startsWith(SELECTOR)) {
+                 fileName = fileName.substring(4);
+             }
+
+             selectedFilenameAndPosition.t = fileName;
+             selectedFilenameAndPosition.u = 0;
+             return;
+         }
+
+         String[] parts = selectedText.split(":");
          String fileName = parts[0];
          String position = parts[1];
 
-         if(fileName.startsWith(SELECTOR)) {
+         if (fileName.startsWith(SELECTOR)) {
              fileName = fileName.substring(4);
          }
 
@@ -91,11 +105,11 @@
 
          int pageLimit = 100;
 
-         if(pageLimit > crawlResults.size()) {
+         if (pageLimit > crawlResults.size()) {
              pageLimit = crawlResults.size();
          }
 
-         for(int i = 0 ;i < pageLimit; i++) {
+         for (int i = 0; i < pageLimit; i++) {
              searchResults.add(crawlResults.get(i) + "\n");
          }
 
@@ -115,7 +129,7 @@
          while ((resultCount < rawResults.size()) && !isViewLimitReached) {
              String rawLine = rawResults.get(resultCount);
 
-             if(rawLine == null) {
+             if (rawLine == null) {
                  // if the UI is drawing the previous search results
                  // while the results are updated
                  return;
@@ -123,11 +137,11 @@
 
              locations = search.getFileNameAndPosition(rawLine);
 
-             for(Pair<String, Integer> location : locations) {
-                 String result = location.t + ":" + location.u +":"
+             for (Pair<String, Integer> location : locations) {
+                 String result = location.t + ":" + location.u + ":"
                          + rawLine;
 
-                 if(!rawLine.endsWith("\n")) {
+                 if (!rawLine.endsWith("\n")) {
                      // optimization GrepSearch lines come with \n
                      // don't want to change the logic there for performance
                      result += "\n";
@@ -136,7 +150,7 @@
                  searchResults.add(result);
                  resultCount++;
 
-                 if(resultCount >= UI_VIEW_LIMIT) {
+                 if (resultCount >= UI_VIEW_LIMIT) {
                      isViewLimitReached = true;
                      break;
                  }
@@ -154,8 +168,7 @@
              if (previewLinesIndex == selectedSearchResultIndex) {
                  builder.append(SELECTOR).append(str);
 
-                 // todo isFillSearch == true
-                 if(str.indexOf(":") > 0) {
+                 if (str.indexOf(":") > 0) {
 
                      String[] parts = str.split(":");
                      String fileName = parts[0];
@@ -196,5 +209,19 @@
 
      public int resultSize() {
          return searchResults.size();
+     }
+
+     public String getSelectedFilename() {
+        String result = selectedFilenameAndPosition.t;
+
+        if(result.endsWith("\n")) {
+            result = result.substring(0, result.length() - 1);
+        }
+
+         return result;
+     }
+
+     public Integer getSelectedPosition() {
+         return selectedFilenameAndPosition.u;
      }
  }

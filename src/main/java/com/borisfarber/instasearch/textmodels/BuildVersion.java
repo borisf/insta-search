@@ -11,19 +11,16 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.model;
-import java.util.Comparator;
+package com.borisfarber.instasearch.textmodels;
 
-public class SearchResultsSorter implements Comparator<String> {
-    //  "log.txt:2424:something";
+public class BuildVersion {
+    public static String getBuildVersion() {
+        String result = BuildVersion.class.getPackage().getImplementationVersion();
 
-    @Override
-    public int compare(String s1, String s2) {
-        String[] s1Parts = s1.split(":");
-        String[] s2Parts = s2.split(":");
-        if(!s1Parts[0].equals(s2Parts[0])) {
-            return s1Parts[0].compareTo(s2Parts[0]);
+        if (result == null) {
+            result = "Development Version";
         }
-        return Integer.valueOf(s1Parts[1]).compareTo(Integer.valueOf(s2Parts[1]));
+
+        return result;
     }
 }

@@ -14,7 +14,7 @@
  package com.borisfarber.instasearch.search;
 
  import com.borisfarber.instasearch.ui.Controller;
- import com.borisfarber.instasearch.model.Pair;
+ import com.borisfarber.instasearch.textmodels.Pair;
  import com.borisfarber.instasearch.filesystem.PathMatchers;
 
  import javax.swing.*;
@@ -172,13 +172,18 @@
              return "";
          }
 
-         if(resultLine.indexOf(":") < 0) {
-             return resultLine;
-         }
+         String fileName;
+         String line;
 
-         String[] parts  = resultLine.split(":");
-         String fileName = parts[0];
-         String line = parts[1];
+         if(resultLine.indexOf(":") > 0) {
+             String[] parts  = resultLine.split(":");
+             fileName = parts[0];
+             line = parts[1];
+         } else {
+             // remove the new line in the end
+             fileName = resultLine.substring(0, resultLine.length() - 1);
+             line = "0";
+         }
 
          int bline = 0;
 
@@ -212,6 +217,10 @@
 
      @Override
      public Path getPathPerFileName(String fileName) {
+         if (fileName.endsWith("/n")) {
+             return filenamesToPaths.get(fileName.substring(0, fileName.length() - 1));
+         }
+
          return filenamesToPaths.get(fileName);
      }
 

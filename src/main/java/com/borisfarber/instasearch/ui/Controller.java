@@ -14,10 +14,10 @@
 package com.borisfarber.instasearch.ui;
 
 import com.borisfarber.instasearch.filesystem.PrivateFolder;
-import com.borisfarber.instasearch.model.ResultModel;
+import com.borisfarber.instasearch.textmodels.ResultModel;
 import com.borisfarber.instasearch.search.Search;
 import com.borisfarber.instasearch.search.SearchFactory;
-import com.borisfarber.instasearch.model.Background;
+import com.borisfarber.instasearch.textmodels.Background;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -157,7 +157,8 @@ public final class Controller implements DocumentListener {
     public void onEnterPressed() {
         fullFilePreview(
                 search,
-                resultModel.selectedFilenameAndPosition,
+                resultModel.getSelectedFilename(),
+                resultModel.getSelectedPosition(),
                 previewTasksExecutor,
                 previewTextPane,
                 file);

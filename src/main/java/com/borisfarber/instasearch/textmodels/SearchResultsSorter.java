@@ -11,15 +11,19 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.model;
+package com.borisfarber.instasearch.textmodels;
+import java.util.Comparator;
 
-// value class to represent pairs data structure
-public class Pair<T, U> {
-    public T t;
-    public U u;
+public class SearchResultsSorter implements Comparator<String> {
+    //  "log.txt:2424:something";
 
-    public Pair(T t, U u) {
-        this.t= t;
-        this.u= u;
+    @Override
+    public int compare(String s1, String s2) {
+        String[] s1Parts = s1.split(":");
+        String[] s2Parts = s2.split(":");
+        if(!s1Parts[0].equals(s2Parts[0])) {
+            return s1Parts[0].compareTo(s2Parts[0]);
+        }
+        return Integer.valueOf(s1Parts[1]).compareTo(Integer.valueOf(s2Parts[1]));
     }
 }

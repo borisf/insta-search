@@ -16,7 +16,7 @@
 
 package com.borisfarber.instasearch.formats;
 
-import com.borisfarber.instasearch.model.Pair;
+import com.borisfarber.instasearch.textmodels.Pair;
 import com.borisfarber.instasearch.filesystem.PrivateFolder;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;

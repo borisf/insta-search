@@ -11,16 +11,15 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.model;
+package com.borisfarber.instasearch.textmodels;
 
-public class BuildVersion {
-    public static String getBuildVersion() {
-        String result = BuildVersion.class.getPackage().getImplementationVersion();
+// value class to represent pairs data structure
+public class Pair<T, U> {
+    public T t;
+    public U u;
 
-        if (result == null) {
-            result = "Development Version";
-        }
-
-        return result;
+    public Pair(T t, U u) {
+        this.t= t;
+        this.u= u;
     }
 }

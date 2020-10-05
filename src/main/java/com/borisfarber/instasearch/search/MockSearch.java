@@ -31,8 +31,8 @@
 package com.borisfarber.instasearch.search;
 
 import com.borisfarber.instasearch.ui.Controller;
-import com.borisfarber.instasearch.model.Pair;
-import com.borisfarber.instasearch.model.SearchResultsSorter;
+import com.borisfarber.instasearch.textmodels.Pair;
+import com.borisfarber.instasearch.textmodels.SearchResultsSorter;
 
 import java.io.File;
 import java.nio.file.Path;
