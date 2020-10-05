@@ -58,6 +58,7 @@
      }
 
      public void lineSelected(String selectedText) {
+         // TODO not sure need this, follow up
          int index = searchResults.indexOf((selectedText + "\n"));
 
          if (index == -1) {

@@ -213,7 +213,7 @@
          result.addMouseListener(popupListener);
 
          result.addMouseListener(new MouseAdapter() {
-
+             // TODO check for the new line in the end
              String previousLine = "";
 
              public void mouseClicked(MouseEvent me) {
@@ -240,6 +240,36 @@
                      controller.onMouseSingleClick(result.getSelectedText());
                      previousLine = line;
                  }
+             }
+         });
+
+         result.addKeyListener(new KeyListener() {
+             @Override
+             public void keyTyped(KeyEvent keyEvent) {
+
+             }
+
+             @Override
+             public void keyPressed(KeyEvent keyEvent) {
+                 if (keyEvent.getKeyCode() == VK_UP) {
+                     controller.onUpPressed();
+                     return;
+                 }
+
+                 if (keyEvent.getKeyCode() == VK_DOWN) {
+                     controller.onDownPressed();
+                     return;
+                 }
+
+                 if (keyEvent.getKeyCode() == VK_ENTER) {
+                     controller.onEnterPressed();
+                     return;
+                 }
+             }
+
+             @Override
+             public void keyReleased(KeyEvent keyEvent) {
+
              }
          });
 
