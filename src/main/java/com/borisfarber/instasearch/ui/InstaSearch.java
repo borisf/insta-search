@@ -229,11 +229,6 @@
                  result.select(startRow, endRow);
                  String line = result.getSelectedText();
 
-                 // TODO think of moving to ResultModel
-                 if(line.endsWith("\n")) {
-                     line = line.substring(0, line.length() - 1);
-                 }
-
                  if(line == null) {
                      return;
                  }

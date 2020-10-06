@@ -58,6 +58,11 @@
      }
 
      public void lineSelected(String selectedText) {
+         // TODO think of moving to ResultModel
+         if(selectedText.endsWith("\n")) {
+             selectedText = selectedText.substring(0, selectedText.length() - 1);
+         }
+
          // TODO not sure need this, follow up
          int index = searchResults.indexOf((selectedText + "\n"));
 
