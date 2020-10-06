@@ -209,6 +209,7 @@ public final class Controller implements DocumentListener {
 
         if(resultModel.resultSize() > 0) {
             previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
+            previewTextPane.setCaretPosition(0);
             highlightPreview();
         }
 
