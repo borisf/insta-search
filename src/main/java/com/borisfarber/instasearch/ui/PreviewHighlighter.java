@@ -20,8 +20,19 @@
  public class PreviewHighlighter {
 
      public void highlightPreview(JTextPane previewTextPane, String selectedLine, Color color) {
+         // TODO all this to result model
+         String[] parts = selectedLine.split(":");
+         String fileName = parts[0];
+         String position = parts[1];
+         selectedLine = parts[2];
+
+
          if(selectedLine.endsWith("\n\n")) {
              selectedLine = selectedLine.substring(0, selectedLine.length() - 2);
+         }
+
+         if(selectedLine.endsWith("\n")) {
+             selectedLine = selectedLine.substring(0, selectedLine.length() - 1);
          }
 
          DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
@@ -35,7 +46,7 @@
 
              if(pos == -1) {
                  // hex view in the preview, no reason to highlight
-                 //System.err.println("wrong search index");
+                 //System.out.println("here");
                  return;
              }
 

@@ -191,6 +191,7 @@ public final class Controller implements DocumentListener {
         resultModel.crawlFinished(toString);
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());
+        resultTextPane.setCaretPosition(0);
     }
 
     public void onSearchFinish() {
@@ -201,6 +202,7 @@ public final class Controller implements DocumentListener {
     private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());
+        resultTextPane.setCaretPosition(0);
 
         if(resultModel.resultSize() > 0) {
             previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
@@ -236,6 +238,7 @@ public final class Controller implements DocumentListener {
     }
 
     private void highlightPreview() {
+        // TODO somehow broken
         if(query != null) {
             previewHighlighter.highlightPreview(previewTextPane,
                     resultModel.getSelectedLine(), FOREGROUND_COLOR);
