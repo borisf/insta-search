@@ -11,7 +11,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.filesystem;
+package com.borisfarber.instasearch.contollers;
 
 import com.borisfarber.instasearch.formats.Clazz;
 import com.borisfarber.instasearch.formats.Dex;

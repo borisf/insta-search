@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.ui;
 
- import com.borisfarber.instasearch.filesystem.*;
+ import com.borisfarber.instasearch.contollers.*;
  import com.borisfarber.instasearch.textmodels.Background;
  import com.borisfarber.instasearch.textmodels.BuildVersion;
 
@@ -29,7 +29,10 @@
  public final class InstaSearch extends JFrame {
      private final Font textFont;
      private JTextField searchField;
+
+     // todo make own class with highlighter
      private JTextPane resultTextPane;
+     // todo make own class with highlighter
      private JTextPane previewTextPane;
      private JLabel resultCountLabel;
      private final JPopupMenu copyPopup = new JPopupMenu();

@@ -30,7 +30,7 @@
  */
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.ui.Controller;
+import com.borisfarber.instasearch.contollers.Controller;
 import com.borisfarber.instasearch.textmodels.Pair;
 import com.borisfarber.instasearch.textmodels.SearchResultsSorter;
 

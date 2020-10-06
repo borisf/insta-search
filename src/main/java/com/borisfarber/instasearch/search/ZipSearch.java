@@ -13,10 +13,10 @@
   */
  package com.borisfarber.instasearch.search;
 
- import com.borisfarber.instasearch.ui.Controller;
+ import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.textmodels.SearchResultsSorter;
  import com.borisfarber.instasearch.textmodels.HexDump;
- import com.borisfarber.instasearch.filesystem.PrivateFolder;
+ import com.borisfarber.instasearch.contollers.PrivateFolder;
  import com.borisfarber.instasearch.textmodels.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
@@ -88,7 +88,7 @@
          }
 
          executorService.execute(() -> {
-             // TODO rewrite
+             // TODO result model
              String fileName;
              String line;
 

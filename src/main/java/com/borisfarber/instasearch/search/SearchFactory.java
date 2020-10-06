@@ -13,9 +13,9 @@
  */
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.ui.Controller;
-import com.borisfarber.instasearch.filesystem.PathMatchers;
-import com.borisfarber.instasearch.filesystem.PrivateFolder;
+import com.borisfarber.instasearch.contollers.Controller;
+import com.borisfarber.instasearch.contollers.PathMatchers;
+import com.borisfarber.instasearch.contollers.PrivateFolder;
 
 import java.io.File;
 import java.nio.file.Path;

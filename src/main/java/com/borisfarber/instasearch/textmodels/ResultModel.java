@@ -20,7 +20,7 @@
  import java.util.LinkedList;
  import java.util.List;
 
- import static com.borisfarber.instasearch.ui.Controller.UI_VIEW_LIMIT;
+ import static com.borisfarber.instasearch.contollers.Controller.UI_VIEW_LIMIT;
 
  // line format: name, line num, line  and selection with ==>
  public class ResultModel {
@@ -106,7 +106,7 @@
          selectedFilenameAndPosition.u = Integer.parseInt(position);
      }
 
-     public void crawlFinished(List<String> crawlResults) {
+     public void setCrawlResults(List<String> crawlResults) {
          isFullSearch = false;
          searchResults.clear();
 
@@ -125,7 +125,7 @@
          searchResultsCount = pageLimit;
      }
 
-     public void searchFinished(Search search) {
+     public void setSearchResults(Search search) {
          isFullSearch = true;
 
          int resultCount = 0;

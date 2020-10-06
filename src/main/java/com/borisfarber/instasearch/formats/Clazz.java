@@ -13,7 +13,7 @@
   */
 package com.borisfarber.instasearch.formats;
 
-import com.borisfarber.instasearch.filesystem.PrivateFolder;
+import com.borisfarber.instasearch.contollers.PrivateFolder;
 import com.borisfarber.instasearch.textmodels.Pair;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;

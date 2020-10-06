@@ -11,13 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.borisfarber.instasearch.ui;
+package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.filesystem.PrivateFolder;
 import com.borisfarber.instasearch.textmodels.ResultModel;
 import com.borisfarber.instasearch.search.Search;
 import com.borisfarber.instasearch.search.SearchFactory;
 import com.borisfarber.instasearch.textmodels.Background;
+import com.borisfarber.instasearch.ui.PreviewHighlighter;
+import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -29,7 +30,7 @@ import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.borisfarber.instasearch.filesystem.FullFilePreview.fullFilePreview;
+import static com.borisfarber.instasearch.contollers.FullFilePreview.fullFilePreview;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 
 public final class Controller implements DocumentListener {
@@ -187,15 +188,15 @@ public final class Controller implements DocumentListener {
         }
     }
 
-    public void onCrawlFinish(java.util.List<String> toString) {
-        resultModel.crawlFinished(toString);
+    public void onCrawlFinish(java.util.List<String> crawlResults) {
+        resultModel.setCrawlResults(crawlResults);
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());
         resultTextPane.setCaretPosition(0);
     }
 
     public void onSearchFinish() {
-        resultModel.searchFinished(search);
+        resultModel.setSearchResults(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
@@ -206,6 +207,7 @@ public final class Controller implements DocumentListener {
 
         if(resultModel.resultSize() > 0) {
             // todo should be previewTextPane.setText(search.getPreview(resultModel.getPreviewLine()));
+            // TODO preview on files doesn't work with fuzzy search
             previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
             highlightPreview();
         }

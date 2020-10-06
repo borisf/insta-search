@@ -30,10 +30,10 @@
  */
 package com.borisfarber.instasearch.search;
 
-import com.borisfarber.instasearch.filesystem.*;
+import com.borisfarber.instasearch.contollers.*;
 import com.borisfarber.instasearch.textmodels.Pair;
 import com.borisfarber.instasearch.textmodels.SearchResultsSorter;
-import com.borisfarber.instasearch.ui.Controller;
+import com.borisfarber.instasearch.contollers.Controller;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -328,6 +328,7 @@ public class GrepSearch implements Search {
 
         executorService.execute(() -> {
             try {
+                // TODO move to result model
                 String[] parts  = resultLine.split(":");
                 String lineNum = parts[1];
                 int lineNumInt = Integer.parseInt(lineNum);
@@ -356,9 +357,7 @@ public class GrepSearch implements Search {
 
                 String result =  builder.toString();
 
-                Runnable runnable = () -> {
-                    controller.onUpdatePreview(result);
-                };
+                Runnable runnable = () -> controller.onUpdatePreview(result);
 
                 SwingUtilities.invokeLater(runnable);
             } catch (IOException e) {
