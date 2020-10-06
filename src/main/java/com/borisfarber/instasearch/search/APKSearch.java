@@ -45,16 +45,28 @@ public class APKSearch extends ZipSearch {
         }
 
         executorService.execute(() -> {
-            // TODO fix here for file names
-            String[] parts = resultLine.split(":");
-            String fileName = parts[0];
-            String line = parts[2];
+
+            String fileName;
+            String line;
+
+            // TODO think of removing the double line
+            if(resultLine.indexOf(":") > 0) {
+                String[] parts = resultLine.split(":");
+                fileName = parts[0];
+                line = parts[2];
+            } else {
+                fileName = line = resultLine;
+            }
 
             String nLine = line;
 
             // remove the new line in the end
             if (nLine.endsWith("\n")) {
                 nLine = nLine.substring(0, nLine.length() - 1);
+            }
+
+            if (fileName.endsWith("\n")) {
+                fileName = fileName.substring(0, fileName.length() - 1);
             }
 
             byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
