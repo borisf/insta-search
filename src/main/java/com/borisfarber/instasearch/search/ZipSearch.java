@@ -88,9 +88,17 @@
          }
 
          executorService.execute(() -> {
-             String[] parts  = resultLine.split(":");
-             String fileName = parts[0];
-             String line = parts[2];
+             // TODO rewrite
+             String fileName;
+             String line;
+
+             if(resultLine.indexOf(":") > 0) {
+                 String[] parts  = resultLine.split(":");
+                 fileName = parts[0];
+                 line = parts[2];
+             } else {
+                 fileName = line = resultLine;
+             }
 
              String nLine = line;
 
@@ -111,9 +119,7 @@
                      HexDump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
                      "\n...\n";
 
-             Runnable runnable = () -> {
-                 controller.onUpdatePreview(result);
-             };
+             Runnable runnable = () -> controller.onUpdatePreview(result);
 
              SwingUtilities.invokeLater(runnable);
          });

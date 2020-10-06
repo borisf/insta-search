@@ -104,7 +104,8 @@
          isFullSearch = false;
          searchResults.clear();
 
-         int pageLimit = 100;
+         // TODO paginator
+         int pageLimit = 1000;
 
          if (pageLimit > crawlResults.size()) {
              pageLimit = crawlResults.size();
