@@ -208,8 +208,6 @@ public final class Controller implements DocumentListener {
         resultTextPane.setCaretPosition(0);
 
         if(resultModel.resultSize() > 0) {
-            // todo should be previewTextPane.setText(search.getPreview(resultModel.getPreviewLine()));
-            // TODO preview on files doesn't work with fuzzy search
             previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
             highlightPreview();
         }

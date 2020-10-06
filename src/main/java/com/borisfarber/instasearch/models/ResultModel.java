@@ -234,12 +234,6 @@
          return selectedFilenameAndPosition.u;
      }
 
-     public static String fromUItoText(String UIText) {
-
-
-         return "";
-     }
-
      // todo clean up, more cases with ':'s in such as time stamps
      public String getPreviewLine() {
          String previewLine = getSelectedLine();

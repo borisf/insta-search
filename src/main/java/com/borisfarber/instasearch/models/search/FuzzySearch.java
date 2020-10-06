@@ -180,6 +180,8 @@
              fileName = parts[0];
              line = parts[1];
          } else {
+             // todo stopped here doesn't work for file names, no need to go -7
+             // todo do a boolean with condition
              // remove the new line in the end
              fileName = resultLine.substring(0, resultLine.length() - 1);
              line = "0";
