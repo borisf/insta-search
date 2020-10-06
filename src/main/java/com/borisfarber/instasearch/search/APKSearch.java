@@ -45,7 +45,6 @@ public class APKSearch extends ZipSearch {
         }
 
         executorService.execute(() -> {
-
             String fileName;
             String line;
 

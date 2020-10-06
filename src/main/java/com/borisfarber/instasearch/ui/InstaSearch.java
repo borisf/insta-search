@@ -213,7 +213,6 @@
          result.addMouseListener(popupListener);
 
          result.addMouseListener(new MouseAdapter() {
-             // TODO check for the new line in the end
              String previousLine = "";
 
              public void mouseClicked(MouseEvent me) {
@@ -229,6 +228,11 @@
                  int endRow = result.viewToModel2D(new Point(result.getWidth(), rect.y));
                  result.select(startRow, endRow);
                  String line = result.getSelectedText();
+
+                 // TODO think of moving to ResultModel
+                 if(line.endsWith("\n")) {
+                     line = line.substring(0, line.length() - 1);
+                 }
 
                  if(line == null) {
                      return;

@@ -226,4 +226,10 @@
      public Integer getSelectedPosition() {
          return selectedFilenameAndPosition.u;
      }
+
+     public static String fromUItoText(String UIText) {
+
+
+         return "";
+     }
  }
