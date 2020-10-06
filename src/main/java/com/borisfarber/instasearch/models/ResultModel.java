@@ -14,6 +14,7 @@
  package com.borisfarber.instasearch.models;
 
  import com.borisfarber.instasearch.models.search.Search;
+ import com.borisfarber.instasearch.models.text.Background;
 
  import java.util.ArrayList;
  import java.util.Arrays;
@@ -263,5 +264,42 @@
          }
 
         return previewLine;
+     }
+
+     public static Pair<String, String> getFileNameLineNoNewLine(String from) {
+         String fileName;
+         String line;
+
+         if(from.indexOf(":") > 0) {
+             String[] parts = from.split(":");
+             fileName = parts[0];
+             line = parts[2];
+         } else {
+             fileName = line = from;
+         }
+
+         // remove the new line in the end
+         if (line.endsWith("\n")) {
+             line = line.substring(0, line.length() - 1);
+         }
+
+         if (fileName.endsWith("\n")) {
+             fileName = fileName.substring(0, fileName.length() - 1);
+         }
+
+         Pair<String, String> result = new Pair<>(fileName, line);
+         return result;
+     }
+
+     public static int getLineNumber(String resultLine) {
+         String[] parts  = resultLine.split(":");
+         String lineNum = parts[1];
+         int lineNumInt = Integer.parseInt(lineNum);
+
+         return lineNumInt;
+     }
+
+     public String getBackground() {
+        return Background.INTRO;
      }
  }

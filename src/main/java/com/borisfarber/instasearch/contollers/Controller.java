@@ -65,6 +65,8 @@ public final class Controller implements DocumentListener {
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
         this.previewHighlighter = new PreviewHighlighter();
         this.resultModel = new ResultModel();
+
+        this.resultTextPane.setText(resultModel.getBackground());
     }
 
     public void onFileOpened(File newFile) {

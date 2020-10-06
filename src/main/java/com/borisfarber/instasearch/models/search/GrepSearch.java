@@ -32,6 +32,7 @@ package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.*;
 import com.borisfarber.instasearch.models.Pair;
+import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 import com.borisfarber.instasearch.contollers.Controller;
 import com.jramoyo.io.IndexedFileReader;
@@ -296,6 +297,7 @@ public class GrepSearch implements Search {
             return new LinkedList<>();
         }
 
+        // TODO new line to result model
         String strkey = line.substring(0, line.length() - 1);
         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
 
@@ -328,10 +330,7 @@ public class GrepSearch implements Search {
 
         executorService.execute(() -> {
             try {
-                // TODO move to result model
-                String[] parts  = resultLine.split(":");
-                String lineNum = parts[1];
-                int lineNumInt = Integer.parseInt(lineNum);
+                int lineNumInt = ResultModel.getLineNumber(resultLine);
 
                 int lowerBound = lineNumInt - 7;
                 if(lowerBound < 1) {

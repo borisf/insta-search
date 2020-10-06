@@ -14,7 +14,6 @@
  package com.borisfarber.instasearch.ui;
 
  import com.borisfarber.instasearch.contollers.*;
- import com.borisfarber.instasearch.models.text.Background;
  import com.borisfarber.instasearch.models.text.BuildVersion;
 
  import javax.swing.*;
@@ -202,7 +201,6 @@
          result.setFont(textFont);
          result.setBackground(BACKGROUND_COLOR);
          result.setForeground(FOREGROUND_COLOR);
-         result.setText(Background.INTRO);
          result.setDragEnabled(true);
          result.setTransferHandler(new FileDragAndDrop(this));
          result.setEditable(false);

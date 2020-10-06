@@ -14,6 +14,7 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.models.ResultModel;
  import com.borisfarber.instasearch.models.text.SearchResultsSorter;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
@@ -88,24 +89,9 @@
          }
 
          executorService.execute(() -> {
-             // TODO result model
-             String fileName;
-             String line;
-
-             if(resultLine.indexOf(":") > 0) {
-                 String[] parts  = resultLine.split(":");
-                 fileName = parts[0];
-                 line = parts[2];
-             } else {
-                 fileName = line = resultLine;
-             }
-
+             Pair<String, String> pair = ResultModel.getFileNameLineNoNewLine(resultLine);
+             String line = pair.u;
              String nLine = line;
-
-             // remove the new line in the end
-             if(nLine.endsWith("\n")) {
-                 nLine = nLine.substring(0, nLine.length() - 1);
-             }
 
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
              int headerSize = bytes.length;
