@@ -14,8 +14,8 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.models.SearchResultsSorter;
- import com.borisfarber.instasearch.models.HexDump;
+ import com.borisfarber.instasearch.models.text.SearchResultsSorter;
+ import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
  import com.borisfarber.instasearch.models.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;

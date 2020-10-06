@@ -16,7 +16,7 @@ package com.borisfarber.instasearch.contollers;
 import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.search.Search;
 import com.borisfarber.instasearch.models.search.SearchFactory;
-import com.borisfarber.instasearch.models.Background;
+import com.borisfarber.instasearch.models.text.Background;
 import com.borisfarber.instasearch.ui.PreviewHighlighter;
 import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
@@ -189,14 +189,14 @@ public final class Controller implements DocumentListener {
     }
 
     public void onCrawlFinish(java.util.List<String> crawlResults) {
-        resultModel.setCrawlResults(crawlResults);
+        resultModel.fillCrawlResults(crawlResults);
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());
         resultTextPane.setCaretPosition(0);
     }
 
     public void onSearchFinish() {
-        resultModel.setSearchResults(search);
+        resultModel.fillSearchResults(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 

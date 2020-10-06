@@ -18,7 +18,7 @@ package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.models.formats.BinaryXml;
 import com.borisfarber.instasearch.contollers.Controller;
-import com.borisfarber.instasearch.models.HexDump;
+import com.borisfarber.instasearch.models.text.HexDump;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;

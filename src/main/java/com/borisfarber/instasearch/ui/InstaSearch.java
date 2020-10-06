@@ -14,8 +14,8 @@
  package com.borisfarber.instasearch.ui;
 
  import com.borisfarber.instasearch.contollers.*;
- import com.borisfarber.instasearch.models.Background;
- import com.borisfarber.instasearch.models.BuildVersion;
+ import com.borisfarber.instasearch.models.text.Background;
+ import com.borisfarber.instasearch.models.text.BuildVersion;
 
  import javax.swing.*;
  import javax.swing.text.BadLocationException;

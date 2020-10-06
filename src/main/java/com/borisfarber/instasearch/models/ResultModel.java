@@ -106,7 +106,7 @@
          selectedFilenameAndPosition.u = Integer.parseInt(position);
      }
 
-     public void setCrawlResults(List<String> crawlResults) {
+     public void fillCrawlResults(List<String> crawlResults) {
          isFullSearch = false;
          searchResults.clear();
 
@@ -125,7 +125,7 @@
          searchResultsCount = pageLimit;
      }
 
-     public void setSearchResults(Search search) {
+     public void fillSearchResults(Search search) {
          isFullSearch = true;
 
          int resultCount = 0;
