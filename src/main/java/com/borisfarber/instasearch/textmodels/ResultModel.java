@@ -34,6 +34,7 @@
      private boolean isFullSearch = false;
      private String selectedLine;
 
+     // todo clean up and add tests
      // TODO big thing, fix all search previews for non : lines
      public ResultModel() {
 
@@ -236,5 +237,31 @@
 
 
          return "";
+     }
+
+     // todo clean up, more cases with ':'s in such as time stamps
+     public String getPreviewLine() {
+         String previewLine = getSelectedLine();
+
+         if(getSelectedLine().indexOf(":") <0 ) {
+             return getSelectedLine();
+         }
+
+
+         String[] parts = previewLine.split(":");
+         String fileName = parts[0];
+         String position = parts[1];
+         previewLine = parts[2];
+
+
+         if(previewLine.endsWith("\n\n")) {
+             previewLine = previewLine.substring(0, previewLine.length() - 2);
+         }
+
+         if(previewLine.endsWith("\n")) {
+             previewLine = previewLine.substring(0, previewLine.length() - 1);
+         }
+
+        return previewLine;
      }
  }

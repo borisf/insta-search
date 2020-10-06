@@ -205,6 +205,7 @@ public final class Controller implements DocumentListener {
         resultTextPane.setCaretPosition(0);
 
         if(resultModel.resultSize() > 0) {
+            // todo should be previewTextPane.setText(search.getPreview(resultModel.getPreviewLine()));
             previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
             highlightPreview();
         }
@@ -238,10 +239,9 @@ public final class Controller implements DocumentListener {
     }
 
     private void highlightPreview() {
-        // TODO somehow broken
         if(query != null) {
             previewHighlighter.highlightPreview(previewTextPane,
-                    resultModel.getSelectedLine(), FOREGROUND_COLOR);
+                    resultModel.getPreviewLine(), FOREGROUND_COLOR);
         }
     }
 

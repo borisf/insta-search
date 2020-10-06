@@ -48,7 +48,7 @@ public class APKSearch extends ZipSearch {
             String fileName;
             String line;
 
-            // TODO think of removing the double line
+            // TODO move to ResultModel
             if(resultLine.indexOf(":") > 0) {
                 String[] parts = resultLine.split(":");
                 fileName = parts[0];
