@@ -13,10 +13,10 @@
   */
 package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.Dex;
-import com.borisfarber.instasearch.search.Search;
-import com.borisfarber.instasearch.textmodels.Pair;
+import com.borisfarber.instasearch.models.formats.Clazz;
+import com.borisfarber.instasearch.models.formats.Dex;
+import com.borisfarber.instasearch.models.search.Search;
+import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.ui.HexPanel;
 import dorkbox.notify.Notify;
 import dorkbox.notify.Pos;

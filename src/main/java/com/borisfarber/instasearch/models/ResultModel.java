@@ -11,9 +11,9 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.instasearch.textmodels;
+ package com.borisfarber.instasearch.models;
 
- import com.borisfarber.instasearch.search.Search;
+ import com.borisfarber.instasearch.models.search.Search;
 
  import java.util.ArrayList;
  import java.util.Arrays;

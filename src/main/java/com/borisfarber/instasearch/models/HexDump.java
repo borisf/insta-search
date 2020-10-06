@@ -12,7 +12,7 @@
   * limitations under the License.
   */
 
-package com.borisfarber.instasearch.textmodels;
+package com.borisfarber.instasearch.models;
 /**
  * Utility class for generating hexdumps from byte arrays. Mostly for debugging purposes.
  */

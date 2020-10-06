@@ -28,11 +28,11 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.borisfarber.instasearch.search;
+package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.Controller;
-import com.borisfarber.instasearch.textmodels.Pair;
-import com.borisfarber.instasearch.textmodels.SearchResultsSorter;
+import com.borisfarber.instasearch.models.Pair;
+import com.borisfarber.instasearch.models.SearchResultsSorter;
 
 import java.io.File;
 import java.nio.file.Path;

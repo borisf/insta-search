@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.borisfarber.instasearch.search;
+package com.borisfarber.instasearch.models.search;
 
-import com.borisfarber.instasearch.formats.BinaryXml;
+import com.borisfarber.instasearch.models.formats.BinaryXml;
 import com.borisfarber.instasearch.contollers.Controller;
-import com.borisfarber.instasearch.textmodels.HexDump;
+import com.borisfarber.instasearch.models.HexDump;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;

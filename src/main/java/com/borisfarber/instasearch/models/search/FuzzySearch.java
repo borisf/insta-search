@@ -11,10 +11,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.instasearch.search;
+ package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.textmodels.Pair;
+ import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
 
  import javax.swing.*;

@@ -1,6 +1,6 @@
-package com.borisfarber.instasearch.search;
+package com.borisfarber.instasearch.models.search;
 
-import com.borisfarber.instasearch.textmodels.Pair;
+import com.borisfarber.instasearch.models.Pair;
 
 import java.io.File;
 import java.nio.file.Path;

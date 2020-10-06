@@ -11,13 +11,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.instasearch.search;
+ package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.textmodels.SearchResultsSorter;
- import com.borisfarber.instasearch.textmodels.HexDump;
+ import com.borisfarber.instasearch.models.SearchResultsSorter;
+ import com.borisfarber.instasearch.models.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
- import com.borisfarber.instasearch.textmodels.Pair;
+ import com.borisfarber.instasearch.models.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 

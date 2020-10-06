@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.borisfarber.instasearch.formats;
+package com.borisfarber.instasearch.models.formats;
 
-import com.borisfarber.instasearch.textmodels.Pair;
+import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.contollers.PrivateFolder;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;

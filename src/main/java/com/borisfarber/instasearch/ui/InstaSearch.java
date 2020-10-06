@@ -14,8 +14,8 @@
  package com.borisfarber.instasearch.ui;
 
  import com.borisfarber.instasearch.contollers.*;
- import com.borisfarber.instasearch.textmodels.Background;
- import com.borisfarber.instasearch.textmodels.BuildVersion;
+ import com.borisfarber.instasearch.models.Background;
+ import com.borisfarber.instasearch.models.BuildVersion;
 
  import javax.swing.*;
  import javax.swing.text.BadLocationException;
@@ -30,9 +30,7 @@
      private final Font textFont;
      private JTextField searchField;
 
-     // todo make own class with highlighter
      private JTextPane resultTextPane;
-     // todo make own class with highlighter
      private JTextPane previewTextPane;
      private JLabel resultCountLabel;
      private final JPopupMenu copyPopup = new JPopupMenu();
