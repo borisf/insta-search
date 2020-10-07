@@ -175,7 +175,7 @@
 
          boolean isFileInternals = true;
 
-         Pair<String, String> previewData = ResultPresentation.getFileNameLineNoNewLine(resultLine);
+         Pair<String, String> previewData = ResultPresentation.extractFilenameAndLineNumber(resultLine);
          String fileName = previewData.t;
          String line = previewData.u;
 

@@ -246,7 +246,9 @@ public final class Controller implements DocumentListener {
     private void highlightPreview() {
         if(query != null) {
             previewHighlighter.highlightPreview(previewTextPane,
-                    resultPresentation.getPreviewLineNoNewLine(), FOREGROUND_COLOR);
+                    ResultPresentation.extractPreviewLine(
+                            resultPresentation.getSelectedLine()),
+                    FOREGROUND_COLOR);
         }
     }
 

@@ -330,7 +330,7 @@ public class GrepSearch implements Search {
 
         executorService.execute(() -> {
             try {
-                int lineNumInt = ResultPresentation.getLineNumber(resultLine);
+                int lineNumInt = ResultPresentation.extractLineNumber(resultLine);
 
                 int lowerBound = lineNumInt - 7;
                 if(lowerBound < 1) {

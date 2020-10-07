@@ -47,7 +47,7 @@ public class APKSearch extends ZipSearch {
         }
 
         executorService.execute(() -> {
-            Pair<String, String> pair = ResultPresentation.getFileNameLineNoNewLine(resultLine);
+            Pair<String, String> pair = ResultPresentation.extractFilenameAndLineNumber(resultLine);
 
             String fileName = pair.t;
             byte[] bytes = ZipUtil.unpackEntry(zipFile, fileName);

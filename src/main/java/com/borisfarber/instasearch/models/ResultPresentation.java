@@ -237,39 +237,13 @@
          return exportedFileAndLineIndex.u;
      }
 
-     // todo clean up, more cases with ':'s in such as time stamps
-     public String getPreviewLineNoNewLine() {
-         String previewLine = getSelectedLine();
-
-         if(getSelectedLine().indexOf(":") <0 ) {
-             return getSelectedLine();
-         }
-
-         String[] parts = previewLine.split(":");
-         String fileName = parts[0];
-         String position = parts[1];
-         previewLine = parts[2];
-
-
-         if(previewLine.endsWith("\n\n")) {
-             previewLine = previewLine.substring(0, previewLine.length() - 2);
-         }
-
-         if(previewLine.endsWith("\n")) {
-             previewLine = previewLine.substring(0, previewLine.length() - 1);
-         }
-
-         return previewLine;
-     }
-
-     // TODO only for ZIP - need to rething the line as shows double entries
-     public static String getPreviewLineFromSelectedLineNoNewLine(String from) {
+     public static String extractPreviewLine(String line) {
          String result;
-         if(from.indexOf(":") > 0) {
-             String[] parts = from.split(":");
+         if(line.indexOf(":") > 0) {
+             String[] parts = line.split(":");
              result = parts[2];
          } else {
-             result = from;
+             result = line;
          }
 
          // remove the new line in the end
@@ -280,41 +254,41 @@
          return result;
      }
 
-     public static Pair<String, String> getFileNameLineNoNewLine(String from) {
-         String fileName;
-         String line;
+     public static int extractLineNumber(String line) {
+         int lineNumInt = 0;
 
-         if(from.indexOf(":") > 0) {
-             String[] parts = from.split(":");
+         if(line.indexOf(":") > 0) {
+             String[] parts  = line.split(":");
+             String lineNum = parts[1];
+             lineNumInt = Integer.parseInt(lineNum);
+         }
+
+         return lineNumInt;
+     }
+
+     public static Pair<String, String> extractFilenameAndLineNumber(String line) {
+         String fileName;
+         String lineNumber;
+
+         if(line.indexOf(":") > 0) {
+             String[] parts = line.split(":");
              fileName = parts[0];
-             line = parts[1];
+             lineNumber = parts[1];
          } else {
-             fileName = from;
-             line = "0";
+             fileName = line;
+             lineNumber = "0";
          }
 
          // remove the new line in the end
-         if (line.endsWith("\n")) {
-             line = line.substring(0, line.length() - 1);
+         if (lineNumber.endsWith("\n")) {
+             lineNumber = lineNumber.substring(0, lineNumber.length() - 1);
          }
 
          if (fileName.endsWith("\n")) {
              fileName = fileName.substring(0, fileName.length() - 1);
          }
 
-         Pair<String, String> result = new Pair<>(fileName, line);
+         Pair<String, String> result = new Pair<>(fileName, lineNumber);
          return result;
-     }
-
-     public static int getLineNumber(String resultLine) {
-         int lineNumInt = 0;
-
-         if(resultLine.indexOf(":") > 0) {
-             String[] parts  = resultLine.split(":");
-             String lineNum = parts[1];
-             lineNumInt = Integer.parseInt(lineNum);
-         }
-
-         return lineNumInt;
      }
  }
