@@ -88,8 +88,15 @@
              locations = search.getFileNameAndPosition(rawLine);
 
              for (Pair<String, Integer> location : locations) {
-                 String result = location.t + ":" + location.u + ":"
-                         + rawLine;
+
+                 String result = "";
+                 // TODO nice constant for -1 in Search interface
+                 if(location.u != -1) {
+                     result = location.t + ":" + location.u + ":"
+                             + rawLine;
+                 } else {
+                     result = rawLine;
+                 }
 
                  if (!rawLine.endsWith("\n")) {
                      // optimization GrepSearch lines come with \n
@@ -104,6 +111,7 @@
                      isViewLimitReached = true;
                      break;
                  }
+
              }
          }
 

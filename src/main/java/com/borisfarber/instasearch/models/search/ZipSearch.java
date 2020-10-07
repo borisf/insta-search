@@ -72,7 +72,8 @@
          // may be to add mapping to simple file names, not sure
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         Pair<String, Integer> pair = new Pair<>(line, 0);
+         // todo nice constant in Search
+         Pair<String, Integer> pair = new Pair<>(line, -1);
          result.add(pair);
          return result;
      }
@@ -155,7 +156,7 @@
 
      @Override
      public Comparator<String> getResultsSorter() {
-         return new SearchResultsSorter();
+         return (s, t1) -> 1;
      }
 
      public static void main(String[] args) {
