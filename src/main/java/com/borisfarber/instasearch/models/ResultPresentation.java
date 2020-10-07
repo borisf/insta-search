@@ -23,95 +23,38 @@
 
  import static com.borisfarber.instasearch.contollers.Controller.UI_VIEW_LIMIT;
 
- // line format: name, line num, line  and selection with ==>
- public class ResultModel {
+ public class ResultPresentation {
      private static final String SELECTOR = "==> ";
-     private final Pair<String, Integer> selectedFilenameAndPosition =
-             new Pair<>("test.txt", 0);
-     private final ArrayList<String> searchResults = new ArrayList<>();
-     public int selectedSearchResultIndex = 0;
-     private StringBuilder builder;
+
+     // search results, always end with new line
+     private final ArrayList<String> searchResults;
+
+     // diff from search size because files might have duplicate lines
      private int searchResultsCount = 0;
-     private boolean isFullSearch = false;
-     private String selectedLine;
 
-     // todo clean up and add tests
-     // TODO big thing, fix all search previews for non : lines
-     public ResultModel() {
+     // inner presentation
+     private StringBuilder presentation;
 
+     // selection
+     private int selectedLineIndex = 0;
+
+     // export
+     private  Pair<String, Integer> exportedFileAndLineIndex;
+
+     public ResultPresentation() {
+         this.searchResults = new ArrayList<>();
+         this.exportedFileAndLineIndex =
+                 new Pair<>("test.txt", 0);
      }
 
-     public void selectedLineUp() {
-         if (selectedSearchResultIndex > 0) {
-             selectedSearchResultIndex--;
-         }
+     public String getBackground() {
+         return Background.INTRO;
      }
 
-     // TODO may be convert search to a field, fits the empty query
-     public void selectedLineDown(Search search) {
-
-         // TODO fix the lower limit
-         if ((/*selectedSearchResultIndex <
-                 (Integer.parseInt(search.getResultSetCount()) - 1))
-                 &&*/ selectedSearchResultIndex < (
-                 searchResultsCount - 1))) {
-             selectedSearchResultIndex++;
-         }
-     }
-
-     public void lineSelected(String selectedText) {
-         // TODO think of moving to ResultModel
-         if(selectedText.endsWith("\n")) {
-             selectedText = selectedText.substring(0, selectedText.length() - 1);
-         }
-
-         // TODO not sure need this, follow up
-         int index = searchResults.indexOf((selectedText + "\n"));
-
-         if (index == -1) {
-             //TODO clean up
-             // hack when the ui screen is small and the selected line
-             // is smaller than the result line
-             return;
-         }
-
-         selectedSearchResultIndex = index;
-     }
-
-     public void lineClicked(String selectedText) {
-         if(selectedText.endsWith("\n")) {
-             selectedText = selectedText.substring(0, selectedText.length() - 1);
-         }
-
-         if (selectedText.indexOf(":") < 0) {
-
-             String fileName = selectedText;
-             if (selectedText.startsWith(SELECTOR)) {
-                 fileName = fileName.substring(4);
-             }
-
-             selectedFilenameAndPosition.t = fileName;
-             selectedFilenameAndPosition.u = 0;
-             return;
-         }
-
-         String[] parts = selectedText.split(":");
-         String fileName = parts[0];
-         String position = parts[1];
-
-         if (fileName.startsWith(SELECTOR)) {
-             fileName = fileName.substring(4);
-         }
-
-         selectedFilenameAndPosition.t = fileName;
-         selectedFilenameAndPosition.u = Integer.parseInt(position);
-     }
-
-     public void fillCrawlResults(List<String> crawlResults) {
-         isFullSearch = false;
+     public void fillFilenameResults(List<String> crawlResults) {
          searchResults.clear();
 
-         // TODO paginator
+         // paginator
          int pageLimit = 1000;
 
          if (pageLimit > crawlResults.size()) {
@@ -127,8 +70,6 @@
      }
 
      public void fillSearchResults(Search search) {
-         isFullSearch = true;
-
          int resultCount = 0;
          boolean isViewLimitReached = false;
          LinkedList<Pair<String, Integer>> locations;
@@ -170,12 +111,18 @@
          searchResultsCount = resultCount;
      }
 
+     public int getResultCount() {
+         return searchResultsCount;
+     }
+
      public void generateResultView() {
          int previewLinesIndex = 0;
-         builder = new StringBuilder();
+         presentation = new StringBuilder();
          for (String str : searchResults) {
-             if (previewLinesIndex == selectedSearchResultIndex) {
-                 builder.append(SELECTOR).append(str);
+             if (previewLinesIndex == selectedLineIndex) {
+                 presentation.append(SELECTOR).append(str);
+
+                 // TODO - move to export line
 
                  if (str.indexOf(":") > 0) {
 
@@ -184,59 +131,110 @@
                      String position = parts[1];
 
                      // the text line starts after 2 :s
-                     this.selectedLine = str.substring(parts[0].length() + parts[1].length() + 2);
-
-                     selectedFilenameAndPosition.t = fileName;
-                     selectedFilenameAndPosition.u = Integer.parseInt(position);
+                     exportedFileAndLineIndex.t = fileName;
+                     exportedFileAndLineIndex.u = Integer.parseInt(position);
                  } else {
-                     this.selectedLine = str;
-                     selectedFilenameAndPosition.t = str;
-                     selectedFilenameAndPosition.u = 0;
+                     exportedFileAndLineIndex.t = str;
+                     exportedFileAndLineIndex.u = 0;
                  }
              } else {
-                 builder.append(str);
+                 presentation.append(str);
              }
              previewLinesIndex++;
          }
      }
 
      public String getResultView() {
-         return builder.toString();
+         return presentation.toString();
      }
 
-     public int getSelectionIndex() {
-         return builder.toString().indexOf(SELECTOR);
+     public void resetSelectedLine() {
+         selectedLineIndex = 0;
+     }
+
+     public void increaseSelectedLine() {
+         if (selectedLineIndex > 0) {
+             selectedLineIndex--;
+         }
+     }
+
+     public void decreaseSelectedLine(Search search) {
+         // TODO may be convert search to a field, fits the empty query
+         // TODO fix the lower limit
+         if ((/*selectedSearchResultIndex <
+                 (Integer.parseInt(search.getResultSetCount()) - 1))
+                 &&*/ selectedLineIndex < (
+                 searchResultsCount - 1))) {
+             selectedLineIndex++;
+         }
+     }
+
+     public void setSelectedLine(String line) {
+         // what comes from mouse click has no new line in the end
+         int index = line.endsWith("\n") ?
+                 searchResults.indexOf(line) : searchResults.indexOf((line + "\n"));
+
+         if (index == -1) {
+             // hack when the ui screen is small and the selected line
+             // is smaller than the result line
+             return;
+         }
+
+         selectedLineIndex = index;
      }
 
      public String getSelectedLine() {
-         if(selectedSearchResultIndex >= searchResults.size()) {
-            // for zip dummy dirs
-            return "";
+         if(selectedLineIndex >= searchResults.size()) {
+             // for zip dummy dirs
+             return "";
          }
 
-         return searchResults.get(selectedSearchResultIndex);
+         return searchResults.get(selectedLineIndex);
      }
 
-     public int getResultCount() {
-         return searchResultsCount;
+     public int getSelectionIndex() {
+         return presentation.toString().indexOf(SELECTOR);
      }
 
-     public int resultSize() {
-         return searchResults.size();
+     public void exportLine(String line) {
+         if(line.endsWith("\n")) {
+             line = line.substring(0, line.length() - 1);
+         }
+
+         if (line.indexOf(":") < 0) {
+             String fileName = line;
+             if (line.startsWith(SELECTOR)) {
+                 fileName = fileName.substring(4);
+             }
+
+             exportedFileAndLineIndex.t = fileName;
+             exportedFileAndLineIndex.u = 0;
+         } else {
+             String[] parts = line.split(":");
+             String fileName = parts[0];
+             String index = parts[1];
+
+             if (fileName.startsWith(SELECTOR)) {
+                 fileName = fileName.substring(4);
+             }
+
+             exportedFileAndLineIndex.t = fileName;
+             exportedFileAndLineIndex.u = Integer.parseInt(index);
+         }
      }
 
-     public String getSelectedFilename() {
-        String result = selectedFilenameAndPosition.t;
+     public String getExportedFilename() {
+         String result = exportedFileAndLineIndex.t;
 
-        if(result.endsWith("\n")) {
-            result = result.substring(0, result.length() - 1);
-        }
+         if(result.endsWith("\n")) {
+             result = result.substring(0, result.length() - 1);
+         }
 
          return result;
      }
 
-     public Integer getSelectedPosition() {
-         return selectedFilenameAndPosition.u;
+     public Integer getExportedLineIndex() {
+         return exportedFileAndLineIndex.u;
      }
 
      // todo clean up, more cases with ':'s in such as time stamps
@@ -261,10 +259,10 @@
              previewLine = previewLine.substring(0, previewLine.length() - 1);
          }
 
-        return previewLine;
+         return previewLine;
      }
 
-     // TODO for ZIP - need to rething the line
+     // TODO only for ZIP - need to rething the line as shows double entries
      public static String getPreviewLineFromSelectedLineNoNewLine(String from) {
          String result;
          if(from.indexOf(":") > 0) {
@@ -318,9 +316,5 @@
          }
 
          return lineNumInt;
-     }
-
-     public String getBackground() {
-        return Background.INTRO;
      }
  }

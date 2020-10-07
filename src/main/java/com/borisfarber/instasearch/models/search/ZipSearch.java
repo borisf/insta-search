@@ -14,7 +14,7 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.models.ResultModel;
+ import com.borisfarber.instasearch.models.ResultPresentation;
  import com.borisfarber.instasearch.models.text.SearchResultsSorter;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
@@ -89,7 +89,7 @@
          }
 
          executorService.execute(() -> {
-             String nLine  = ResultModel.getPreviewLineFromSelectedLineNoNewLine(resultLine);
+             String nLine  = ResultPresentation.getPreviewLineFromSelectedLineNoNewLine(resultLine);
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
              int headerSize = bytes.length;
 

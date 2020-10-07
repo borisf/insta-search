@@ -17,7 +17,7 @@
 package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.models.Pair;
-import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.ResultPresentation;
 import com.borisfarber.instasearch.models.formats.BinaryXml;
 import com.borisfarber.instasearch.contollers.Controller;
 import com.borisfarber.instasearch.models.text.HexDump;
@@ -47,7 +47,7 @@ public class APKSearch extends ZipSearch {
         }
 
         executorService.execute(() -> {
-            Pair<String, String> pair = ResultModel.getFileNameLineNoNewLine(resultLine);
+            Pair<String, String> pair = ResultPresentation.getFileNameLineNoNewLine(resultLine);
 
             String fileName = pair.t;
             byte[] bytes = ZipUtil.unpackEntry(zipFile, fileName);

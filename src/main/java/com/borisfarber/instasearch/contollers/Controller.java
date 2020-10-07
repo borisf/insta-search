@@ -13,7 +13,7 @@
  */
 package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.ResultPresentation;
 import com.borisfarber.instasearch.models.search.Search;
 import com.borisfarber.instasearch.models.search.SearchFactory;
 import com.borisfarber.instasearch.models.text.Background;
@@ -45,7 +45,7 @@ public final class Controller implements DocumentListener {
     private File file;
     private String query;
     private Search search;
-    private ResultModel resultModel;
+    private ResultPresentation resultPresentation;
 
     private final ThreadPoolExecutor searchTasksExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
@@ -64,9 +64,9 @@ public final class Controller implements DocumentListener {
         this.search = SearchFactory.INSTANCE.createMockSearch(this);
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
         this.previewHighlighter = new PreviewHighlighter();
-        this.resultModel = new ResultModel();
+        this.resultPresentation = new ResultPresentation();
 
-        this.resultTextPane.setText(resultModel.getBackground());
+        this.resultTextPane.setText(resultPresentation.getBackground());
     }
 
     public void onFileOpened(File newFile) {
@@ -134,22 +134,22 @@ public final class Controller implements DocumentListener {
     }
 
     public void onUpPressed() {
-        resultModel.selectedLineUp();
+        resultPresentation.increaseSelectedLine();
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onDownPressed() {
-        resultModel.selectedLineDown(search);
+        resultPresentation.decreaseSelectedLine(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onMouseSingleClick(String selectedText) {
-        resultModel.lineSelected(selectedText);
+        resultPresentation.setSelectedLine(selectedText);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onMouseDoubleClick(String selectedText) {
-        resultModel.lineClicked(selectedText);
+        resultPresentation.exportLine(selectedText);
         onEnterPressed();
     }
 
@@ -160,8 +160,8 @@ public final class Controller implements DocumentListener {
     public void onEnterPressed() {
         fullFilePreview(
                 search,
-                resultModel.getSelectedFilename(),
-                resultModel.getSelectedPosition(),
+                resultPresentation.getExportedFilename(),
+                resultPresentation.getExportedLineIndex(),
                 previewTasksExecutor,
                 previewTextPane,
                 file);
@@ -180,8 +180,8 @@ public final class Controller implements DocumentListener {
     }
 
     private void search(String query) {
-        resultModel.selectedSearchResultIndex = 0;
         this.query = query;
+        resultPresentation.resetSelectedLine();
 
         Runnable runnableTask = () -> search.search(query);
         long waitingTasksCount = searchTasksExecutor.getActiveCount();
@@ -191,36 +191,37 @@ public final class Controller implements DocumentListener {
     }
 
     public void onCrawlFinish(java.util.List<String> crawlResults) {
-        resultModel.fillCrawlResults(crawlResults);
-        resultModel.generateResultView();
-        resultTextPane.setText(resultModel.getResultView());
+        resultPresentation.fillFilenameResults(crawlResults);
+        resultPresentation.generateResultView();
+        resultTextPane.setText(resultPresentation.getResultView());
         resultTextPane.setCaretPosition(0);
     }
 
     public void onSearchFinish() {
-        resultModel.fillSearchResults(search);
+        resultPresentation.fillSearchResults(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
     private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
-        resultModel.generateResultView();
-        resultTextPane.setText(resultModel.getResultView());
+        resultPresentation.generateResultView();
+        resultTextPane.setText(resultPresentation.getResultView());
         resultTextPane.setCaretPosition(0);
 
-        if(resultModel.resultSize() > 0) {
-            previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
+        if(resultPresentation.getResultCount() > 0) {
+            previewTextPane.setText(search.getPreview(resultPresentation.getSelectedLine()));
             previewTextPane.setCaretPosition(0);
             highlightPreview();
         }
 
-        if(resultModel.resultSize() > UI_VIEW_LIMIT) {
+        if(resultPresentation.getResultCount() > UI_VIEW_LIMIT) {
             resultCountLabel.setText("...");
         } else {
-            resultCountLabel.setText(String.valueOf(resultModel.getResultCount()));
+            resultCountLabel.setText(
+                    String.valueOf(resultPresentation.getResultCount()));
         }
 
         try {
-            int selector = resultModel.getSelectionIndex();
+            int selector = resultPresentation.getSelectionIndex();
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
                 highlightResults(selector, span);
@@ -245,7 +246,7 @@ public final class Controller implements DocumentListener {
     private void highlightPreview() {
         if(query != null) {
             previewHighlighter.highlightPreview(previewTextPane,
-                    resultModel.getPreviewLineNoNewLine(), FOREGROUND_COLOR);
+                    resultPresentation.getPreviewLineNoNewLine(), FOREGROUND_COLOR);
         }
     }
 
