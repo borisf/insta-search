@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.borisfarber.instasearch.search;
+package com.borisfarber.instasearch.models.search;
 
-import com.borisfarber.instasearch.formats.BinaryXml;
-import com.borisfarber.instasearch.ui.Controller;
-import com.borisfarber.instasearch.textblocks.HexDump;
+import com.borisfarber.instasearch.models.Pair;
+import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.formats.BinaryXml;
+import com.borisfarber.instasearch.contollers.Controller;
+import com.borisfarber.instasearch.models.text.HexDump;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.swing.*;
@@ -45,18 +47,10 @@ public class APKSearch extends ZipSearch {
         }
 
         executorService.execute(() -> {
-            String[] parts = resultLine.split(":");
-            String fileName = parts[0];
-            String line = parts[2];
+            Pair<String, String> pair = ResultModel.getFileNameLineNoNewLine(resultLine);
 
-            String nLine = line;
-
-            // remove the new line in the end
-            if (nLine.endsWith("\n")) {
-                nLine = nLine.substring(0, nLine.length() - 1);
-            }
-
-            byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
+            String fileName = pair.t;
+            byte[] bytes = ZipUtil.unpackEntry(zipFile, fileName);
             int headerSize = bytes.length;
 
             String result = "";
@@ -82,9 +76,7 @@ public class APKSearch extends ZipSearch {
             }
 
             String finalResult = result;
-            Runnable runnable = () -> {
-                controller.onUpdatePreview(finalResult);
-            };
+            Runnable runnable = () -> controller.onUpdatePreview(finalResult);
 
             SwingUtilities.invokeLater(runnable);
         });

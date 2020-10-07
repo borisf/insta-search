@@ -13,9 +13,8 @@
   */
  package com.borisfarber.instasearch.ui;
 
- import com.borisfarber.instasearch.filesystem.*;
- import com.borisfarber.instasearch.textblocks.Background;
- import com.borisfarber.instasearch.textblocks.BuildVersion;
+ import com.borisfarber.instasearch.contollers.*;
+ import com.borisfarber.instasearch.models.text.BuildVersion;
 
  import javax.swing.*;
  import javax.swing.text.BadLocationException;
@@ -29,6 +28,7 @@
  public final class InstaSearch extends JFrame {
      private final Font textFont;
      private JTextField searchField;
+
      private JTextPane resultTextPane;
      private JTextPane previewTextPane;
      private JLabel resultCountLabel;
@@ -201,7 +201,6 @@
          result.setFont(textFont);
          result.setBackground(BACKGROUND_COLOR);
          result.setForeground(FOREGROUND_COLOR);
-         result.setText(Background.INTRO);
          result.setDragEnabled(true);
          result.setTransferHandler(new FileDragAndDrop(this));
          result.setEditable(false);
@@ -213,7 +212,6 @@
          result.addMouseListener(popupListener);
 
          result.addMouseListener(new MouseAdapter() {
-
              String previousLine = "";
 
              public void mouseClicked(MouseEvent me) {
@@ -240,6 +238,36 @@
                      controller.onMouseSingleClick(result.getSelectedText());
                      previousLine = line;
                  }
+             }
+         });
+
+         result.addKeyListener(new KeyListener() {
+             @Override
+             public void keyTyped(KeyEvent keyEvent) {
+
+             }
+
+             @Override
+             public void keyPressed(KeyEvent keyEvent) {
+                 if (keyEvent.getKeyCode() == VK_UP) {
+                     controller.onUpPressed();
+                     return;
+                 }
+
+                 if (keyEvent.getKeyCode() == VK_DOWN) {
+                     controller.onDownPressed();
+                     return;
+                 }
+
+                 if (keyEvent.getKeyCode() == VK_ENTER) {
+                     controller.onEnterPressed();
+                     return;
+                 }
+             }
+
+             @Override
+             public void keyReleased(KeyEvent keyEvent) {
+
              }
          });
 

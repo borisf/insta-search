@@ -11,13 +11,14 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.instasearch.search;
+ package com.borisfarber.instasearch.models.search;
 
- import com.borisfarber.instasearch.ui.Controller;
- import com.borisfarber.instasearch.textblocks.SearchResultsSorter;
- import com.borisfarber.instasearch.textblocks.HexDump;
- import com.borisfarber.instasearch.filesystem.PrivateFolder;
- import com.borisfarber.instasearch.textblocks.Pair;
+ import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.models.ResultModel;
+ import com.borisfarber.instasearch.models.text.SearchResultsSorter;
+ import com.borisfarber.instasearch.models.text.HexDump;
+ import com.borisfarber.instasearch.contollers.PrivateFolder;
+ import com.borisfarber.instasearch.models.Pair;
  import me.xdrop.fuzzywuzzy.model.ExtractedResult;
  import org.zeroturnaround.zip.ZipUtil;
 
@@ -88,17 +89,7 @@
          }
 
          executorService.execute(() -> {
-             String[] parts  = resultLine.split(":");
-             String fileName = parts[0];
-             String line = parts[2];
-
-             String nLine = line;
-
-             // remove the new line in the end
-             if(nLine.endsWith("\n")) {
-                 nLine = nLine.substring(0, nLine.length() - 1);
-             }
-
+             String nLine  = ResultModel.getPreviewLineFromSelectedLineNoNewLine(resultLine);
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
              int headerSize = bytes.length;
 
@@ -111,9 +102,7 @@
                      HexDump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
                      "\n...\n";
 
-             Runnable runnable = () -> {
-                 controller.onUpdatePreview(result);
-             };
+             Runnable runnable = () -> controller.onUpdatePreview(result);
 
              SwingUtilities.invokeLater(runnable);
          });
@@ -159,7 +148,7 @@
                  builder.append(fileName).append("\n");
              }
 
-             controller.onCrawlFinish(builder.toString());
+             controller.onCrawlFinish(allLines);
          };
          SwingUtilities.invokeLater(runnable);
      }

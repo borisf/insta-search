@@ -19,11 +19,7 @@
 
  public class PreviewHighlighter {
 
-     public void highlightPreview(JTextPane previewTextPane, String selectedLine, Color color) {
-         if(selectedLine.endsWith("\n\n")) {
-             selectedLine = selectedLine.substring(0, selectedLine.length() - 2);
-         }
-
+     public void highlightPreview(JTextPane previewTextPane, String previewLine, Color color) {
          DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
                  new DefaultHighlighter.DefaultHighlightPainter(color);
 
@@ -31,24 +27,24 @@
              Document doc = previewTextPane.getDocument();
              String text = doc.getText(0, doc.getLength());
 
-             int pos = text.toLowerCase().indexOf(selectedLine.toLowerCase());
+             int pos = text.toLowerCase().indexOf(previewLine.toLowerCase());
 
              if(pos == -1) {
                  // hex view in the preview, no reason to highlight
-                 //System.err.println("wrong search index");
+                 //System.out.println("here");
                  return;
              }
 
              previewTextPane.getHighlighter().addHighlight(pos,
-                     pos + selectedLine.length(), previewHighlighter);
+                     pos + previewLine.length(), previewHighlighter);
 
              // back, UX less focus on the preview
              MutableAttributeSet attrs = previewTextPane.getInputAttributes();
              StyledDocument doc1 = previewTextPane.getStyledDocument();
              StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
-             doc1.setCharacterAttributes(pos, pos + selectedLine.length(), attrs, false);
+             doc1.setCharacterAttributes(pos, pos + previewLine.length(), attrs, false);
              StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
-             doc1.setCharacterAttributes(pos + selectedLine.length(), text.length(),attrs, false);
+             doc1.setCharacterAttributes(pos + previewLine.length(), text.length(),attrs, false);
              // end back
          } catch (final BadLocationException ble) {
              System.err.println("Ignored in highlight preview");

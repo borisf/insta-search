@@ -11,12 +11,12 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.filesystem;
+package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.formats.Clazz;
-import com.borisfarber.instasearch.formats.Dex;
-import com.borisfarber.instasearch.search.Search;
-import com.borisfarber.instasearch.textblocks.Pair;
+import com.borisfarber.instasearch.models.formats.Clazz;
+import com.borisfarber.instasearch.models.formats.Dex;
+import com.borisfarber.instasearch.models.search.Search;
+import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.ui.HexPanel;
 import dorkbox.notify.Notify;
 import dorkbox.notify.Pos;
@@ -35,19 +35,20 @@ public class FullFilePreview {
     }
 
     public static void fullFilePreview(Search search,
-                                       Pair<String, Integer> selectedFilenameAndPosition,
+                                       String selectedFilename,
+                                       Integer selectedPosition,
                                        ThreadPoolExecutor previewTasksExecutor,
                                        JTextPane previewTextPane,
                                        File file) {
-        if (search.getPathPerFileName(selectedFilenameAndPosition.t) == null) {
+        if (search.getPathPerFileName(selectedFilename) == null) {
             // garbage files
             return;
         }
 
-        Path selectedPath = search.getPathPerFileName(selectedFilenameAndPosition.t);
+        Path selectedPath = search.getPathPerFileName(selectedFilename);
 
         if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            openFileOnDesktop(selectedPath, selectedFilenameAndPosition.u);
+            openFileOnDesktop(selectedPath, selectedPosition);
         } else if (PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Clazz.decompile(selectedPath);

@@ -28,12 +28,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.borisfarber.instasearch.search;
+package com.borisfarber.instasearch.models.search;
 
-import com.borisfarber.instasearch.filesystem.*;
-import com.borisfarber.instasearch.textblocks.Pair;
-import com.borisfarber.instasearch.textblocks.SearchResultsSorter;
-import com.borisfarber.instasearch.ui.Controller;
+import com.borisfarber.instasearch.contollers.*;
+import com.borisfarber.instasearch.models.Pair;
+import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.text.SearchResultsSorter;
+import com.borisfarber.instasearch.contollers.Controller;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -131,7 +132,7 @@ public class GrepSearch implements Search {
             }
 
             builder.append("...");
-            controller.onCrawlFinish(builder.toString());
+            controller.onCrawlFinish(preview.subList(0,upper));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -296,6 +297,7 @@ public class GrepSearch implements Search {
             return new LinkedList<>();
         }
 
+        // TODO new line to result model
         String strkey = line.substring(0, line.length() - 1);
         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
 
@@ -328,9 +330,7 @@ public class GrepSearch implements Search {
 
         executorService.execute(() -> {
             try {
-                String[] parts  = resultLine.split(":");
-                String lineNum = parts[1];
-                int lineNumInt = Integer.parseInt(lineNum);
+                int lineNumInt = ResultModel.getLineNumber(resultLine);
 
                 int lowerBound = lineNumInt - 7;
                 if(lowerBound < 1) {
@@ -356,9 +356,7 @@ public class GrepSearch implements Search {
 
                 String result =  builder.toString();
 
-                Runnable runnable = () -> {
-                    controller.onUpdatePreview(result);
-                };
+                Runnable runnable = () -> controller.onUpdatePreview(result);
 
                 SwingUtilities.invokeLater(runnable);
             } catch (IOException e) {

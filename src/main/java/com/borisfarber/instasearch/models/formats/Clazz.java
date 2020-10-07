@@ -11,10 +11,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.formats;
+package com.borisfarber.instasearch.models.formats;
 
-import com.borisfarber.instasearch.filesystem.PrivateFolder;
-import com.borisfarber.instasearch.textblocks.Pair;
+import com.borisfarber.instasearch.contollers.PrivateFolder;
+import com.borisfarber.instasearch.models.Pair;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;
 
