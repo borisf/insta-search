@@ -50,10 +50,7 @@ public class APKSearch extends ZipSearch {
             Pair<String, String> pair = ResultModel.getFileNameLineNoNewLine(resultLine);
 
             String fileName = pair.t;
-            String line = pair.u;
-            String nLine = line;
-
-            byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
+            byte[] bytes = ZipUtil.unpackEntry(zipFile, fileName);
             int headerSize = bytes.length;
 
             String result = "";

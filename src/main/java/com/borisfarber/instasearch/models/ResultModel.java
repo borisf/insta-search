@@ -209,6 +209,11 @@
      }
 
      public String getSelectedLine() {
+         if(selectedSearchResultIndex >= searchResults.size()) {
+            // for zip dummy dirs
+            return "";
+         }
+
          return searchResults.get(selectedSearchResultIndex);
      }
 
@@ -235,13 +240,12 @@
      }
 
      // todo clean up, more cases with ':'s in such as time stamps
-     public String getPreviewLine() {
+     public String getPreviewLineNoNewLine() {
          String previewLine = getSelectedLine();
 
          if(getSelectedLine().indexOf(":") <0 ) {
              return getSelectedLine();
          }
-
 
          String[] parts = previewLine.split(":");
          String fileName = parts[0];
@@ -260,6 +264,24 @@
         return previewLine;
      }
 
+     // TODO for ZIP - need to rething the line
+     public static String getPreviewLineFromSelectedLineNoNewLine(String from) {
+         String result;
+         if(from.indexOf(":") > 0) {
+             String[] parts = from.split(":");
+             result = parts[2];
+         } else {
+             result = from;
+         }
+
+         // remove the new line in the end
+         if (result.endsWith("\n")) {
+             result = result.substring(0, result.length() - 1);
+         }
+
+         return result;
+     }
+
      public static Pair<String, String> getFileNameLineNoNewLine(String from) {
          String fileName;
          String line;
@@ -267,9 +289,10 @@
          if(from.indexOf(":") > 0) {
              String[] parts = from.split(":");
              fileName = parts[0];
-             line = parts[2];
+             line = parts[1];
          } else {
-             fileName = line = from;
+             fileName = from;
+             line = "0";
          }
 
          // remove the new line in the end
@@ -286,9 +309,13 @@
      }
 
      public static int getLineNumber(String resultLine) {
-         String[] parts  = resultLine.split(":");
-         String lineNum = parts[1];
-         int lineNumInt = Integer.parseInt(lineNum);
+         int lineNumInt = 0;
+
+         if(resultLine.indexOf(":") > 0) {
+             String[] parts  = resultLine.split(":");
+             String lineNum = parts[1];
+             lineNumInt = Integer.parseInt(lineNum);
+         }
 
          return lineNumInt;
      }

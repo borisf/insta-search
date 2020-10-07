@@ -238,13 +238,14 @@ public final class Controller implements DocumentListener {
 
     public void onUpdatePreview(String result) {
         previewTextPane.setText(result);
+        previewTextPane.setCaretPosition(0);
         highlightPreview();
     }
 
     private void highlightPreview() {
         if(query != null) {
             previewHighlighter.highlightPreview(previewTextPane,
-                    resultModel.getPreviewLine(), FOREGROUND_COLOR);
+                    resultModel.getPreviewLineNoNewLine(), FOREGROUND_COLOR);
         }
     }
 

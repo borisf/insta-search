@@ -16,6 +16,7 @@
  import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
+ import com.borisfarber.instasearch.models.ResultModel;
 
  import javax.swing.*;
  import java.io.File;
@@ -172,38 +173,31 @@
              return "";
          }
 
-         String fileName;
-         String line;
+         boolean isFileInternals = true;
 
-         if(resultLine.indexOf(":") > 0) {
-             String[] parts  = resultLine.split(":");
-             fileName = parts[0];
-             line = parts[1];
-         } else {
-             // todo stopped here doesn't work for file names, no need to go -7
-             // todo do a boolean with condition
-             // remove the new line in the end
-             fileName = resultLine.substring(0, resultLine.length() - 1);
-             line = "0";
+         Pair<String, String> previewData = ResultModel.getFileNameLineNoNewLine(resultLine);
+         String fileName = previewData.t;
+         String line = previewData.u;
+
+         if(resultLine.indexOf(":") < 0) {
+             isFileInternals = false;
          }
 
-         int bline = 0;
-
-         for(Pair<Integer,String> fData : numLinesToFilenames) {
-             if(fData.u.equals(fileName)) {
-                 break;
-             }
-             bline += fData.t;
-         }
-
+         int bline = getFileBaseline(fileName);
          StringBuilder builder = new StringBuilder();
          int allLinesIndex = Integer.parseInt(line) + bline;
+         int lower, upper;
 
-         int lower = allLinesIndex - 7;
-         int upper = allLinesIndex + 7;
+         if(isFileInternals) {
+             lower = allLinesIndex - 7;
+             upper = allLinesIndex + 7;
 
-         if (lower < 0) {
-             lower = 0;
+             if (lower < 0) {
+                 lower = 0;
+             }
+         } else {
+             lower = allLinesIndex + 0;
+             upper = allLinesIndex + 120;
          }
 
          if (upper >= allLines.size()) {
@@ -215,6 +209,18 @@
          }
 
          return builder.toString();
+     }
+
+     private int getFileBaseline(String fileName) {
+         int bline = 0;
+
+         for(Pair<Integer,String> fData : numLinesToFilenames) {
+             if(fData.u.equals(fileName)) {
+                 break;
+             }
+             bline += fData.t;
+         }
+         return bline;
      }
 
      @Override

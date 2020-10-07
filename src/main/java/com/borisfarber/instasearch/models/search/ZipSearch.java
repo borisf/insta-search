@@ -89,10 +89,7 @@
          }
 
          executorService.execute(() -> {
-             Pair<String, String> pair = ResultModel.getFileNameLineNoNewLine(resultLine);
-             String line = pair.u;
-             String nLine = line;
-
+             String nLine  = ResultModel.getPreviewLineFromSelectedLineNoNewLine(resultLine);
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
              int headerSize = bytes.length;
 
