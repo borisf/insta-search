@@ -23,10 +23,18 @@
 
  import static com.borisfarber.instasearch.contollers.Controller.UI_VIEW_LIMIT;
 
+ /** 2 format lines: files and search, optional selector and mandatory
+  * new line
+  *
+  * files   selector filename\n
+  * search  selector filename:linenumber:result line\n
+  *
+  * Extract without the new line
+  */
  public class ResultPresentation {
      private static final String SELECTOR = "==> ";
 
-     // search results, always end with new line
+     // search results, always end with the new line
      private final ArrayList<String> searchResultLines;
      private StringBuilder presentation;
 
@@ -37,7 +45,7 @@
      private int selectedLineIndex = 0;
 
      // export
-     private  Pair<String, Integer> exportedFileAndLineIndex;
+     private final Pair<String, Integer> exportedFileAndLineIndex;
 
      public ResultPresentation() {
          this.searchResultLines = new ArrayList<>();
@@ -52,7 +60,7 @@
      public void fillFilenameResults(List<String> fileNameResults) {
          searchResultLines.clear();
 
-         // paginator
+         // pagination
          int pageLimit = 1000;
 
          if (pageLimit > fileNameResults.size()) {
@@ -78,7 +86,7 @@
              String rawLine = rawResults.get(resultCount);
 
              if (rawLine == null) {
-                 // if the UI is drawing the previous search results
+                 // when the UI is drawing the previous search results
                  // while the results are updated
                  return;
              }
@@ -86,7 +94,6 @@
              locations = search.getFileNameAndPosition(rawLine);
 
              for (Pair<String, Integer> location : locations) {
-
                  String result;
 
                  if(location.u != Search.NOT_IN_FILE) {
@@ -127,18 +134,12 @@
              if (previewLinesIndex == selectedLineIndex) {
                  presentation.append(SELECTOR).append(str);
 
-                 // TODO - move to export line
-                 if (str.indexOf(":") > 0) {
-                     String[] parts = str.split(":");
-                     String fileName = parts[0];
-                     String position = parts[1];
+                 Pair<String, String> extract = extractFilenameAndLineNumber(str);
+                 exportedFileAndLineIndex.t = extract.t;
 
-                     // the text line starts after 2 :s
-                     exportedFileAndLineIndex.t = fileName;
-                     exportedFileAndLineIndex.u = Integer.parseInt(position);
-                 } else {
-                     exportedFileAndLineIndex.t = str;
-                     // TODO maybe -1 constant
+                 try {
+                     exportedFileAndLineIndex.u = Integer.parseInt(extract.u);
+                 } catch (NumberFormatException nfe) {
                      exportedFileAndLineIndex.u = 0;
                  }
              } else {
@@ -200,7 +201,7 @@
              line = line.substring(0, line.length() - 1);
          }
 
-         if (line.indexOf(":") < 0) {
+         if (!line.contains(":")) {
              String fileName = line;
              if (line.startsWith(SELECTOR)) {
                  fileName = fileName.substring(4);
@@ -259,6 +260,7 @@
          if(line.indexOf(":") > 0) {
              String[] parts  = line.split(":");
              String lineNum = parts[1];
+             // todo might be an issue with binary files
              lineNumInt = Integer.parseInt(lineNum);
          }
 
@@ -287,7 +289,6 @@
              fileName = fileName.substring(0, fileName.length() - 1);
          }
 
-         Pair<String, String> result = new Pair<>(fileName, lineNumber);
-         return result;
+         return new Pair<>(fileName, lineNumber);
      }
  }
