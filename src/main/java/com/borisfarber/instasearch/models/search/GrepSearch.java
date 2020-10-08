@@ -32,7 +32,7 @@ package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.*;
 import com.borisfarber.instasearch.models.Pair;
-import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.ResultPresentation;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 import com.borisfarber.instasearch.contollers.Controller;
 import com.jramoyo.io.IndexedFileReader;
@@ -330,7 +330,7 @@ public class GrepSearch implements Search {
 
         executorService.execute(() -> {
             try {
-                int lineNumInt = ResultModel.getLineNumber(resultLine);
+                int lineNumInt = ResultPresentation.extractLineNumber(resultLine);
 
                 int lowerBound = lineNumInt - 7;
                 if(lowerBound < 1) {

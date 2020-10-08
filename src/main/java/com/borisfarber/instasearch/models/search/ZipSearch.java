@@ -14,7 +14,7 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.models.ResultModel;
+ import com.borisfarber.instasearch.models.ResultPresentation;
  import com.borisfarber.instasearch.models.text.SearchResultsSorter;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
@@ -72,7 +72,7 @@
          // may be to add mapping to simple file names, not sure
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         Pair<String, Integer> pair = new Pair<>(line, 0);
+         Pair<String, Integer> pair = new Pair<>(line, Search.NOT_IN_FILE);
          result.add(pair);
          return result;
      }
@@ -89,7 +89,7 @@
          }
 
          executorService.execute(() -> {
-             String nLine  = ResultModel.getPreviewLineFromSelectedLineNoNewLine(resultLine);
+             String nLine  = ResultPresentation.extractPreviewLine(resultLine);
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
              int headerSize = bytes.length;
 
@@ -155,7 +155,7 @@
 
      @Override
      public Comparator<String> getResultsSorter() {
-         return new SearchResultsSorter();
+         return (s, t1) -> 1;
      }
 
      public static void main(String[] args) {

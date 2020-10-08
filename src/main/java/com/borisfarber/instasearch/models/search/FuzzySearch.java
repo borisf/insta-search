@@ -16,7 +16,7 @@
  import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
- import com.borisfarber.instasearch.models.ResultModel;
+ import com.borisfarber.instasearch.models.ResultPresentation;
 
  import javax.swing.*;
  import java.io.File;
@@ -175,7 +175,7 @@
 
          boolean isFileInternals = true;
 
-         Pair<String, String> previewData = ResultModel.getFileNameLineNoNewLine(resultLine);
+         Pair<String, String> previewData = ResultPresentation.extractFilenameAndLineNumber(resultLine);
          String fileName = previewData.t;
          String line = previewData.u;
 
