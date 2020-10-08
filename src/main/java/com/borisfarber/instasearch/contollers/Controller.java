@@ -139,7 +139,7 @@ public final class Controller implements DocumentListener {
     }
 
     public void onDownPressed() {
-        resultPresentation.decreaseSelectedLine(search);
+        resultPresentation.decreaseSelectedLine();
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 

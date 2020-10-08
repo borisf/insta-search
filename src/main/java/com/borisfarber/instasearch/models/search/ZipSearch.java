@@ -72,8 +72,7 @@
          // may be to add mapping to simple file names, not sure
          LinkedList<Pair<String, Integer>> result = new LinkedList<>();
 
-         // todo nice constant in Search
-         Pair<String, Integer> pair = new Pair<>(line, -1);
+         Pair<String, Integer> pair = new Pair<>(line, Search.NOT_IN_FILE);
          result.add(pair);
          return result;
      }

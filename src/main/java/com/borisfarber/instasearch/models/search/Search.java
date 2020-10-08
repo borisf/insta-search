@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public interface Search {
+
+    int NOT_IN_FILE = -1;
+
     void crawl(File file);
 
     void search(String query);

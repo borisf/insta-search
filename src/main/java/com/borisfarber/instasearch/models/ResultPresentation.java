@@ -27,13 +27,11 @@
      private static final String SELECTOR = "==> ";
 
      // search results, always end with new line
-     private final ArrayList<String> searchResults;
+     private final ArrayList<String> searchResultLines;
+     private StringBuilder presentation;
 
      // diff from search size because files might have duplicate lines
      private int searchResultsCount = 0;
-
-     // inner presentation
-     private StringBuilder presentation;
 
      // selection
      private int selectedLineIndex = 0;
@@ -42,7 +40,7 @@
      private  Pair<String, Integer> exportedFileAndLineIndex;
 
      public ResultPresentation() {
-         this.searchResults = new ArrayList<>();
+         this.searchResultLines = new ArrayList<>();
          this.exportedFileAndLineIndex =
                  new Pair<>("test.txt", 0);
      }
@@ -51,21 +49,21 @@
          return Background.INTRO;
      }
 
-     public void fillFilenameResults(List<String> crawlResults) {
-         searchResults.clear();
+     public void fillFilenameResults(List<String> fileNameResults) {
+         searchResultLines.clear();
 
          // paginator
          int pageLimit = 1000;
 
-         if (pageLimit > crawlResults.size()) {
-             pageLimit = crawlResults.size();
+         if (pageLimit > fileNameResults.size()) {
+             pageLimit = fileNameResults.size();
          }
 
          for (int i = 0; i < pageLimit; i++) {
-             searchResults.add(crawlResults.get(i) + "\n");
+             searchResultLines.add(fileNameResults.get(i) + "\n");
          }
 
-         Arrays.sort(searchResults.toArray());
+         Arrays.sort(searchResultLines.toArray());
          searchResultsCount = pageLimit;
      }
 
@@ -73,7 +71,7 @@
          int resultCount = 0;
          boolean isViewLimitReached = false;
          LinkedList<Pair<String, Integer>> locations;
-         searchResults.clear();
+         searchResultLines.clear();
          List<String> rawResults = search.getResults();
 
          while ((resultCount < rawResults.size()) && !isViewLimitReached) {
@@ -89,9 +87,9 @@
 
              for (Pair<String, Integer> location : locations) {
 
-                 String result = "";
-                 // TODO nice constant for -1 in Search interface
-                 if(location.u != -1) {
+                 String result;
+
+                 if(location.u != Search.NOT_IN_FILE) {
                      result = location.t + ":" + location.u + ":"
                              + rawLine;
                  } else {
@@ -104,18 +102,17 @@
                      result += "\n";
                  }
 
-                 searchResults.add(result);
+                 searchResultLines.add(result);
                  resultCount++;
 
                  if (resultCount >= UI_VIEW_LIMIT) {
                      isViewLimitReached = true;
                      break;
                  }
-
              }
          }
 
-         searchResults.sort(search.getResultsSorter());
+         searchResultLines.sort(search.getResultsSorter());
          searchResultsCount = resultCount;
      }
 
@@ -126,14 +123,12 @@
      public void generateResultView() {
          int previewLinesIndex = 0;
          presentation = new StringBuilder();
-         for (String str : searchResults) {
+         for (String str : searchResultLines) {
              if (previewLinesIndex == selectedLineIndex) {
                  presentation.append(SELECTOR).append(str);
 
                  // TODO - move to export line
-
                  if (str.indexOf(":") > 0) {
-
                      String[] parts = str.split(":");
                      String fileName = parts[0];
                      String position = parts[1];
@@ -143,6 +138,7 @@
                      exportedFileAndLineIndex.u = Integer.parseInt(position);
                  } else {
                      exportedFileAndLineIndex.t = str;
+                     // TODO maybe -1 constant
                      exportedFileAndLineIndex.u = 0;
                  }
              } else {
@@ -166,13 +162,8 @@
          }
      }
 
-     public void decreaseSelectedLine(Search search) {
-         // TODO may be convert search to a field, fits the empty query
-         // TODO fix the lower limit
-         if ((/*selectedSearchResultIndex <
-                 (Integer.parseInt(search.getResultSetCount()) - 1))
-                 &&*/ selectedLineIndex < (
-                 searchResultsCount - 1))) {
+     public void decreaseSelectedLine() {
+         if (selectedLineIndex < (searchResultsCount - 1)) {
              selectedLineIndex++;
          }
      }
@@ -180,7 +171,7 @@
      public void setSelectedLine(String line) {
          // what comes from mouse click has no new line in the end
          int index = line.endsWith("\n") ?
-                 searchResults.indexOf(line) : searchResults.indexOf((line + "\n"));
+                 searchResultLines.indexOf(line) : searchResultLines.indexOf((line + "\n"));
 
          if (index == -1) {
              // hack when the ui screen is small and the selected line
@@ -192,12 +183,12 @@
      }
 
      public String getSelectedLine() {
-         if(selectedLineIndex >= searchResults.size()) {
+         if(selectedLineIndex >= searchResultLines.size()) {
              // for zip dummy dirs
              return "";
          }
 
-         return searchResults.get(selectedLineIndex);
+         return searchResultLines.get(selectedLineIndex);
      }
 
      public int getSelectionIndex() {
