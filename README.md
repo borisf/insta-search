@@ -15,13 +15,13 @@ incrementally.
 ### Components
 * Search Line - the upper text box, where you type text that are you looking for
 
-* Results View - the middle list, where you see the filtered results
-the search line, use arrows to land to the relevant line
+* Result View - the middle list, where you see the filtered results
+the search line, use arrows or mouse to land to the relevant line
 
-* Preview view - bottom text box, where you see the context near the selected line
+* Preview View - bottom text box, where you see the context near the selected line
 
-* Editor - once found the relevant line, press Enter, and the log file 
-will be opened on the relevant line within your system defined editor
+* Editor - once found the relevant line, press Enter, or click a mouse, and the file 
+will be opened on the relevant line within embedded or system defined editor.
 
 ### Howto
 The Insta Search supports incremental searching in both files and folders: 
@@ -37,7 +37,7 @@ as a hex dump. For classes dex entries, you will see the strings dump.
 
 * Jar/Zip File with class files - Drag and drop your file into the results view. Insta Search 
 will show the entries. Searching will result of filtering of the filenames. Going over the entries 
-with app/down arrow will show the binary preview. Pressing Enter will open a decompiled class view.
+with app/down arrow or selecting with a mouse  will show the binary preview. Pressing Enter or double clicking  will open a decompiled class view.
 
 * Binary File - InstaSearch will open its own hex editor in a separate window. 
 
