@@ -116,7 +116,7 @@ public final class Controller implements DocumentListener {
             if(query.length() > 0) {
                 search(query);
             } else {
-                // transition form 1 letter to 0 letters
+                // transition from 1 letter to 0 letters
                 // in the query
                 resultTextPane.setText("");
                 previewTextPane.setText("");
