@@ -59,7 +59,7 @@ import java.util.regex.PatternSyntaxException;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
-public class GrepSearch implements Search {
+public class BigFileSearch implements Search {
     private static final Charset charset = Charset.forName("ISO-8859-15");
     private static final CharsetDecoder decoder = charset.newDecoder();
 
@@ -88,7 +88,7 @@ public class GrepSearch implements Search {
             new ConcurrentLinkedQueue<>();
     private String query;
 
-    public GrepSearch(Controller controller) {
+    public BigFileSearch(Controller controller) {
         this.controller = controller;
         nameToPaths = new TreeMap<>();
     }

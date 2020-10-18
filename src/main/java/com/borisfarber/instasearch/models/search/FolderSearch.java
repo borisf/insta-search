@@ -17,7 +17,6 @@
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
  import com.borisfarber.instasearch.models.ResultPresentation;
- import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
  import javax.swing.*;
  import java.io.File;
@@ -31,9 +30,8 @@
  import static com.github.eugenelesnov.NgramSearch.ngramSearch;
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
- import static me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted;
 
- public class FuzzySearch implements Search {
+ public class FolderSearch implements Search {
      private final Controller controller;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
@@ -45,7 +43,7 @@
              Executors.newSingleThreadExecutor();
      private Map<String, Float> matchedSet;
 
-     public FuzzySearch(Controller controller) {
+     public FolderSearch(Controller controller) {
          this.controller = controller;
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();
