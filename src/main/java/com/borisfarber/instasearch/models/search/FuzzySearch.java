@@ -132,7 +132,9 @@
                  return;
              }
 
+             // TODO here if want to remove fuzzy use Levinstein from ngram
              if(query.length() < 3) {
+                 /*
                  List<ExtractedResult> shortList = extractSorted(query, allLines, 50);
                  Map<String, Float> shortMatchedSet = new HashMap<>();
 
@@ -140,7 +142,8 @@
                      shortMatchedSet.put(er.getString(), Float.valueOf(1));
                  }
 
-                 matchedSet = shortMatchedSet;
+                 matchedSet = shortMatchedSet;*/
+                 matchedSet = ngramSearch(1,50, query, allLines, String::toString);
              } else {
                  matchedSet = ngramSearch(3,50, query, allLines, String::toString);
              }

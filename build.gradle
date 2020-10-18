@@ -30,7 +30,6 @@ dependencies {
     implementation 'org.zeroturnaround:zt-zip:1.14'
     implementation 'org.bitbucket.mstrobel:procyon-compilertools:0.5.36'
     implementation 'com.dorkbox:Notify:3.7'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     implementation group: 'com.google.guava', name: 'guava', version: '23.5-jre'
     implementation group: 'org.smali', name: 'dexlib2', version: '2.4.0'
 }

@@ -61,6 +61,7 @@
                  return;
              }
 
+             // TODO here use ngram/levistein
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted(query, allLines, 50);
              Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);

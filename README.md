@@ -1,10 +1,10 @@
 # Insta Search
 
-A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
-logs.  And a decent chunk of time spent reading, is actually spent on searching.
-
 Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) 
 search inside files, folders, APK/ZIP/Jar files.
+
+A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
+logs.  And a decent chunk of time spent reading, is actually spent on searching.
 
 With Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
