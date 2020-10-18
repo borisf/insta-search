@@ -113,9 +113,11 @@ public final class Controller implements DocumentListener {
             final String query = document.getText(0,
                     document.getLength());
 
-            if(query.length() > 1) {
+            if(query.length() > 0) {
                 search(query);
             } else {
+                // transition from 1 letter to 0 letters
+                // in the query
                 resultTextPane.setText("");
                 previewTextPane.setText("");
                 resultCountLabel.setText("");

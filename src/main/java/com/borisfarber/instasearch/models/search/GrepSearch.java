@@ -121,21 +121,25 @@ public class GrepSearch implements Search {
             cb3 = mapToCharBuffer(this.file, 2 * qq, qq);
             cb4 = mapToCharBuffer(this.file, 3 * qq, qq);
 
-            int upper = 10;
-            if(upper > preview.size()) {
-                upper = preview.size();
-            }
-
-            StringBuilder builder = new StringBuilder();
-            for(String str : preview.subList(0, upper)) {
-                builder.append(str).append("\n");
-            }
-
-            builder.append("...");
-            controller.onCrawlFinish(preview.subList(0,upper));
+            generateCrawlResult();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void generateCrawlResult() {
+        int upper = 10;
+        if(upper > preview.size()) {
+            upper = preview.size();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for(String str : preview.subList(0, upper)) {
+            builder.append(str).append("\n");
+        }
+
+        builder.append("...");
+        controller.onCrawlFinish(preview.subList(0,upper));
     }
 
     private File dumpFolderToFile(File file) {
@@ -228,6 +232,8 @@ public class GrepSearch implements Search {
     @Override
     public void search(String query) {
         if(query.length() < 3) {
+            // TODO not sure here, not exited of doing a 20 lines search
+            emptyQuery();
             return;
         }
 
@@ -399,7 +405,7 @@ public class GrepSearch implements Search {
 
     @Override
     public void emptyQuery() {
-
+        generateCrawlResult();
     }
 
     @Override

@@ -17,6 +17,7 @@
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
  import com.borisfarber.instasearch.models.ResultPresentation;
+ import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
  import javax.swing.*;
  import java.io.File;
@@ -30,6 +31,7 @@
  import static com.github.eugenelesnov.NgramSearch.ngramSearch;
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
+ import static me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted;
 
  public class FuzzySearch implements Search {
      private final Controller controller;
@@ -130,7 +132,18 @@
                  return;
              }
 
-             matchedSet = ngramSearch(3,50, query, allLines, String::toString);
+             if(query.length() < 3) {
+                 List<ExtractedResult> shortList = extractSorted(query, allLines, 50);
+                 Map<String, Float> shortMatchedSet = new HashMap<>();
+
+                 for(ExtractedResult er : shortList) {
+                     shortMatchedSet.put(er.getString(), Float.valueOf(1));
+                 }
+
+                 matchedSet = shortMatchedSet;
+             } else {
+                 matchedSet = ngramSearch(3,50, query, allLines, String::toString);
+             }
              Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
@@ -237,7 +250,7 @@
          ArrayList<String> result = new ArrayList<>(matchedSet.size());
 
          for (String ms : matchedSet.keySet()) {
-                 result.add(ms);
+             result.add(ms);
          }
 
          return result;
@@ -264,15 +277,15 @@
      @Override
      public void emptyQuery() {
          Runnable runnable = () -> {
-             ArrayList<String> mmm = new ArrayList<>();
+             ArrayList<String> allFiles = new ArrayList<>();
 
              StringBuilder builder = new StringBuilder();
              for (String fileName : filenamesToPaths.keySet()) {
                  builder.append(fileName).append("\n");
-                 mmm.add(fileName);
+                 allFiles.add(fileName);
              }
 
-             controller.onCrawlFinish(mmm);
+             controller.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
      }
