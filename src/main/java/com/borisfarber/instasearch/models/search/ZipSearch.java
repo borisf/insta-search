@@ -15,7 +15,6 @@
 
  import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.models.ResultPresentation;
- import com.borisfarber.instasearch.models.text.SearchResultsSorter;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
  import com.borisfarber.instasearch.models.Pair;
@@ -37,6 +36,7 @@
      protected final ExecutorService executorService =
              Executors.newFixedThreadPool(4);
      private List<ExtractedResult> resultSet = new ArrayList<>();
+     
 
      public ZipSearch(File zipFile, Controller controller) {
          this.zipFile = zipFile;
@@ -61,7 +61,7 @@
                  return;
              }
 
-             // TODO here use ngram/levistein
+             //TODO here use ngram/levistein - https://github.com/EugeneLesnov/fuzzy-search
              resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted(query, allLines, 50);
              Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
