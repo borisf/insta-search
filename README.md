@@ -1,10 +1,10 @@
 # Insta Search
 
-A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
-logs.  And a decent chunk of time spent reading, is actually spent on searching.
-
 Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approximate_string_matching) 
 search inside files, folders, APK/ZIP/Jar files.
+
+A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
+logs.  And a decent chunk of time spent reading, is actually spent on searching.
 
 With Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
@@ -30,16 +30,15 @@ The Insta Search supports incremental searching in both files and folders:
 
 * Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder. 
 
-* APK/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
+* APK//Jar/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
 Searching will result of filtering of the filenames. Going over the entries with app/down arrows will
-show the selected entry in the preview. You will see AndroidManifest as text, and other binary files 
-as a hex dump. For classes dex entries, you will see the strings dump. 
+show the selected entry in the preview: 
+    * AndroidManifest.xml (APK) ==> text 
+    * Classes dex (APK) ==> string dump
+    * Class files (Jar) ==> decompiled class view 
+    * Binary files ==> hex dump   
 
-* Jar/Zip File with class files - Drag and drop your file into the results view. Insta Search 
-will show the entries. Searching will result of filtering of the filenames. Going over the entries 
-with app/down arrow or selecting with a mouse  will show the binary preview. Pressing Enter or double clicking  will open a decompiled class view.
-
-* Binary File - InstaSearch will open its own hex editor in a separate window. 
+Pressing Enter or double clicking on an entry will open its own hex editor in a separate window.
 
 ### File Menu
 When you click on File menu you will get the following:

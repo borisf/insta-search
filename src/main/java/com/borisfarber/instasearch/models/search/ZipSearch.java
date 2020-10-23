@@ -15,11 +15,10 @@
 
  import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.models.ResultPresentation;
- import com.borisfarber.instasearch.models.text.SearchResultsSorter;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
  import com.borisfarber.instasearch.models.Pair;
- import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+ import com.github.eugenelesnov.LevenshteinSearch;
  import org.zeroturnaround.zip.ZipUtil;
 
  import javax.swing.*;
@@ -36,7 +35,7 @@
      private final ArrayList<String> allLines = new ArrayList<>();
      protected final ExecutorService executorService =
              Executors.newFixedThreadPool(4);
-     private List<ExtractedResult> resultSet = new ArrayList<>();
+     private TreeMap<Integer, String> resultMap;
 
      public ZipSearch(File zipFile, Controller controller) {
          this.zipFile = zipFile;
@@ -48,7 +47,6 @@
      public void crawl(File file) {
          this.zipFile = file;
          allLines.clear();
-         resultSet.clear();
          ZipUtil.iterate(file, zipEntry -> allLines.add(zipEntry.getName()));
          emptyQuery();
      }
@@ -57,11 +55,14 @@
      public void search(String query) {
          executorService.execute(() -> {
              if(allLines.isEmpty()) {
-                 resultSet = new LinkedList<>();
                  return;
              }
 
-             resultSet = me.xdrop.fuzzywuzzy.FuzzySearch.extractSorted(query, allLines, 50);
+             Map<String, Integer> matchedSet =
+                     LevenshteinSearch.levenshteinSearch(90, query, allLines, String::toString);
+             resultMap = new TreeMap<>();
+             matchedSet.forEach((k, v) -> resultMap.put(v,k));
+
              Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
@@ -112,11 +113,8 @@
 
      @Override
      public List<String> getResults() {
-         ArrayList<String> result = new ArrayList<>(resultSet.size());
-
-         for (ExtractedResult er : resultSet) {
-             result.add(er.getString());
-         }
+         ArrayList<String> result = new ArrayList<>(resultMap.size());
+         resultMap.forEach((k, v) -> result.add(v));
 
          return result;
      }

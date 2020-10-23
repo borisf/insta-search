@@ -31,9 +31,9 @@ public enum SearchFactory {
     public Search createSearch(File newFile, Controller controller) {
         if (newFile.isDirectory()) {
             if(PrivateFolder.isSourceFolder(newFile)) {
-                return new FuzzySearch(controller);
+                return new FolderSearch(controller);
             } else {
-                return new GrepSearch(controller);
+                return new BigFileSearch(controller);
             }
         } else {
             if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
@@ -41,7 +41,7 @@ public enum SearchFactory {
             } else if (PathMatchers.APK_MATCHER.matches(Path.of(newFile.toURI()))) {
                 return new APKSearch(newFile, controller);
             } else {
-                return new GrepSearch(controller);
+                return new BigFileSearch(controller);
             }
         }
     }
