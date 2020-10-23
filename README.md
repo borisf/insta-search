@@ -30,7 +30,7 @@ The Insta Search supports incremental searching in both files and folders:
 
 * Source Folder - Open folder via the menu, or run Insta Search inside the relevant folder. 
 
-* APK//Jar/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
+* APK/Jar/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
 Searching will result of filtering of the filenames. Going over the entries with app/down arrows will
 show the selected entry in the preview: 
     * AndroidManifest.xml (APK) ==> text 
