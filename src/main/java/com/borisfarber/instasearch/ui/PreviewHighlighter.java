@@ -51,9 +51,9 @@
              MutableAttributeSet attrs = previewTextPane.getInputAttributes();
              StyledDocument doc1 = previewTextPane.getStyledDocument();
              StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
-             doc1.setCharacterAttributes(startPosition, startPosition + previewLine.length(), attrs, false);
+             doc1.setCharacterAttributes(startPosition, endPosition, attrs, false);
              StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
-             doc1.setCharacterAttributes(startPosition + previewLine.length(), text.length(),attrs, false);
+             doc1.setCharacterAttributes(endPosition, text.length(),attrs, false);
              // end back
          } catch (final BadLocationException ble) {
              System.err.println("Ignored in highlight preview");
