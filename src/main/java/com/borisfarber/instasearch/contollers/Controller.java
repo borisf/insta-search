@@ -25,13 +25,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import java.awt.*;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.borisfarber.instasearch.contollers.FullFilePreview.fullFilePreview;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
+import static com.borisfarber.instasearch.ui.InstaSearch.RESULT_HIGHLIGHT_COLOR;
 
 public final class Controller implements DocumentListener {
     public static final int UI_VIEW_LIMIT = 1000;
@@ -62,7 +62,7 @@ public final class Controller implements DocumentListener {
         this.previewTextPane = previewArea;
         this.resultCountLabel = resultCountLabel;
         this.search = SearchFactory.INSTANCE.createMockSearch(this);
-        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
+        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, RESULT_HIGHLIGHT_COLOR);
         this.previewHighlighter = new PreviewHighlighter();
         this.resultPresentation = new ResultPresentation();
 
