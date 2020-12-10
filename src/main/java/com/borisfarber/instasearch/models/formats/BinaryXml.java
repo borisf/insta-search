@@ -16,12 +16,14 @@
 package com.borisfarber.instasearch.models.formats;
 
 import com.borisfarber.instasearch.contollers.PrivateFolder;
+import com.borisfarber.instasearch.models.Pair;
 import com.google.common.io.LittleEndianDataInputStream;
-import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -106,9 +108,21 @@ public class BinaryXml {
         Arrays.fill(SPACE_FILL, ' ');
     }
 
-    public static File extractManifest(File file) {
+    // TODO merge the two methods below
+    public static Pair<File, String> fromBinaryFile(Path selectedPath) {
+        // TODO second parameter, string to the manifest text
+        Pair <File, String> result = new Pair<>(extractManifestFromAPK(selectedPath.toFile()),"");
+        return result;
+    }
+
+    private static File extractManifestFromAPK(File file) {
         File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
-        byte[] bytes = ZipUtil.unpackEntry(file, "AndroidManifest.xml");
+        byte[] bytes = new byte[0];
+        try {
+            bytes = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try (PrintWriter out = new PrintWriter(man)) {
             BinaryXml binaryXml = new BinaryXml();

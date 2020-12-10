@@ -13,6 +13,7 @@
   */
 package com.borisfarber.instasearch.contollers;
 
+import com.borisfarber.instasearch.models.formats.BinaryXml;
 import com.borisfarber.instasearch.models.formats.Clazz;
 import com.borisfarber.instasearch.models.formats.Dex;
 import com.borisfarber.instasearch.models.search.Search;
@@ -62,6 +63,11 @@ public class FullFilePreview {
         } else if (PathMatchers.DEX_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Dex.decompile(file.toPath());
+                openPreviewAndDesktop(previewTextPane, result);
+            });
+        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(selectedPath)) {
+            previewTasksExecutor.execute(() -> {
+                Pair<File, String> result = BinaryXml.fromBinaryFile(selectedPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else {
