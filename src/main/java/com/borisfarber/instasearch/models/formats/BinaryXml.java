@@ -107,33 +107,31 @@ public class BinaryXml {
     static {
         Arrays.fill(SPACE_FILL, ' ');
     }
-
-    // TODO merge the two methods below
-    public static Pair<File, String> fromBinaryFile(Path selectedPath) {
-        // TODO second parameter, string to the manifest text
-        Pair <File, String> result = new Pair<>(extractManifestFromAPK(selectedPath.toFile()),"");
-        return result;
-    }
-
-    private static File extractManifestFromAPK(File file) {
+    
+    public static Pair<File, String> convertFromBinaryToText(Path selectedPath) {
         File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
+        String content = "";
+
         byte[] bytes = new byte[0];
         try {
-            bytes = Files.readAllBytes(file.toPath());
+            bytes = Files.readAllBytes(selectedPath);
         } catch (IOException e) {
+            // file doesn't exist
             e.printStackTrace();
         }
 
         try (PrintWriter out = new PrintWriter(man)) {
             BinaryXml binaryXml = new BinaryXml();
-            String content = binaryXml.decompressXml(bytes);
+            content = binaryXml.decompressXml(bytes);
             out.println(content);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return man;
+        Pair <File, String> result = new Pair<>(man, content);
+
+        return result;
     }
 
     public void setAppendNamespaces(boolean appendNamespaces) {

@@ -67,7 +67,7 @@ public class FullFilePreview {
             });
         } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(selectedPath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = BinaryXml.fromBinaryFile(selectedPath);
+                Pair<File, String> result = BinaryXml.convertFromBinaryToText(selectedPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else {
