@@ -125,7 +125,7 @@
      }
 
      @Override
-     public Path createPathForSelectedFile(String fileName) {
+     public Path extractSelectedFile(String fileName) {
          String simpleName = new File(fileName).getName();
          File tempFile = PrivateFolder.INSTANCE.getTempFile(simpleName);
          ZipUtil.unpackEntry(zipFile, fileName, tempFile);

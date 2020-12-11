@@ -46,7 +46,7 @@
          this.doc = textPane.getDocument();
      }
 
-     public void highlightSearch(int from, HIGHLIGHT_SPAN span , String pattern) {
+     public void highlight(int from, HIGHLIGHT_SPAN span , String pattern) {
          try {
              int interval = span.value;
              // borders to highlight

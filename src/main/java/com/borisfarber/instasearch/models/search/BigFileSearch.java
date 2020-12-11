@@ -160,7 +160,7 @@ public class BigFileSearch implements Search {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                         throws IOException {
-                    if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(path)) {
+                    if (PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(path)) {
                         try {
                             List<String> allFileLines = Files.readAllLines(path);
                             preview.addAll(allFileLines);
@@ -386,7 +386,7 @@ public class BigFileSearch implements Search {
     }
 
     @Override
-    public Path createPathForSelectedFile(String fileName) {
+    public Path extractSelectedFile(String fileName) {
         return nameToPaths.get(fileName);
     }
 

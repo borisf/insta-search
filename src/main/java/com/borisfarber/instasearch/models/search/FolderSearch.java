@@ -68,7 +68,7 @@
          }
 
          Path pathString = file.toPath();
-         PathMatcher matcher = PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER;
+         PathMatcher matcher = PathMatchers.SOURCE_OR_TEXT_MATCHER;
 
          try {
              Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
@@ -228,7 +228,7 @@
      }
 
      @Override
-     public Path createPathForSelectedFile(String fileName) {
+     public Path extractSelectedFile(String fileName) {
          if (fileName.endsWith("/n")) {
              return filenamesToPaths.get(fileName.substring(0, fileName.length() - 1));
          }

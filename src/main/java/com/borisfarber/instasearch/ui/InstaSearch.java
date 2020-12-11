@@ -313,7 +313,7 @@
      }
 
      private static boolean isTextSupported(String filePath) {
-         return PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(new File(filePath).toPath());
+         return PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(new File(filePath).toPath());
      }
 
      public static void main(final String[] args) {

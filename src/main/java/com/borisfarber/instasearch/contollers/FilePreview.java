@@ -36,42 +36,42 @@ public class FilePreview {
     }
 
     public static void filePreview(Search search,
-                                   String selectedFilename,
-                                   Integer selectedPosition,
+                                   String filename,
+                                   Integer position,
                                    ThreadPoolExecutor previewTasksExecutor,
                                    JTextPane previewTextPane,
                                    File file) {
-        if (search.createPathForSelectedFile(selectedFilename) == null) {
+        if (search.extractSelectedFile(filename) == null) {
             // garbage files
             return;
         }
 
-        Path selectedFilePath = search.createPathForSelectedFile(selectedFilename);
+        Path previewPath = search.extractSelectedFile(filename);
 
-        if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedFilePath)) {
-            openFileOnDesktop(selectedFilePath, selectedPosition);
-        } else if (PathMatchers.CLASS_MATCHER.matches(selectedFilePath)) {
+        if (PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(previewPath)) {
+            openFileOnDesktop(previewPath, position);
+        } else if (PathMatchers.CLASS_MATCHER.matches(previewPath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedFilePath);
+                Pair<File, String> result = Clazz.decompile(previewPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
-        } else if (PathMatchers.CLASS_MATCHER.matches(selectedFilePath)) {
+        } else if (PathMatchers.CLASS_MATCHER.matches(previewPath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedFilePath);
+                Pair<File, String> result = Clazz.decompile(previewPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
-        } else if (PathMatchers.DEX_MATCHER.matches(selectedFilePath)) {
+        } else if (PathMatchers.DEX_MATCHER.matches(previewPath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Dex.decompile(file.toPath());
                 openPreviewAndDesktop(previewTextPane, result);
             });
-        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(selectedFilePath)) {
+        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(previewPath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = BinaryXml.decompile(selectedFilePath);
+                Pair<File, String> result = BinaryXml.decompile(previewPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else {
-            HexPanel.createJFrameWithHexPanel(selectedFilePath.toFile());
+            HexPanel.createJFrameWithHexPanel(previewPath.toFile());
         }
     }
 

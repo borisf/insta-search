@@ -235,7 +235,7 @@ public final class Controller implements DocumentListener {
 
     private void highlightResults(int from, ResultsHighlighter.HIGHLIGHT_SPAN span) {
         if(query != null) {
-            resultsHighlighter.highlightSearch(from, span, query);
+            resultsHighlighter.highlight(from, span, query);
         }
     }
 
