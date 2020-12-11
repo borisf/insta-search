@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class filePreview {
+public class FilePreview {
 
-    private filePreview(){
+    private FilePreview(){
 
     }
 

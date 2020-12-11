@@ -31,7 +31,7 @@
   *
   * Extract without the new line
   */
- public class ResultPresentation {
+ public class ResultModel {
      private static final String SELECTOR = "==> ";
 
      // search results, always end with the new line
@@ -47,7 +47,7 @@
      // export
      private final Pair<String, Integer> exportedFileAndLineIndex;
 
-     public ResultPresentation() {
+     public ResultModel() {
          this.searchResultLines = new ArrayList<>();
          this.exportedFileAndLineIndex =
                  new Pair<>("test.txt", 0);
