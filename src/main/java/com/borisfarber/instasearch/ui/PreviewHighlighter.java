@@ -19,7 +19,7 @@
 
  public class PreviewHighlighter {
 
-     public void highlightPreview(JTextPane previewTextPane, String previewLine, Color color) {
+     public void highlight(JTextPane previewTextPane, String previewLine, Color color) {
          DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
                  new DefaultHighlighter.DefaultHighlightPainter(color);
 

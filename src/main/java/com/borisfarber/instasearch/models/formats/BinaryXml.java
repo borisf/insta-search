@@ -107,8 +107,8 @@ public class BinaryXml {
     static {
         Arrays.fill(SPACE_FILL, ' ');
     }
-    
-    public static Pair<File, String> convertFromBinaryToText(Path selectedPath) {
+
+    public static Pair<File, String> decompile(Path selectedPath) {
         File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
         String content = "";
 
@@ -124,13 +124,11 @@ public class BinaryXml {
             BinaryXml binaryXml = new BinaryXml();
             content = binaryXml.decompressXml(bytes);
             out.println(content);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         Pair <File, String> result = new Pair<>(man, content);
-
         return result;
     }
 

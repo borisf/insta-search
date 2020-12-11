@@ -16,7 +16,7 @@
  import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
- import com.borisfarber.instasearch.models.ResultPresentation;
+ import com.borisfarber.instasearch.models.ResultModel;
 
  import javax.swing.*;
  import java.io.File;
@@ -179,7 +179,7 @@
 
          boolean isFileInternals = true;
 
-         Pair<String, String> previewData = ResultPresentation.extractFilenameAndLineNumber(resultLine);
+         Pair<String, String> previewData = ResultModel.extractFilenameAndLineNumber(resultLine);
          String fileName = previewData.t;
          String line = previewData.u;
 
@@ -228,7 +228,7 @@
      }
 
      @Override
-     public Path getPathPerFileName(String fileName) {
+     public Path createPathForSelectedFile(String fileName) {
          if (fileName.endsWith("/n")) {
              return filenamesToPaths.get(fileName.substring(0, fileName.length() - 1));
          }

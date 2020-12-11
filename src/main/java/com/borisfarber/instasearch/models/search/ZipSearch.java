@@ -14,7 +14,7 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.models.ResultPresentation;
+ import com.borisfarber.instasearch.models.ResultModel;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
  import com.borisfarber.instasearch.models.Pair;
@@ -90,7 +90,7 @@
          }
 
          executorService.execute(() -> {
-             String nLine  = ResultPresentation.extractPreviewLine(resultLine);
+             String nLine  = ResultModel.extractPreviewLine(resultLine);
              byte[] bytes = ZipUtil.unpackEntry(zipFile, nLine);
              int headerSize = bytes.length;
 
@@ -125,7 +125,7 @@
      }
 
      @Override
-     public Path getPathPerFileName(String fileName) {
+     public Path createPathForSelectedFile(String fileName) {
          String simpleName = new File(fileName).getName();
          File tempFile = PrivateFolder.INSTANCE.getTempFile(simpleName);
          ZipUtil.unpackEntry(zipFile, fileName, tempFile);

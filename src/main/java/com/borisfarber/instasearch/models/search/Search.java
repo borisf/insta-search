@@ -24,7 +24,7 @@ public interface Search {
 
     String getResultSetCount();
 
-    Path getPathPerFileName(String fileName);
+    Path createPathForSelectedFile(String fileName);
 
     void close();
 

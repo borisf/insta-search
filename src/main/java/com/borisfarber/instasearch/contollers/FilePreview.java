@@ -29,49 +29,49 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class FullFilePreview {
+public class filePreview {
 
-    private FullFilePreview(){
+    private filePreview(){
 
     }
 
-    public static void fullFilePreview(Search search,
-                                       String selectedFilename,
-                                       Integer selectedPosition,
-                                       ThreadPoolExecutor previewTasksExecutor,
-                                       JTextPane previewTextPane,
-                                       File file) {
-        if (search.getPathPerFileName(selectedFilename) == null) {
+    public static void filePreview(Search search,
+                                   String selectedFilename,
+                                   Integer selectedPosition,
+                                   ThreadPoolExecutor previewTasksExecutor,
+                                   JTextPane previewTextPane,
+                                   File file) {
+        if (search.createPathForSelectedFile(selectedFilename) == null) {
             // garbage files
             return;
         }
 
-        Path selectedPath = search.getPathPerFileName(selectedFilename);
+        Path selectedFilePath = search.createPathForSelectedFile(selectedFilename);
 
-        if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            openFileOnDesktop(selectedPath, selectedPosition);
-        } else if (PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
+        if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedFilePath)) {
+            openFileOnDesktop(selectedFilePath, selectedPosition);
+        } else if (PathMatchers.CLASS_MATCHER.matches(selectedFilePath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedPath);
+                Pair<File, String> result = Clazz.decompile(selectedFilePath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
-        } else if (PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
+        } else if (PathMatchers.CLASS_MATCHER.matches(selectedFilePath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedPath);
+                Pair<File, String> result = Clazz.decompile(selectedFilePath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
-        } else if (PathMatchers.DEX_MATCHER.matches(selectedPath)) {
+        } else if (PathMatchers.DEX_MATCHER.matches(selectedFilePath)) {
             previewTasksExecutor.execute(() -> {
                 Pair<File, String> result = Dex.decompile(file.toPath());
                 openPreviewAndDesktop(previewTextPane, result);
             });
-        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(selectedPath)) {
+        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(selectedFilePath)) {
             previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = BinaryXml.convertFromBinaryToText(selectedPath);
+                Pair<File, String> result = BinaryXml.decompile(selectedFilePath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else {
-            HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
+            HexPanel.createJFrameWithHexPanel(selectedFilePath.toFile());
         }
     }
 

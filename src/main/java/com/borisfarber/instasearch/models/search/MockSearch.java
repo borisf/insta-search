@@ -91,7 +91,7 @@ public class MockSearch implements Search {
     }
 
     @Override
-    public Path getPathPerFileName(String fileName) {
+    public Path createPathForSelectedFile(String fileName) {
         return null;
     }
 
