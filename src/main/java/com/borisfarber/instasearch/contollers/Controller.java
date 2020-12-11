@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.borisfarber.instasearch.contollers.FilePreview.filePreview;
+import static com.borisfarber.instasearch.contollers.FileView.viewFile;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 import static com.borisfarber.instasearch.ui.InstaSearch.RESULT_HIGHLIGHT_COLOR;
 
@@ -47,10 +47,10 @@ public final class Controller implements DocumentListener {
     private Search search;
     private ResultModel resultModel;
 
-    private final ThreadPoolExecutor searchTasksExecutor =
+    private final ThreadPoolExecutor searchExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
-    private final ThreadPoolExecutor previewTasksExecutor =
+    private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
     public Controller(JTextField searchField,
@@ -160,11 +160,11 @@ public final class Controller implements DocumentListener {
     }
 
     public void onEnterPressed() {
-        filePreview(
+        viewFile(
                 search,
                 resultModel.getExportedFilename(),
                 resultModel.getExportedLineIndex(),
-                previewTasksExecutor,
+                previewExecutor,
                 previewTextPane,
                 file);
     }
@@ -186,9 +186,9 @@ public final class Controller implements DocumentListener {
         resultModel.resetSelectedLine();
 
         Runnable runnableTask = () -> search.search(query);
-        long waitingTasksCount = searchTasksExecutor.getActiveCount();
+        long waitingTasksCount = searchExecutor.getActiveCount();
         if(waitingTasksCount < 1) {
-            searchTasksExecutor.submit(runnableTask);
+            searchExecutor.submit(runnableTask);
         }
     }
 
@@ -255,8 +255,8 @@ public final class Controller implements DocumentListener {
     }
 
     public void onClose() {
-        searchTasksExecutor.shutdown();
-        previewTasksExecutor.shutdown();
+        searchExecutor.shutdown();
+        previewExecutor.shutdown();
         search.close();
         PrivateFolder.INSTANCE.shutdown();
     }

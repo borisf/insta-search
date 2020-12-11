@@ -38,7 +38,7 @@ public class FilePreview {
     public static void filePreview(Search search,
                                    String filename,
                                    Integer position,
-                                   ThreadPoolExecutor previewTasksExecutor,
+                                   ThreadPoolExecutor previewExecutor,
                                    JTextPane previewTextPane,
                                    File file) {
         if (search.extractSelectedFile(filename) == null) {
@@ -51,22 +51,22 @@ public class FilePreview {
         if (PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(previewPath)) {
             openFileOnDesktop(previewPath, position);
         } else if (PathMatchers.CLASS_MATCHER.matches(previewPath)) {
-            previewTasksExecutor.execute(() -> {
+            previewExecutor.execute(() -> {
                 Pair<File, String> result = Clazz.decompile(previewPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else if (PathMatchers.CLASS_MATCHER.matches(previewPath)) {
-            previewTasksExecutor.execute(() -> {
+            previewExecutor.execute(() -> {
                 Pair<File, String> result = Clazz.decompile(previewPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else if (PathMatchers.DEX_MATCHER.matches(previewPath)) {
-            previewTasksExecutor.execute(() -> {
+            previewExecutor.execute(() -> {
                 Pair<File, String> result = Dex.decompile(file.toPath());
                 openPreviewAndDesktop(previewTextPane, result);
             });
         } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(previewPath)) {
-            previewTasksExecutor.execute(() -> {
+            previewExecutor.execute(() -> {
                 Pair<File, String> result = BinaryXml.decompile(previewPath);
                 openPreviewAndDesktop(previewTextPane, result);
             });
