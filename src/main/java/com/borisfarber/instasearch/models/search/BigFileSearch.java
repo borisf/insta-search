@@ -32,7 +32,7 @@ package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.*;
 import com.borisfarber.instasearch.models.Pair;
-import com.borisfarber.instasearch.models.ResultPresentation;
+import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 import com.borisfarber.instasearch.contollers.Controller;
 import com.jramoyo.io.IndexedFileReader;
@@ -160,7 +160,7 @@ public class BigFileSearch implements Search {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                         throws IOException {
-                    if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(path)) {
+                    if (PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(path)) {
                         try {
                             List<String> allFileLines = Files.readAllLines(path);
                             preview.addAll(allFileLines);
@@ -336,7 +336,7 @@ public class BigFileSearch implements Search {
 
         executorService.execute(() -> {
             try {
-                int lineNumInt = ResultPresentation.extractLineNumber(resultLine);
+                int lineNumInt = ResultModel.extractLineNumber(resultLine);
 
                 int lowerBound = lineNumInt - 7;
                 if(lowerBound < 1) {
@@ -386,7 +386,7 @@ public class BigFileSearch implements Search {
     }
 
     @Override
-    public Path getPathPerFileName(String fileName) {
+    public Path extractSelectedFile(String fileName) {
         return nameToPaths.get(fileName);
     }
 

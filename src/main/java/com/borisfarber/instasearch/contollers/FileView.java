@@ -13,6 +13,7 @@
   */
 package com.borisfarber.instasearch.contollers;
 
+import com.borisfarber.instasearch.models.formats.BinaryXml;
 import com.borisfarber.instasearch.models.formats.Clazz;
 import com.borisfarber.instasearch.models.formats.Dex;
 import com.borisfarber.instasearch.models.search.Search;
@@ -28,56 +29,60 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class FullFilePreview {
+public class FileView {
 
-    private FullFilePreview(){
+    private FileView(){
 
     }
 
-    public static void fullFilePreview(Search search,
-                                       String selectedFilename,
-                                       Integer selectedPosition,
-                                       ThreadPoolExecutor previewTasksExecutor,
-                                       JTextPane previewTextPane,
-                                       File file) {
-        if (search.getPathPerFileName(selectedFilename) == null) {
+    public static void viewFile(Search search,
+                                String filename,
+                                Integer position,
+                                ThreadPoolExecutor previewExecutor,
+                                JTextPane previewTextPane,
+                                File file) {
+        Path viewPath = search.extractSelectedFile(filename);
+        if (viewPath == null) {
             // garbage files
             return;
         }
 
-        Path selectedPath = search.getPathPerFileName(selectedFilename);
-
-        if (PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(selectedPath)) {
-            openFileOnDesktop(selectedPath, selectedPosition);
-        } else if (PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
-            previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedPath);
-                openPreviewAndDesktop(previewTextPane, result);
+        if (PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(viewPath)) {
+            showFileExternally(viewPath, position);
+        } else if (PathMatchers.CLASS_MATCHER.matches(viewPath)) {
+            previewExecutor.execute(() -> {
+                Pair<File, String> result = Clazz.decompile(viewPath);
+                showFile(previewTextPane, result);
             });
-        } else if (PathMatchers.CLASS_MATCHER.matches(selectedPath)) {
-            previewTasksExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(selectedPath);
-                openPreviewAndDesktop(previewTextPane, result);
+        } else if (PathMatchers.CLASS_MATCHER.matches(viewPath)) {
+            previewExecutor.execute(() -> {
+                Pair<File, String> result = Clazz.decompile(viewPath);
+                showFile(previewTextPane, result);
             });
-        } else if (PathMatchers.DEX_MATCHER.matches(selectedPath)) {
-            previewTasksExecutor.execute(() -> {
+        } else if (PathMatchers.DEX_MATCHER.matches(viewPath)) {
+            previewExecutor.execute(() -> {
                 Pair<File, String> result = Dex.decompile(file.toPath());
-                openPreviewAndDesktop(previewTextPane, result);
+                showFile(previewTextPane, result);
+            });
+        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(viewPath)) {
+            previewExecutor.execute(() -> {
+                Pair<File, String> result = BinaryXml.decompile(viewPath);
+                showFile(previewTextPane, result);
             });
         } else {
-            HexPanel.createJFrameWithHexPanel(selectedPath.toFile());
+            HexPanel.createJFrameWithHexPanel(viewPath.toFile());
         }
     }
 
-    private static void openPreviewAndDesktop(JTextPane previewTextPane, Pair<File, String> result) {
+    private static void showFile(JTextPane previewTextPane, Pair<File, String> result) {
         Runnable runnable = () -> {
             previewTextPane.setText(result.u);
-            openFileOnDesktop(result.t.toPath(), 0);
+            showFileExternally(result.t.toPath(), 0);
         };
         SwingUtilities.invokeLater(runnable);
     }
 
-    private static void openFileOnDesktop(Path path, int line) {
+    private static void showFileExternally(Path path, int line) {
         try {
             Desktop desktop = Desktop.getDesktop();
             desktop.open(new File(path.toString()));

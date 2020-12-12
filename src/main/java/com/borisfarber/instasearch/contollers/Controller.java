@@ -13,7 +13,7 @@
  */
 package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.models.ResultPresentation;
+import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.search.Search;
 import com.borisfarber.instasearch.models.search.SearchFactory;
 import com.borisfarber.instasearch.models.text.Background;
@@ -25,13 +25,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import java.awt.*;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.borisfarber.instasearch.contollers.FullFilePreview.fullFilePreview;
+import static com.borisfarber.instasearch.contollers.FileView.viewFile;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
+import static com.borisfarber.instasearch.ui.InstaSearch.RESULT_HIGHLIGHT_COLOR;
 
 public final class Controller implements DocumentListener {
     public static final int UI_VIEW_LIMIT = 1000;
@@ -45,12 +45,12 @@ public final class Controller implements DocumentListener {
     private File file;
     private String query;
     private Search search;
-    private ResultPresentation resultPresentation;
+    private ResultModel resultModel;
 
-    private final ThreadPoolExecutor searchTasksExecutor =
+    private final ThreadPoolExecutor searchExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
-    private final ThreadPoolExecutor previewTasksExecutor =
+    private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
     public Controller(JTextField searchField,
@@ -62,11 +62,11 @@ public final class Controller implements DocumentListener {
         this.previewTextPane = previewArea;
         this.resultCountLabel = resultCountLabel;
         this.search = SearchFactory.INSTANCE.createMockSearch(this);
-        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, Color.BLACK);
+        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, RESULT_HIGHLIGHT_COLOR);
         this.previewHighlighter = new PreviewHighlighter();
-        this.resultPresentation = new ResultPresentation();
+        this.resultModel = new ResultModel();
 
-        this.resultTextPane.setText(resultPresentation.getBackground());
+        this.resultTextPane.setText(resultModel.getBackground());
     }
 
     public void onFileOpened(File newFile) {
@@ -136,22 +136,22 @@ public final class Controller implements DocumentListener {
     }
 
     public void onUpPressed() {
-        resultPresentation.increaseSelectedLine();
+        resultModel.increaseSelectedLine();
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onDownPressed() {
-        resultPresentation.decreaseSelectedLine();
+        resultModel.decreaseSelectedLine();
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onMouseSingleClick(String selectedText) {
-        resultPresentation.setSelectedLine(selectedText);
+        resultModel.setSelectedLine(selectedText);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.SHORT);
     }
 
     public void onMouseDoubleClick(String selectedText) {
-        resultPresentation.exportLine(selectedText);
+        resultModel.exportLine(selectedText);
         onEnterPressed();
     }
 
@@ -160,11 +160,11 @@ public final class Controller implements DocumentListener {
     }
 
     public void onEnterPressed() {
-        fullFilePreview(
+        viewFile(
                 search,
-                resultPresentation.getExportedFilename(),
-                resultPresentation.getExportedLineIndex(),
-                previewTasksExecutor,
+                resultModel.getExportedFilename(),
+                resultModel.getExportedLineIndex(),
+                previewExecutor,
                 previewTextPane,
                 file);
     }
@@ -183,47 +183,47 @@ public final class Controller implements DocumentListener {
 
     private void search(String query) {
         this.query = query;
-        resultPresentation.resetSelectedLine();
+        resultModel.resetSelectedLine();
 
         Runnable runnableTask = () -> search.search(query);
-        long waitingTasksCount = searchTasksExecutor.getActiveCount();
+        long waitingTasksCount = searchExecutor.getActiveCount();
         if(waitingTasksCount < 1) {
-            searchTasksExecutor.submit(runnableTask);
+            searchExecutor.submit(runnableTask);
         }
     }
 
     public void onCrawlFinish(java.util.List<String> crawlResults) {
-        resultPresentation.fillFilenameResults(crawlResults);
-        resultPresentation.generateResultView();
-        resultTextPane.setText(resultPresentation.getResultView());
+        resultModel.fillFilenameResults(crawlResults);
+        resultModel.generateResultView();
+        resultTextPane.setText(resultModel.getResultView());
         resultTextPane.setCaretPosition(0);
     }
 
     public void onSearchFinish() {
-        resultPresentation.fillSearchResults(search);
+        resultModel.fillSearchResults(search);
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
     private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
-        resultPresentation.generateResultView();
-        resultTextPane.setText(resultPresentation.getResultView());
+        resultModel.generateResultView();
+        resultTextPane.setText(resultModel.getResultView());
         resultTextPane.setCaretPosition(0);
 
-        if(resultPresentation.getResultCount() > 0) {
-            previewTextPane.setText(search.getPreview(resultPresentation.getSelectedLine()));
+        if(resultModel.getResultCount() > 0) {
+            previewTextPane.setText(search.getPreview(resultModel.getSelectedLine()));
             previewTextPane.setCaretPosition(0);
             highlightPreview();
         }
 
-        if(resultPresentation.getResultCount() > UI_VIEW_LIMIT) {
+        if(resultModel.getResultCount() > UI_VIEW_LIMIT) {
             resultCountLabel.setText("...");
         } else {
             resultCountLabel.setText(
-                    String.valueOf(resultPresentation.getResultCount()));
+                    String.valueOf(resultModel.getResultCount()));
         }
 
         try {
-            int selector = resultPresentation.getSelectionIndex();
+            int selector = resultModel.getSelectionIndex();
             if(selector != -1) {
                 resultTextPane.setCaretPosition(selector);
                 highlightResults(selector, span);
@@ -235,7 +235,7 @@ public final class Controller implements DocumentListener {
 
     private void highlightResults(int from, ResultsHighlighter.HIGHLIGHT_SPAN span) {
         if(query != null) {
-            resultsHighlighter.highlightSearch(from, span, query);
+            resultsHighlighter.highlight(from, span, query);
         }
     }
 
@@ -247,16 +247,16 @@ public final class Controller implements DocumentListener {
 
     private void highlightPreview() {
         if(query != null) {
-            previewHighlighter.highlightPreview(previewTextPane,
-                    ResultPresentation.extractPreviewLine(
-                            resultPresentation.getSelectedLine()),
+            previewHighlighter.highlight(previewTextPane,
+                    ResultModel.extractPreviewLine(
+                            resultModel.getSelectedLine()),
                     FOREGROUND_COLOR);
         }
     }
 
     public void onClose() {
-        searchTasksExecutor.shutdown();
-        previewTasksExecutor.shutdown();
+        searchExecutor.shutdown();
+        previewExecutor.shutdown();
         search.close();
         PrivateFolder.INSTANCE.shutdown();
     }

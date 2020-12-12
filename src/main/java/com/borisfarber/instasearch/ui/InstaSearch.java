@@ -37,6 +37,7 @@
 
      public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
      public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
+     public static final Color RESULT_HIGHLIGHT_COLOR = new Color(0x13,0x23, 0);
 
      public InstaSearch(String file) {
          this();
@@ -312,7 +313,7 @@
      }
 
      private static boolean isTextSupported(String filePath) {
-         return PathMatchers.SOURCE_OR_TEXT_PATH_MATCHER.matches(new File(filePath).toPath());
+         return PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(new File(filePath).toPath());
      }
 
      public static void main(final String[] args) {

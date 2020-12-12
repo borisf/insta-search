@@ -16,12 +16,14 @@
 package com.borisfarber.instasearch.models.formats;
 
 import com.borisfarber.instasearch.contollers.PrivateFolder;
+import com.borisfarber.instasearch.models.Pair;
 import com.google.common.io.LittleEndianDataInputStream;
-import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -106,20 +108,28 @@ public class BinaryXml {
         Arrays.fill(SPACE_FILL, ' ');
     }
 
-    public static File extractManifest(File file) {
+    public static Pair<File, String> decompile(Path selectedPath) {
         File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
-        byte[] bytes = ZipUtil.unpackEntry(file, "AndroidManifest.xml");
+        String content = "";
+
+        byte[] bytes = new byte[0];
+        try {
+            bytes = Files.readAllBytes(selectedPath);
+        } catch (IOException e) {
+            // file doesn't exist
+            e.printStackTrace();
+        }
 
         try (PrintWriter out = new PrintWriter(man)) {
             BinaryXml binaryXml = new BinaryXml();
-            String content = binaryXml.decompressXml(bytes);
+            content = binaryXml.decompressXml(bytes);
             out.println(content);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return man;
+        Pair <File, String> result = new Pair<>(man, content);
+        return result;
     }
 
     public void setAppendNamespaces(boolean appendNamespaces) {

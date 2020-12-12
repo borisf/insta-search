@@ -12,26 +12,28 @@
   * limitations under the License.
   */
 
-package com.borisfarber.instasearch.contollers;
+ package com.borisfarber.instasearch.contollers;
 
-import java.nio.file.FileSystems;
-import java.nio.file.PathMatcher;
+ import java.nio.file.FileSystems;
+ import java.nio.file.PathMatcher;
 
-public class PathMatchers {
-    public static final PathMatcher SOURCE_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
-    public static final PathMatcher SOURCE_OR_TEXT_PATH_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
-    public static final PathMatcher CLASS_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{class}");
-    public static final PathMatcher ZIP_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
-    public static final PathMatcher APK_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{apk}");
-    public static final PathMatcher DEX_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{dex}");
+ public class PathMatchers {
+     public static final PathMatcher SOURCE_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
+     public static final PathMatcher SOURCE_OR_TEXT_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+     public static final PathMatcher CLASS_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{class}");
+     public static final PathMatcher ZIP_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
+     public static final PathMatcher APK_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{apk}");
+     public static final PathMatcher DEX_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{dex}");
+     public static final PathMatcher ANDROID_BINARY_XML_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{xml}");
 
-    private PathMatchers() {
+     private PathMatchers() {
 
-    }
-}
+     }
+ }

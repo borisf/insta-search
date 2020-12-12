@@ -19,7 +19,7 @@
 
  public class PreviewHighlighter {
 
-     public void highlightPreview(JTextPane previewTextPane, String previewLine, Color color) {
+     public void highlight(JTextPane previewTextPane, String previewLine, Color color) {
          DefaultHighlighter.DefaultHighlightPainter previewHighlighter =
                  new DefaultHighlighter.DefaultHighlightPainter(color);
 
@@ -27,24 +27,33 @@
              Document doc = previewTextPane.getDocument();
              String text = doc.getText(0, doc.getLength());
 
-             int pos = text.toLowerCase().indexOf(previewLine.toLowerCase());
+             int startPosition = text.toLowerCase().indexOf(previewLine.toLowerCase());
 
-             if(pos == -1) {
+             if(startPosition == -1) {
                  // hex view in the preview, no reason to highlight
                  //System.out.println("here");
                  return;
              }
 
-             previewTextPane.getHighlighter().addHighlight(pos,
-                     pos + previewLine.length(), previewHighlighter);
+             while(text.charAt(startPosition) == ' ') {
+                 startPosition++;
+             }
+
+             int endPosition = startPosition + previewLine.length();
+
+             while(text.charAt(endPosition) == ' ') {
+                 endPosition--;
+             }
+
+             previewTextPane.getHighlighter().addHighlight(startPosition, endPosition, previewHighlighter);
 
              // back, UX less focus on the preview
              MutableAttributeSet attrs = previewTextPane.getInputAttributes();
              StyledDocument doc1 = previewTextPane.getStyledDocument();
              StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
-             doc1.setCharacterAttributes(pos, pos + previewLine.length(), attrs, false);
+             doc1.setCharacterAttributes(startPosition, endPosition, attrs, false);
              StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
-             doc1.setCharacterAttributes(pos + previewLine.length(), text.length(),attrs, false);
+             doc1.setCharacterAttributes(endPosition, text.length(),attrs, false);
              // end back
          } catch (final BadLocationException ble) {
              System.err.println("Ignored in highlight preview");
