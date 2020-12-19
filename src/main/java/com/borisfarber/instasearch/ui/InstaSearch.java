@@ -37,7 +37,7 @@
 
      public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
      public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
-     public static final Color RESULT_HIGHLIGHT_COLOR = new Color(0x13,0x23, 0);
+     public static final Color RESULT_HIGHLIGHT_COLOR = new Color(0x9b,0, 0x9b);
 
      public InstaSearch(String file) {
          this();
