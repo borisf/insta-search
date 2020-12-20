@@ -126,10 +126,19 @@
 
          final JMenuItem aboutItem = new JMenuItem("About");
          aboutItem.setFont(textFont);
+
+         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/shark.png"));
+         Image image = aboutIcon.getImage();
+         Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
+         aboutIcon = new ImageIcon(tempImage);
+
+         ImageIcon finalAboutIcon = aboutIcon; // to capture in the lambda
          aboutItem.addActionListener(
-                 actionEvent -> JOptionPane.showMessageDialog(this,
-                         "Classy Shark Insta Search version " +
-                                 BuildVersion.getBuildVersion()));
+                 actionEvent -> JOptionPane.showMessageDialog(
+                         this,
+                         "Classy Shark Insta Search version " + BuildVersion.getBuildVersion(),
+                         "ClassyShark Insta Search", JOptionPane.PLAIN_MESSAGE,
+                         finalAboutIcon));
          menu.add(aboutItem);
 
          final JMenuItem closeItem = new JMenuItem("Exit");
@@ -153,6 +162,8 @@
          Dimension dim = defaultToolkit.getScreenSize();
          setPreferredSize(new Dimension(1200, 900));
          setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
+         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/shark.png")).getImage());
+
          pack();
          setVisible(true);
      }

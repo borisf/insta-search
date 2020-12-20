@@ -29,8 +29,9 @@ import java.awt.*;
 
 import static com.borisfarber.instasearch.ui.InstaSearch.BACKGROUND_COLOR;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 
-public final class HexPanel extends JPanel implements CaretListener {
+ public final class HexPanel extends JPanel implements CaretListener {
     private static final int DEFAULT_BYTES_PER_LINE = 16;
     private static final String HEX_FORMAT = "%02X ";
 
@@ -317,6 +318,7 @@ public final class HexPanel extends JPanel implements CaretListener {
         panel.setPreferredSize(new Dimension(1200, 900));
 
         JFrame jframe = new JFrame(file.getName());
+        jframe.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         jframe.setContentPane(panel);
 
         jframe.setVisible(true);
