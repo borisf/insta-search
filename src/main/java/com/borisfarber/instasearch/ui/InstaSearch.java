@@ -127,7 +127,7 @@
          final JMenuItem aboutItem = new JMenuItem("About");
          aboutItem.setFont(textFont);
 
-         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/shark.png"));
+         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/blue-shark.png"));
          Image image = aboutIcon.getImage();
          Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
          aboutIcon = new ImageIcon(tempImage);
@@ -162,7 +162,7 @@
          Dimension dim = defaultToolkit.getScreenSize();
          setPreferredSize(new Dimension(1200, 900));
          setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
-         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/shark.png")).getImage());
+         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/blue-shark.png")).getImage());
 
          pack();
          setVisible(true);
