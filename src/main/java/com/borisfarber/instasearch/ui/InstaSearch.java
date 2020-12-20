@@ -52,6 +52,7 @@
                  new Controller(searchField, resultTextPane,
                          previewTextPane, resultCountLabel);
          searchField.getDocument().addDocumentListener(this.controller);
+         controller.onFileOpened(openFile());
      }
 
      public final void onFileDragged(final File file) {
@@ -115,7 +116,7 @@
          openFolderItem.setFont(textFont);
          openFolderItem.addActionListener(actionEvent -> {
              try {
-                 File newFile = open();
+                 File newFile = openFile();
                  controller.onFileOpened(newFile);
              } catch (Exception e) {
                  e.printStackTrace();
@@ -294,7 +295,7 @@
          return result;
      }
 
-     private File open() {
+     private File openFile() {
          final JFileChooser fileChooser = new JFileChooser();
          fileChooser.setPreferredSize(new Dimension(700,500));
          fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -326,7 +327,7 @@
 
          InstaSearch classySearch;
          if (args.length == 0) {
-             classySearch = new InstaSearch(System.getProperty("user.dir"));
+             classySearch = new InstaSearch();
              classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
          } else {
              if (isBinarySupported(args[0]) || isTextSupported(args[0])) {
