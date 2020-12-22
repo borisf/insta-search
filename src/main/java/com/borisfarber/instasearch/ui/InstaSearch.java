@@ -52,6 +52,7 @@
                  new Controller(searchField, resultTextPane,
                          previewTextPane, resultCountLabel);
          searchField.getDocument().addDocumentListener(this.controller);
+         controller.onFileOpened(openFile());
      }
 
      public final void onFileDragged(final File file) {
@@ -115,7 +116,7 @@
          openFolderItem.setFont(textFont);
          openFolderItem.addActionListener(actionEvent -> {
              try {
-                 File newFile = open();
+                 File newFile = openFile();
                  controller.onFileOpened(newFile);
              } catch (Exception e) {
                  e.printStackTrace();
@@ -125,10 +126,19 @@
 
          final JMenuItem aboutItem = new JMenuItem("About");
          aboutItem.setFont(textFont);
+
+         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/blue-shark.png"));
+         Image image = aboutIcon.getImage();
+         Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
+         aboutIcon = new ImageIcon(tempImage);
+
+         ImageIcon finalAboutIcon = aboutIcon; // to capture in the lambda
          aboutItem.addActionListener(
-                 actionEvent -> JOptionPane.showMessageDialog(this,
-                         "Classy Shark Insta Search version " +
-                                 BuildVersion.getBuildVersion()));
+                 actionEvent -> JOptionPane.showMessageDialog(
+                         this,
+                         "Classy Shark Insta Search version " + BuildVersion.getBuildVersion(),
+                         "ClassyShark Insta Search", JOptionPane.PLAIN_MESSAGE,
+                         finalAboutIcon));
          menu.add(aboutItem);
 
          final JMenuItem closeItem = new JMenuItem("Exit");
@@ -152,6 +162,8 @@
          Dimension dim = defaultToolkit.getScreenSize();
          setPreferredSize(new Dimension(1200, 900));
          setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
+         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/blue-shark.png")).getImage());
+
          pack();
          setVisible(true);
      }
@@ -294,7 +306,7 @@
          return result;
      }
 
-     private File open() {
+     private File openFile() {
          final JFileChooser fileChooser = new JFileChooser();
          fileChooser.setPreferredSize(new Dimension(700,500));
          fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -326,7 +338,7 @@
 
          InstaSearch classySearch;
          if (args.length == 0) {
-             classySearch = new InstaSearch(System.getProperty("user.dir"));
+             classySearch = new InstaSearch();
              classySearch.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
          } else {
              if (isBinarySupported(args[0]) || isTextSupported(args[0])) {
