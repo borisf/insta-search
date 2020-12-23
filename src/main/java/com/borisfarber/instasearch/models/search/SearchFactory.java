@@ -33,7 +33,7 @@ public enum SearchFactory {
             if(PrivateFolder.isSourceFolder(newFile)) {
                 return new FolderSearch(controller);
             } else {
-                return new BigFileSearch(controller);
+                return new FilenameSearch(controller);
             }
         } else {
             if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
