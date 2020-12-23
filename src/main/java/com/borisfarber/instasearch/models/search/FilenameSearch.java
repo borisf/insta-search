@@ -39,7 +39,6 @@
 
      private final ArrayList<String> allLines;
      private Map<String, Float> matchedSet;
-     private TreeMap<Float, String> resultMap;
 
      public FilenameSearch(Controller controller) {
          this.controller = controller;
