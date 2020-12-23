@@ -81,8 +81,9 @@
              }
 
              if (query.length() < 3) {
-                 // TODO exception here, add sync block
-                 matchedSet = ngramSearch(1, 50, query, allLines, String::toString);
+                 synchronized (this) {
+                     matchedSet = ngramSearch(1, 50, query, allLines, String::toString);
+                 }
              } else {
                  matchedSet = ngramSearch(3, 50, query, allLines, String::toString);
              }
@@ -109,7 +110,7 @@
      @Override
      public List<String> getResults() {
          ArrayList<String> result = new ArrayList<>(matchedSet.size());
-         matchedSet.forEach((k, v) -> result.add(k + "#" + v));
+         matchedSet.forEach((k, v) -> result.add(k));
 
          return result;
      }
