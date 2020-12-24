@@ -43,8 +43,7 @@ Pressing Enter or double-clicking on an entry will open its own hex editor in a 
 ### File Menu
 When you click on File menu you will get the following:
 * Open - will open a file selection dialog to open a window. For a source folder InstaSearch 
-  will do a search inside files, while for a regular folder InstaSearch
-  will do a file name search. 
+  will do a search inside files, while for a regular folder InstaSearch will do a file name search. 
 
 * About - will show you the version
 

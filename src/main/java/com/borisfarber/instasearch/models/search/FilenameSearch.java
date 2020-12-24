@@ -70,6 +70,8 @@
          } catch (IOException e) {
              e.printStackTrace();
          }
+
+         controller.onCrawlFinish(allLines);
      }
 
      @Override
