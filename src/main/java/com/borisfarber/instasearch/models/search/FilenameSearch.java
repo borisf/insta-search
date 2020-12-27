@@ -15,6 +15,9 @@
 
  import com.borisfarber.instasearch.contollers.Controller;
  import com.borisfarber.instasearch.models.Pair;
+ import com.illucit.instatrie.index.PrefixIndex;
+ import com.illucit.instatrie.index.TriePrefixIndex;
+ import com.illucit.instatrie.splitter.StringWordSplitter;
 
  import javax.swing.*;
  import java.io.File;
@@ -28,7 +31,6 @@
  import java.util.concurrent.ExecutorService;
  import java.util.concurrent.Executors;
 
- import static com.github.eugenelesnov.NgramSearch.ngramSearch;
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
@@ -38,17 +40,18 @@
              Executors.newSingleThreadExecutor();
 
      private final ArrayList<String> allLines;
-     private Map<String, Float> matchedSet;
+     private PrefixIndex<String> index = new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
+     private List<String> search = new LinkedList<>();
 
      public FilenameSearch(Controller controller) {
          this.controller = controller;
          allLines = new ArrayList<>();
-         matchedSet = new TreeMap<>();
      }
 
      @Override
      public void crawl(File file) {
          try {
+             controller.onCrawlUpdate("Crawling files");
              Files.walkFileTree(file.toPath(), new SimpleFileVisitor<>() {
 
                  @Override
@@ -62,7 +65,6 @@
 
                  @Override
                  public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-                     //System.out.println(path);
                      allLines.add(path.toString());
                      return CONTINUE;
                  }
@@ -71,6 +73,8 @@
              e.printStackTrace();
          }
 
+         controller.onCrawlUpdate("Indexing c[]");
+         index.createIndex(allLines);
          controller.onCrawlFinish(allLines);
      }
 
@@ -81,13 +85,7 @@
                  return;
              }
 
-             if (query.length() < 3) {
-                 synchronized (this) {
-                     matchedSet = ngramSearch(1, 50, query, allLines, String::toString);
-                 }
-             } else {
-                 matchedSet = ngramSearch(3, 50, query, allLines, String::toString);
-             }
+             search = index.search(query);
 
              Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
@@ -110,10 +108,15 @@
 
      @Override
      public List<String> getResults() {
+         /*
          ArrayList<String> result = new ArrayList<>(matchedSet.size());
          matchedSet.forEach((k, v) -> result.add(k));
 
          return result;
+
+          */
+
+         return search;
      }
 
      @Override

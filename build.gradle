@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.borisfarber'
-version '6.1'
+version '6.2'
 
 repositories {
     mavenCentral()
@@ -31,6 +31,7 @@ dependencies {
     implementation 'com.dorkbox:Notify:3.7'
     implementation group: 'com.google.guava', name: 'guava', version: '23.5-jre'
     implementation group: 'org.smali', name: 'dexlib2', version: '2.4.0'
+    implementation 'com.illucit:instatrie:2.0.0'
 }
 
 allprojects {
