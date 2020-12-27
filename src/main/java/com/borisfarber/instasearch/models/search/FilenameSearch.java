@@ -41,7 +41,7 @@
 
      private final ArrayList<String> allLines;
      private PrefixIndex<String> index = new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
-     private List<String> search = new LinkedList<>();
+     private List<String> searchResults = new LinkedList<>();
 
      public FilenameSearch(Controller controller) {
          this.controller = controller;
@@ -85,8 +85,7 @@
                  return;
              }
 
-             search = index.search(query);
-
+             searchResults = index.search(query);
              Runnable runnable = controller::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
@@ -108,15 +107,7 @@
 
      @Override
      public List<String> getResults() {
-         /*
-         ArrayList<String> result = new ArrayList<>(matchedSet.size());
-         matchedSet.forEach((k, v) -> result.add(k));
-
-         return result;
-
-          */
-
-         return search;
+         return searchResults;
      }
 
      @Override

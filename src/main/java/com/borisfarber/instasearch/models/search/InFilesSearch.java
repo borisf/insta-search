@@ -31,7 +31,7 @@
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
- public class FolderSearch implements Search {
+ public class InFilesSearch implements Search {
      private final Controller controller;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
@@ -43,7 +43,7 @@
              Executors.newSingleThreadExecutor();
      private Map<String, Float> matchedSet;
 
-     public FolderSearch(Controller controller) {
+     public InFilesSearch(Controller controller) {
          this.controller = controller;
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();
@@ -63,7 +63,7 @@
              return;
          }
 
-         if(file.isDirectory() && file.list().length ==0) {
+         if(file.isDirectory() && Objects.requireNonNull(file.list()).length ==0) {
              return;
          }
 
@@ -183,7 +183,7 @@
          String fileName = previewData.t;
          String line = previewData.u;
 
-         if(resultLine.indexOf(":") < 0) {
+         if(!resultLine.contains(":")) {
              isFileInternals = false;
          }
 
@@ -200,8 +200,8 @@
                  lower = 0;
              }
          } else {
-             lower = allLinesIndex + 0;
-             upper = allLinesIndex + 120;
+             lower = allLinesIndex;
+             upper = lower + 120;
          }
 
          if (upper >= allLines.size()) {
@@ -239,10 +239,7 @@
      @Override
      public List<String> getResults() {
          ArrayList<String> result = new ArrayList<>(matchedSet.size());
-
-         for (String ms : matchedSet.keySet()) {
-             result.add(ms);
-         }
+         result.addAll(matchedSet.keySet());
 
          return result;
      }
@@ -270,9 +267,7 @@
          Runnable runnable = () -> {
              ArrayList<String> allFiles = new ArrayList<>();
 
-             StringBuilder builder = new StringBuilder();
              for (String fileName : filenamesToPaths.keySet()) {
-                 builder.append(fileName).append("\n");
                  allFiles.add(fileName);
              }
 
