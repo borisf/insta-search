@@ -51,7 +51,7 @@
      @Override
      public void crawl(File file) {
          try {
-             controller.onCrawlUpdate("Crawling files");
+             controller.onCrawlUpdate("Crawling files ...");
              Files.walkFileTree(file.toPath(), new SimpleFileVisitor<>() {
 
                  @Override
@@ -73,7 +73,7 @@
              e.printStackTrace();
          }
 
-         controller.onCrawlUpdate("Indexing c[]");
+         controller.onCrawlUpdate("Indexing ...");
          index.createIndex(allLines);
          controller.onCrawlFinish(allLines);
      }
