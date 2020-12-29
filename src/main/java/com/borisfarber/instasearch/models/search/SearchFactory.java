@@ -31,7 +31,7 @@ public enum SearchFactory {
     public Search createSearch(File newFile, Controller controller) {
         if (newFile.isDirectory()) {
             if(PrivateFolder.isSourceFolder(newFile)) {
-                return new FolderSearch(controller);
+                return new InFilesSearch(controller);
             } else {
                 return new FilenameSearch(controller);
             }

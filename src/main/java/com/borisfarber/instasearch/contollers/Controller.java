@@ -97,6 +97,10 @@ public final class Controller implements DocumentListener {
         search.crawl(file);
     }
 
+    public void onCrawlUpdate(String update) {
+        previewTextPane.setText(update);
+    }
+
     @Override
     public void insertUpdate(final DocumentEvent evt) {
         // letter
@@ -197,6 +201,7 @@ public final class Controller implements DocumentListener {
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());
         resultTextPane.setCaretPosition(0);
+        previewTextPane.setText("");
     }
 
     public void onSearchFinish() {
