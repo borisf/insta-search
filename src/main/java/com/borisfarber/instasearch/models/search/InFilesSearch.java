@@ -266,11 +266,7 @@
      public void emptyQuery() {
          Runnable runnable = () -> {
              ArrayList<String> allFiles = new ArrayList<>();
-
-             for (String fileName : filenamesToPaths.keySet()) {
-                 allFiles.add(fileName);
-             }
-
+             allFiles.addAll(filenamesToPaths.keySet());
              controller.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
