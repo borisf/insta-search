@@ -13,8 +13,8 @@
   */
  package com.borisfarber.instasearch.ui;
 
- import com.borisfarber.instasearch.contollers.*;
- import com.borisfarber.instasearch.models.text.BuildVersion;
+ import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.PathMatchers;
 
  import javax.swing.*;
  import javax.swing.text.BadLocationException;
@@ -61,8 +61,9 @@
      }
 
      private void buildUI() {
+         Toolbar toolbar = new Toolbar(this);
+
          searchField = buildSearchField();
-         searchField.setAlignmentX(0.0f);
          searchField.setMaximumSize(new Dimension(1400, 30));
 
          resultTextPane = buildResultTextPane();
@@ -83,16 +84,8 @@
                  controller.onMouseScrolled(currentAnchor * 240, ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
              }
          });
-
          previewTextPane = buildPreviewTextPane();
          JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
-
-         resultCountLabel = new JLabel("...");
-         JPanel statusPanel = new JPanel();
-         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-         resultCountLabel.setAlignmentX(0.5f);
-         statusPanel.add(resultCountLabel);
-         statusPanel.setAlignmentX(0.0f);
 
          JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, showResultsScrolled, showFileScrolled);
          splitPane.setDividerSize(20);
@@ -100,55 +93,21 @@
          splitPane.setDividerLocation(400);
          splitPane.setOneTouchExpandable(true);
          splitPane.setContinuousLayout(true);
-         splitPane.setAlignmentX(0.0f);
+         // aligns to other size components (box layout)
+         splitPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+         resultCountLabel = new JLabel("...");
+         JPanel statusPanel = new JPanel();
+         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+         resultCountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+         statusPanel.add(resultCountLabel);
+         statusPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+         getContentPane().add(toolbar);
          getContentPane().add(searchField);
          getContentPane().add(splitPane);
          getContentPane().add(statusPanel);
          getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-
-         JMenuBar menuBar = new JMenuBar();
-         UIManager.put("Menu.font", textFont);
-         JMenu menu = new JMenu("File");
-         menuBar.add(menu);
-         menuBar.add(Box.createHorizontalGlue());
-         JMenuItem openFolderItem = new JMenuItem("Open...");
-         openFolderItem.setFont(textFont);
-         openFolderItem.addActionListener(actionEvent -> {
-             try {
-                 File newFile = openFile();
-                 controller.onFileOpened(newFile);
-             } catch (Exception e) {
-                 e.printStackTrace();
-             }
-         });
-         menu.add(openFolderItem);
-
-         final JMenuItem aboutItem = new JMenuItem("About");
-         aboutItem.setFont(textFont);
-
-         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/blue-shark.png"));
-         Image image = aboutIcon.getImage();
-         Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
-         aboutIcon = new ImageIcon(tempImage);
-
-         ImageIcon finalAboutIcon = aboutIcon; // to capture in the lambda
-         aboutItem.addActionListener(
-                 actionEvent -> JOptionPane.showMessageDialog(
-                         this,
-                         "Classy Shark Insta Search version " + BuildVersion.getBuildVersion(),
-                         "ClassyShark Insta Search", JOptionPane.PLAIN_MESSAGE,
-                         finalAboutIcon));
-         menu.add(aboutItem);
-
-         final JMenuItem closeItem = new JMenuItem("Exit");
-         closeItem.setFont(textFont);
-         closeItem.addActionListener(actionEvent -> {
-             controller.onClose();
-             System.exit(0);
-         });
-         menu.add(closeItem);
-         setJMenuBar(menuBar);
 
          addWindowListener(new WindowAdapter() {
              @Override
@@ -318,6 +277,10 @@
          }
 
          return null;
+     }
+
+     public void openFileGrep() {
+         controller.onFileOpened(openFile());
      }
 
      private static boolean isBinarySupported(String filePath) {

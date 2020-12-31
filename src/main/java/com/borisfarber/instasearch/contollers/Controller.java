@@ -42,7 +42,7 @@ public final class Controller implements DocumentListener {
     private final JLabel resultCountLabel;
     private final ResultsHighlighter resultsHighlighter;
     private final PreviewHighlighter previewHighlighter;
-    private File file;
+    private File root;
     private String query;
     private Search search;
     private ResultModel resultModel;
@@ -87,14 +87,16 @@ public final class Controller implements DocumentListener {
         crawl(file);
     }
 
-    private void crawl(final File file) {
-        if (file == null || !file.exists()) {
+    private void crawl(final File root) {
+        if (root == null || !root.exists()) {
             return;
         }
 
-        this.file = file;
-        search = SearchFactory.INSTANCE.createSearch(file, this);
-        search.crawl(file);
+        this.root = root;
+
+        // TODO add parameter for content versus names for folders
+        search = SearchFactory.INSTANCE.createSearch(root, this);
+        search.crawl(root);
     }
 
     public void onCrawlUpdate(String update) {
@@ -170,7 +172,7 @@ public final class Controller implements DocumentListener {
                 resultModel.getExportedLineIndex(),
                 previewExecutor,
                 previewTextPane,
-                file);
+                root);
     }
 
     private void runNewSearch(final Document searchQueryDoc) {

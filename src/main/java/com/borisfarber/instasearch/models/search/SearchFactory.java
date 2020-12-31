@@ -30,6 +30,9 @@ public enum SearchFactory {
 
     public Search createSearch(File newFile, Controller controller) {
         if (newFile.isDirectory()) {
+
+            // TODO add button for search inside versus file names
+            // TODO remove is Source Folder
             if(PrivateFolder.isSourceFolder(newFile)) {
                 return new InFilesSearch(controller);
             } else {
