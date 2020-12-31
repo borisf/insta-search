@@ -24,6 +24,8 @@
  import java.io.File;
 
  import static java.awt.event.KeyEvent.*;
+ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
+ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
  public final class InstaSearch extends JFrame {
      public static final int FRAME_WIDTH = 1200;
@@ -69,7 +71,9 @@
          searchField.setMaximumSize(new Dimension(FRAME_WIDTH, 40));
 
          resultTextPane = buildResultTextPane();
-         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
+         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane,
+                 VERTICAL_SCROLLBAR_ALWAYS,
+                 HORIZONTAL_SCROLLBAR_ALWAYS);
          showResultsScrolled.addMouseWheelListener(new MouseWheelListener() {
              int currentAnchor = 0;
 
@@ -87,11 +91,14 @@
              }
          });
          previewTextPane = buildPreviewTextPane();
-         JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
+         JScrollPane showFileScrolled = new JScrollPane(previewTextPane,
+                 VERTICAL_SCROLLBAR_ALWAYS,
+                 HORIZONTAL_SCROLLBAR_ALWAYS);
 
          JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                  showResultsScrolled, showFileScrolled);
          splitPane.setMaximumSize(new Dimension(FRAME_WIDTH, 750));
+         splitPane.setMinimumSize(new Dimension(FRAME_WIDTH, 750));
          splitPane.setDividerSize(20);
          splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
          splitPane.setDividerLocation(400);
@@ -100,7 +107,6 @@
          splitPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
          resultCountLabel = new JLabel("...");
-         resultCountLabel.setFont(textFont);
          resultCountLabel.setMaximumSize(new Dimension(80, 35));
          resultCountLabel.setMinimumSize(new Dimension(80, 35));
          resultCountLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
