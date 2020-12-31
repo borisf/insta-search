@@ -64,7 +64,7 @@
          Toolbar toolbar = new Toolbar(this);
 
          searchField = buildSearchField();
-         searchField.setMaximumSize(new Dimension(1400, 30));
+         searchField.setMaximumSize(new Dimension(1200, 30));
 
          resultTextPane = buildResultTextPane();
          JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);

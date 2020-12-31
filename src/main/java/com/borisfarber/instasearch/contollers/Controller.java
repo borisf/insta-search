@@ -72,37 +72,32 @@ public final class Controller implements DocumentListener {
     }
 
     public void onFileOpened(File newFile) {
-        if(newFile != null) {
-            searchField.setText("");
-            resultTextPane.setText("Indexing");
-            previewTextPane.setText("");
-            resultCountLabel.setText("");
-            this.currentFile = newFile;
-            crawl(newFile);
-        }
+        crawl(newFile);
     }
 
     public void onFileDragged(File newFile) {
-       onFileOpened(newFile);
+       crawl(newFile);
     }
 
     public void updateSearchMode(String searchMode) {
         this.searchMode = searchMode;
-        searchField.setText("");
-        resultTextPane.setText("Indexing");
-        previewTextPane.setText("");
-        resultCountLabel.setText("");
         crawl(currentFile);
     }
 
-    private void crawl(final File root) {
-        if (root == null || !root.exists()) {
-            resultTextPane.setText("");
+    private void crawl(final File file) {
+        searchField.setText("");
+        resultTextPane.setText("");
+        previewTextPane.setText("");
+        resultCountLabel.setText("");
+
+        if (file == null || !file.exists()) {
             return;
         }
 
-        search = SearchFactory.INSTANCE.createSearch(this, root, searchMode);
-        search.crawl(root);
+        this.currentFile = file;
+        resultTextPane.setText("Indexing ...");
+        search = SearchFactory.INSTANCE.createSearch(this, file, searchMode);
+        search.crawl(file);
     }
 
     @Override
