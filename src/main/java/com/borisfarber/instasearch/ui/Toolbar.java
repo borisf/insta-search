@@ -29,8 +29,8 @@ public class Toolbar extends JToolBar {
         openButton = buildOpenButton();
         searchModeCombo = buildSearchModeCombo();
 
-        add(searchModeCombo);
         add(openButton);
+        add(searchModeCombo);
         setFloatable(false);
         setBorder(BorderFactory.createEmptyBorder());
     }

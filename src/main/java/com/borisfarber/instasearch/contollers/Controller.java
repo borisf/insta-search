@@ -42,7 +42,6 @@ public final class Controller implements DocumentListener {
     private final JLabel resultCountLabel;
     private final ResultsHighlighter resultsHighlighter;
     private final PreviewHighlighter previewHighlighter;
-    private File root;
     private String query;
     private Search search;
     private ResultModel resultModel;
@@ -95,9 +94,10 @@ public final class Controller implements DocumentListener {
         }
 
         this.currentFile = file;
-        resultTextPane.setText("Indexing ...");
+        resultCountLabel.setText("Indexing ...");
         search = SearchFactory.INSTANCE.createSearch(this, file, searchMode);
         search.crawl(file);
+        resultCountLabel.setText(" ...");
     }
 
     @Override
@@ -169,7 +169,7 @@ public final class Controller implements DocumentListener {
                 resultModel.getExportedLineIndex(),
                 previewExecutor,
                 previewTextPane,
-                root);
+                currentFile);
     }
 
     private void runNewSearch(final Document searchQueryDoc) {
