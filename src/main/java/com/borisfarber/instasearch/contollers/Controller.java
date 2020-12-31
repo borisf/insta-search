@@ -42,7 +42,7 @@ public final class Controller implements DocumentListener {
     private final JLabel resultCountLabel;
     private final ResultsHighlighter resultsHighlighter;
     private final PreviewHighlighter previewHighlighter;
-    private File file;
+    private File root;
     private String query;
     private Search search;
     private ResultModel resultModel;
@@ -52,6 +52,7 @@ public final class Controller implements DocumentListener {
 
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
+    private String searchMode = "Content";
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -75,26 +76,31 @@ public final class Controller implements DocumentListener {
             resultTextPane.setText(Background.INTRO);
             previewTextPane.setText("");
             resultCountLabel.setText("");
-
             crawl(newFile);
         }
     }
 
-    public void onFileDragged(File file) {
+    public void onFileDragged(File newFile) {
         searchField.setText("");
         resultTextPane.setText(Background.INTRO);
         previewTextPane.setText("");
-        crawl(file);
+        crawl(newFile);
     }
 
-    private void crawl(final File file) {
-        if (file == null || !file.exists()) {
+    public void updateSearchMode(String searchMode) {
+        this.searchMode = searchMode;
+        this.searchField.setText("");
+        crawl(root);
+    }
+
+    private void crawl(final File root) {
+        if (root == null || !root.exists()) {
             return;
         }
 
-        this.file = file;
-        search = SearchFactory.INSTANCE.createSearch(file, this);
-        search.crawl(file);
+        this.root = root;
+        search = SearchFactory.INSTANCE.createSearch(this, root, searchMode);
+        search.crawl(root);
     }
 
     public void onCrawlUpdate(String update) {
@@ -170,7 +176,7 @@ public final class Controller implements DocumentListener {
                 resultModel.getExportedLineIndex(),
                 previewExecutor,
                 previewTextPane,
-                file);
+                root);
     }
 
     private void runNewSearch(final Document searchQueryDoc) {

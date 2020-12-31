@@ -22,10 +22,7 @@
  import javax.swing.*;
  import java.io.File;
  import java.io.IOException;
- import java.nio.file.FileVisitResult;
- import java.nio.file.Files;
- import java.nio.file.Path;
- import java.nio.file.SimpleFileVisitor;
+ import java.nio.file.*;
  import java.nio.file.attribute.BasicFileAttributes;
  import java.util.*;
  import java.util.concurrent.ExecutorService;
@@ -40,7 +37,8 @@
              Executors.newSingleThreadExecutor();
 
      private final ArrayList<String> allLines;
-     private PrefixIndex<String> index = new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
+     private final PrefixIndex<String> index =
+             new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
      private List<String> searchResults = new LinkedList<>();
 
      public FilenameSearch(Controller controller) {
@@ -57,7 +55,11 @@
                  @Override
                  public FileVisitResult preVisitDirectory(Path dir,
                                                           BasicFileAttributes attrs) {
-                     if (dir.getFileName().toString().startsWith(".")) {
+                     // TODO add ignore list
+                     // TODO to the result output
+                     // looks the idiomatic approach for skipping
+                     if (dir.getFileName().toString().startsWith("Unity")
+                             || dir.getFileName().toString().startsWith(".")) {
                          return SKIP_SUBTREE;
                      }
                      return CONTINUE;
@@ -67,6 +69,15 @@
                  public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
                      allLines.add(path.toString());
                      return CONTINUE;
+                 }
+
+                 @Override
+                 public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                     if (exc instanceof AccessDeniedException) {
+                         return FileVisitResult.SKIP_SUBTREE;
+                     }
+
+                     return super.visitFileFailed(file, exc);
                  }
              });
          } catch (IOException e) {
