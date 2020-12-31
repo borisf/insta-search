@@ -56,7 +56,7 @@ public class Toolbar extends JToolBar {
 
     private JComboBox buildSearchModeCombo() {
         String modes[] ={"Content", "Filenames"};
-        JComboBox result = new JComboBox(modes);
+        JComboBox<String> result = new JComboBox<>(modes);
 
         result.addActionListener(actionEvent -> {
             JComboBox cb = (JComboBox)actionEvent.getSource();
