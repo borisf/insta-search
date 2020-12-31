@@ -71,9 +71,7 @@
          searchField.setMaximumSize(new Dimension(FRAME_WIDTH, 40));
 
          resultTextPane = buildResultTextPane();
-         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane,
-                 VERTICAL_SCROLLBAR_ALWAYS,
-                 HORIZONTAL_SCROLLBAR_ALWAYS);
+         JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
          showResultsScrolled.addMouseWheelListener(new MouseWheelListener() {
              int currentAnchor = 0;
 
@@ -91,9 +89,7 @@
              }
          });
          previewTextPane = buildPreviewTextPane();
-         JScrollPane showFileScrolled = new JScrollPane(previewTextPane,
-                 VERTICAL_SCROLLBAR_ALWAYS,
-                 HORIZONTAL_SCROLLBAR_ALWAYS);
+         JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
 
          JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                  showResultsScrolled, showFileScrolled);
