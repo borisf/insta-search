@@ -16,14 +16,10 @@
  import java.io.File;
  import java.io.IOException;
  import java.nio.file.*;
- import java.nio.file.attribute.BasicFileAttributes;
  import java.nio.file.attribute.PosixFileAttributes;
  import java.nio.file.attribute.PosixFilePermission;
  import java.util.Comparator;
  import java.util.Set;
-
- import static java.nio.file.FileVisitResult.CONTINUE;
- import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public enum PrivateFolder {
 
@@ -49,52 +45,6 @@
          } catch(IOException e) {
 
          }
-     }
-
-     public static boolean isSourceFolder(File folder) {
-         Path pathString = folder.toPath();
-         PathMatcher matcher = PathMatchers.SOURCE_MATCHER;
-
-         final int[] allFiles = {0};
-         final int[] srcFiles = {0};
-         final boolean[] largeTextFile = {false};
-
-         try {
-             Files.walkFileTree(pathString, new SimpleFileVisitor<>() {
-
-                 @Override
-                 public FileVisitResult preVisitDirectory(Path dir,
-                                                          BasicFileAttributes attrs) {
-                     if (dir.getFileName().toString().startsWith(".")) {
-                         return SKIP_SUBTREE;
-                     }
-                     return CONTINUE;
-                 }
-
-                 @Override
-                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-                     allFiles[0]++;
-                     if (matcher.matches(path)) {
-                        srcFiles[0]++;
-                     }
-
-                     if(path.getFileName().toString().endsWith(".txt")) {
-                         if(Files.size(path) > 50 * 1000) {
-                             largeTextFile[0] = true;
-                         }
-                     }
-                     return CONTINUE;
-                 }
-             });
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-
-         if(largeTextFile[0]) {
-             return false;
-         }
-
-         return srcFiles[0] > 0;
      }
 
      public File getTempFile(String name, String ext) {

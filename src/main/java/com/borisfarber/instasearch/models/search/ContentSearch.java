@@ -31,7 +31,7 @@
  import static java.nio.file.FileVisitResult.CONTINUE;
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
- public class InFilesSearch implements Search {
+ public class ContentSearch implements Search {
      private final Controller controller;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
@@ -43,7 +43,7 @@
              Executors.newSingleThreadExecutor();
      private Map<String, Float> matchedSet;
 
-     public InFilesSearch(Controller controller) {
+     public ContentSearch(Controller controller) {
          this.controller = controller;
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();

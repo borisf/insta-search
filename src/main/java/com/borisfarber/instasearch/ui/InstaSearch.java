@@ -271,7 +271,7 @@
          fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
          fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
-         final int returnVal = fileChooser.showDialog(this, "Open");
+         final int returnVal = fileChooser.showDialog(this, "Search");
          if (returnVal == 0) {
              return fileChooser.getSelectedFile();
          }
@@ -279,8 +279,12 @@
          return null;
      }
 
-     public void openFileGrep() {
+     public void openFileFromToolbar() {
          controller.onFileOpened(openFile());
+     }
+
+     public void updateFolderSearchMode(String searchMode) {
+        controller.updateSearchMode(searchMode);
      }
 
      private static boolean isBinarySupported(String filePath) {

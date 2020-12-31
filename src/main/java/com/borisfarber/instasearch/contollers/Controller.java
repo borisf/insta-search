@@ -52,6 +52,7 @@ public final class Controller implements DocumentListener {
 
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
+    private String searchMode = "Content";
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -75,16 +76,21 @@ public final class Controller implements DocumentListener {
             resultTextPane.setText(Background.INTRO);
             previewTextPane.setText("");
             resultCountLabel.setText("");
-
             crawl(newFile);
         }
     }
 
-    public void onFileDragged(File file) {
+    public void onFileDragged(File newFile) {
         searchField.setText("");
         resultTextPane.setText(Background.INTRO);
         previewTextPane.setText("");
-        crawl(file);
+        crawl(newFile);
+    }
+
+    public void updateSearchMode(String searchMode) {
+        this.searchMode = searchMode;
+        this.searchField.setText("");
+        crawl(root);
     }
 
     private void crawl(final File root) {
@@ -93,9 +99,7 @@ public final class Controller implements DocumentListener {
         }
 
         this.root = root;
-
-        // TODO add parameter for content versus names for folders
-        search = SearchFactory.INSTANCE.createSearch(root, this);
+        search = SearchFactory.INSTANCE.createSearch(this, root, searchMode);
         search.crawl(root);
     }
 

@@ -28,13 +28,10 @@ public enum SearchFactory {
         return new MockSearch(controller);
     }
 
-    public Search createSearch(File newFile, Controller controller) {
+    public Search createSearch(Controller controller, File newFile, String mode) {
         if (newFile.isDirectory()) {
-
-            // TODO add button for search inside versus file names
-            // TODO remove is Source Folder
-            if(PrivateFolder.isSourceFolder(newFile)) {
-                return new InFilesSearch(controller);
+            if(mode.equals("Content")) {
+                return new ContentSearch(controller);
             } else {
                 return new FilenameSearch(controller);
             }
