@@ -53,6 +53,7 @@ public final class Controller implements DocumentListener {
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
     private String searchMode = "Content";
+    private File currentFile;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -73,38 +74,35 @@ public final class Controller implements DocumentListener {
     public void onFileOpened(File newFile) {
         if(newFile != null) {
             searchField.setText("");
-            resultTextPane.setText(Background.INTRO);
+            resultTextPane.setText("Indexing");
             previewTextPane.setText("");
             resultCountLabel.setText("");
+            this.currentFile = newFile;
             crawl(newFile);
         }
     }
 
     public void onFileDragged(File newFile) {
-        searchField.setText("");
-        resultTextPane.setText(Background.INTRO);
-        previewTextPane.setText("");
-        crawl(newFile);
+       onFileOpened(newFile);
     }
 
     public void updateSearchMode(String searchMode) {
         this.searchMode = searchMode;
-        this.searchField.setText("");
-        crawl(root);
+        searchField.setText("");
+        resultTextPane.setText("Indexing");
+        previewTextPane.setText("");
+        resultCountLabel.setText("");
+        crawl(currentFile);
     }
 
     private void crawl(final File root) {
         if (root == null || !root.exists()) {
+            resultTextPane.setText("");
             return;
         }
 
-        this.root = root;
         search = SearchFactory.INSTANCE.createSearch(this, root, searchMode);
         search.crawl(root);
-    }
-
-    public void onCrawlUpdate(String update) {
-        previewTextPane.setText(update);
     }
 
     @Override
