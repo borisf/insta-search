@@ -84,7 +84,7 @@
          }
 
          index.createIndex(allLines);
-         controller.onCrawlFinish(allLines);
+         emptyQuery();
      }
 
      @Override
@@ -144,7 +144,12 @@
 
      @Override
      public void emptyQuery() {
-
+         Runnable runnable = () -> {
+             ArrayList<String> allFiles = new ArrayList<>();
+             allFiles.addAll(allLines);
+             controller.onCrawlFinish(allFiles);
+         };
+         SwingUtilities.invokeLater(runnable);
      }
 
      @Override

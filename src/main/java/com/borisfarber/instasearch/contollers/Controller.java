@@ -16,7 +16,6 @@ package com.borisfarber.instasearch.contollers;
 import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.search.Search;
 import com.borisfarber.instasearch.models.search.SearchFactory;
-import com.borisfarber.instasearch.models.text.Background;
 import com.borisfarber.instasearch.ui.PreviewHighlighter;
 import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
@@ -75,7 +74,7 @@ public final class Controller implements DocumentListener {
     }
 
     public void onFileDragged(File newFile) {
-       crawl(newFile);
+        crawl(newFile);
     }
 
     public void updateSearchMode(String searchMode) {
@@ -84,20 +83,28 @@ public final class Controller implements DocumentListener {
     }
 
     private void crawl(final File file) {
-        searchField.setText("");
-        resultTextPane.setText("");
-        previewTextPane.setText("");
-        resultCountLabel.setText("");
-
         if (file == null || !file.exists()) {
             return;
         }
 
+        System.out.println("here 1" + Thread.currentThread().getName());
+        searchField.setText("");
+        resultTextPane.setText("Crawling");
+        previewTextPane.setText("Crawling");
+        resultCountLabel.setText("...");
+
         this.currentFile = file;
-        resultCountLabel.setText("Indexing ...");
         search = SearchFactory.INSTANCE.createSearch(this, file, searchMode);
         search.crawl(file);
-        resultCountLabel.setText(" ...");
+    }
+
+    public void onCrawlFinish(java.util.List<String> crawlResults) {
+        resultModel.fillFilenameResults(crawlResults);
+        resultModel.generateResultView();
+        resultTextPane.setText(resultModel.getResultView());
+        resultTextPane.setCaretPosition(0);
+        previewTextPane.setText("");
+        resultCountLabel.setText(""+ crawlResults.size());
     }
 
     @Override
@@ -193,14 +200,6 @@ public final class Controller implements DocumentListener {
         if(waitingTasksCount < 1) {
             searchExecutor.submit(runnableTask);
         }
-    }
-
-    public void onCrawlFinish(java.util.List<String> crawlResults) {
-        resultModel.fillFilenameResults(crawlResults);
-        resultModel.generateResultView();
-        resultTextPane.setText(resultModel.getResultView());
-        resultTextPane.setCaretPosition(0);
-        previewTextPane.setText("");
     }
 
     public void onSearchFinish() {

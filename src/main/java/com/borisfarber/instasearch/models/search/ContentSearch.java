@@ -107,7 +107,6 @@
          }
 
          processDuplicates(allLines);
-
          emptyQuery();
      }
 

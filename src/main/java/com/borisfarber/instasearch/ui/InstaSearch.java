@@ -24,8 +24,6 @@
  import java.io.File;
 
  import static java.awt.event.KeyEvent.*;
- import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
- import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
  public final class InstaSearch extends JFrame {
      public static final int FRAME_WIDTH = 1200;
@@ -288,7 +286,7 @@
      }
 
      public void updateFolderSearchMode(String searchMode) {
-        controller.updateSearchMode(searchMode);
+         controller.updateSearchMode(searchMode);
      }
 
      private static boolean isBinarySupported(String filePath) {
