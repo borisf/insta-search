@@ -34,7 +34,7 @@
      private JTextPane previewTextPane;
      private JLabel resultCountLabel;
      private final JPopupMenu copyPopup = new JPopupMenu();
-     private final Controller controller;
+     private Controller controller;
 
      public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
      public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -51,7 +51,7 @@
          buildUI();
          controller =
                  new Controller(searchField, resultTextPane,
-                         previewTextPane, resultCountLabel);
+                         previewTextPane, resultCountLabel, Toolbar.DEFAULT_SEARCH_MODE);
          searchField.getDocument().addDocumentListener(this.controller);
          controller.onFileOpened(openFile());
      }
@@ -59,6 +59,14 @@
      public final void onFileDragged(final File file) {
          setTitle("ClassySearch - " + file.getName());
          controller.onFileDragged(file);
+     }
+
+     public void openFileFromToolbar() {
+         controller.onFileOpened(openFile());
+     }
+
+     public void updateFolderSearchMode(String searchMode) {
+         controller.updateSearchMode(searchMode);
      }
 
      private void buildUI() {
@@ -279,14 +287,6 @@
          }
 
          return null;
-     }
-
-     public void openFileFromToolbar() {
-         controller.onFileOpened(openFile());
-     }
-
-     public void updateFolderSearchMode(String searchMode) {
-         controller.updateSearchMode(searchMode);
      }
 
      private static boolean isBinarySupported(String filePath) {

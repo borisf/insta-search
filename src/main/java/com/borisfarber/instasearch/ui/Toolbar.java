@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Toolbar extends JToolBar {
+    public static final String DEFAULT_SEARCH_MODE = "Content";
     private final InstaSearch frame;
     private JButton openButton;
     private JComboBox searchModeCombo;
@@ -43,7 +44,6 @@ public class Toolbar extends JToolBar {
 
         JButton result = new JButton(aboutIcon);
         result.setToolTipText("Open ...");
-        //TODO not sure the line below
         result.setContentAreaFilled(false);
 
         result.addActionListener(e -> frame.openFileFromToolbar());
@@ -55,7 +55,7 @@ public class Toolbar extends JToolBar {
     }
 
     private JComboBox buildSearchModeCombo() {
-        String modes[] ={"Content", "Filenames"};
+        String modes[] ={DEFAULT_SEARCH_MODE, "Filenames"};
         JComboBox<String> result = new JComboBox<>(modes);
 
         result.addActionListener(actionEvent -> {

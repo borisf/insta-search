@@ -50,13 +50,15 @@ public final class Controller implements DocumentListener {
 
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
-    private String searchMode = "Content";
+
+    private String searchMode;
     private File currentFile;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
                       JTextPane previewArea,
-                      JLabel resultCountLabel) {
+                      JLabel resultCountLabel,
+                      String searchMode) {
         this.searchField = searchField;
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
@@ -65,6 +67,7 @@ public final class Controller implements DocumentListener {
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, RESULT_HIGHLIGHT_COLOR);
         this.previewHighlighter = new PreviewHighlighter();
         this.resultModel = new ResultModel();
+        this.searchMode = searchMode;
 
         this.resultTextPane.setText(resultModel.getBackground());
     }
@@ -87,15 +90,27 @@ public final class Controller implements DocumentListener {
             return;
         }
 
-        System.out.println("here 1" + Thread.currentThread().getName());
         searchField.setText("");
-        resultTextPane.setText("Crawling");
-        previewTextPane.setText("Crawling");
+        resultTextPane.setText("Crawling: " + file.getAbsolutePath());
+        previewTextPane.setText("");
         resultCountLabel.setText("...");
 
-        this.currentFile = file;
-        search = SearchFactory.INSTANCE.createSearch(this, file, searchMode);
-        search.crawl(file);
+        currentFile = file;
+
+        SwingWorker crawlWorker = new SwingWorker() {
+            // crawl requests either come from either main thread
+            // or from EDT when a file is opened from the toolbar
+            @Override
+            protected String doInBackground() {
+                search = SearchFactory.INSTANCE.createSearch(Controller.this,
+                        file, searchMode);
+                search.crawl(file);
+                String res = "Finished Crawling";
+                return res;
+            }
+        };
+
+        crawlWorker.execute();
     }
 
     public void onCrawlFinish(java.util.List<String> crawlResults) {
