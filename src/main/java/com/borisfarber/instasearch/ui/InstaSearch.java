@@ -34,7 +34,7 @@
      private JTextPane previewTextPane;
      private JLabel resultCountLabel;
      private final JPopupMenu copyPopup = new JPopupMenu();
-     private Controller controller;
+     private final Controller controller;
 
      public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
      public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -58,7 +58,7 @@
 
      public final void onFileDragged(final File file) {
          setTitle("ClassySearch - " + file.getName());
-         controller.onFileDragged(file);
+         controller.onFileOpened(file);
      }
 
      public void openFileFromToolbar() {

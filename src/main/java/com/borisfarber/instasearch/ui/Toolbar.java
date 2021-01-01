@@ -24,6 +24,8 @@ public class Toolbar extends JToolBar {
     private JButton openButton;
     private JComboBox searchModeCombo;
 
+    // TODO think of adding version
+
     public Toolbar(InstaSearch frame) {
         super();
         this.frame = frame;

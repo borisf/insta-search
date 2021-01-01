@@ -76,10 +76,6 @@ public final class Controller implements DocumentListener {
         crawl(newFile);
     }
 
-    public void onFileDragged(File newFile) {
-        crawl(newFile);
-    }
-
     public void updateSearchMode(String searchMode) {
         this.searchMode = searchMode;
         crawl(currentFile);
