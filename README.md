@@ -12,7 +12,14 @@ incrementally.
 
 ![Image of InstaSearch](https://github.com/borisf/insta-search/blob/master/images/InstaSearch.png)
 
-### Components
+### Howto
+*  Toolbar
+     * Open folder file - pressing the icon will pop up folder chooser dialog to select a folder 
+       to search
+     * Select search mode - what you are looking for. You might look either for file (thus Filenames) or for text inside files, ala 
+       grep (thus Content).
+     * About - shows the version number
+
 * Search Line - the upper text box, where you type text that are you looking for
 
 * Result View - the middle list, where you see the filtered results
@@ -23,7 +30,7 @@ the search line, use arrows or mouse to land to the relevant line
 * Editor - once found the relevant line, press Enter, or click a mouse, and the file 
 will be opened on the relevant line within embedded or system defined editor.
 
-### Howto
+### Search
 The Insta Search supports incremental searching in both files and folders: 
 
 * Log File - Drag and drop your file into the results view
@@ -39,11 +46,6 @@ show the selected entry in the preview:
     * Binary files ==> hex dump   
 
 Pressing Enter or double-clicking on an entry will open its own hex editor in a separate window.
-
-### Command toolbar
-* Open folder file
-
-* Select search type
 
 ### Command Line Arguments
 
