@@ -16,7 +16,6 @@ package com.borisfarber.instasearch.contollers;
 import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.search.Search;
 import com.borisfarber.instasearch.models.search.SearchFactory;
-import com.borisfarber.instasearch.models.text.Background;
 import com.borisfarber.instasearch.ui.PreviewHighlighter;
 import com.borisfarber.instasearch.ui.ResultsHighlighter;
 
@@ -42,7 +41,6 @@ public final class Controller implements DocumentListener {
     private final JLabel resultCountLabel;
     private final ResultsHighlighter resultsHighlighter;
     private final PreviewHighlighter previewHighlighter;
-    private File root;
     private String query;
     private Search search;
     private ResultModel resultModel;
@@ -52,13 +50,15 @@ public final class Controller implements DocumentListener {
 
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
-    private String searchMode = "Content";
+
+    private String searchMode;
     private File currentFile;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
                       JTextPane previewArea,
-                      JLabel resultCountLabel) {
+                      JLabel resultCountLabel,
+                      String searchMode) {
         this.searchField = searchField;
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
@@ -67,42 +67,55 @@ public final class Controller implements DocumentListener {
         this.resultsHighlighter = new ResultsHighlighter(resultTextPane, RESULT_HIGHLIGHT_COLOR);
         this.previewHighlighter = new PreviewHighlighter();
         this.resultModel = new ResultModel();
+        this.searchMode = searchMode;
 
         this.resultTextPane.setText(resultModel.getBackground());
     }
 
     public void onFileOpened(File newFile) {
-        if(newFile != null) {
-            searchField.setText("");
-            resultTextPane.setText("Indexing");
-            previewTextPane.setText("");
-            resultCountLabel.setText("");
-            this.currentFile = newFile;
-            crawl(newFile);
-        }
-    }
-
-    public void onFileDragged(File newFile) {
-       onFileOpened(newFile);
+        crawl(newFile);
     }
 
     public void updateSearchMode(String searchMode) {
         this.searchMode = searchMode;
-        searchField.setText("");
-        resultTextPane.setText("Indexing");
-        previewTextPane.setText("");
-        resultCountLabel.setText("");
         crawl(currentFile);
     }
 
-    private void crawl(final File root) {
-        if (root == null || !root.exists()) {
-            resultTextPane.setText("");
+    private void crawl(final File file) {
+        if (file == null || !file.exists()) {
             return;
         }
 
-        search = SearchFactory.INSTANCE.createSearch(this, root, searchMode);
-        search.crawl(root);
+        searchField.setText("");
+        resultTextPane.setText("Crawling: " + file.getAbsolutePath());
+        previewTextPane.setText("");
+        resultCountLabel.setText("...");
+
+        currentFile = file;
+
+        SwingWorker crawlWorker = new SwingWorker() {
+            // crawl requests either come from either main thread
+            // or from EDT when a file is opened from the toolbar
+            @Override
+            protected String doInBackground() {
+                search = SearchFactory.INSTANCE.createSearch(Controller.this,
+                        file, searchMode);
+                search.crawl(file);
+                String res = "Finished Crawling";
+                return res;
+            }
+        };
+
+        crawlWorker.execute();
+    }
+
+    public void onCrawlFinish(java.util.List<String> crawlResults) {
+        resultModel.fillFilenameResults(crawlResults);
+        resultModel.generateResultView();
+        resultTextPane.setText(resultModel.getResultView());
+        resultTextPane.setCaretPosition(0);
+        previewTextPane.setText("");
+        resultCountLabel.setText(""+ crawlResults.size());
     }
 
     @Override
@@ -174,7 +187,7 @@ public final class Controller implements DocumentListener {
                 resultModel.getExportedLineIndex(),
                 previewExecutor,
                 previewTextPane,
-                root);
+                currentFile);
     }
 
     private void runNewSearch(final Document searchQueryDoc) {
@@ -198,14 +211,6 @@ public final class Controller implements DocumentListener {
         if(waitingTasksCount < 1) {
             searchExecutor.submit(runnableTask);
         }
-    }
-
-    public void onCrawlFinish(java.util.List<String> crawlResults) {
-        resultModel.fillFilenameResults(crawlResults);
-        resultModel.generateResultView();
-        resultTextPane.setText(resultModel.getResultView());
-        resultTextPane.setCaretPosition(0);
-        previewTextPane.setText("");
     }
 
     public void onSearchFinish() {

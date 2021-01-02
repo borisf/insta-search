@@ -26,6 +26,7 @@
  import static java.awt.event.KeyEvent.*;
 
  public final class InstaSearch extends JFrame {
+     public static final int FRAME_WIDTH = 1200;
      private final Font textFont;
      private JTextField searchField;
 
@@ -50,21 +51,30 @@
          buildUI();
          controller =
                  new Controller(searchField, resultTextPane,
-                         previewTextPane, resultCountLabel);
+                         previewTextPane, resultCountLabel, Toolbar.DEFAULT_SEARCH_MODE);
          searchField.getDocument().addDocumentListener(this.controller);
          controller.onFileOpened(openFile());
      }
 
      public final void onFileDragged(final File file) {
          setTitle("ClassySearch - " + file.getName());
-         controller.onFileDragged(file);
+         controller.onFileOpened(file);
+     }
+
+     public void openFileFromToolbar() {
+         controller.onFileOpened(openFile());
+     }
+
+     public void updateFolderSearchMode(String searchMode) {
+         controller.updateSearchMode(searchMode);
      }
 
      private void buildUI() {
          Toolbar toolbar = new Toolbar(this);
+         toolbar.setMaximumSize(new Dimension(FRAME_WIDTH, 40));
 
          searchField = buildSearchField();
-         searchField.setMaximumSize(new Dimension(1400, 30));
+         searchField.setMaximumSize(new Dimension(FRAME_WIDTH, 40));
 
          resultTextPane = buildResultTextPane();
          JScrollPane showResultsScrolled = new JScrollPane(resultTextPane);
@@ -87,27 +97,27 @@
          previewTextPane = buildPreviewTextPane();
          JScrollPane showFileScrolled = new JScrollPane(previewTextPane);
 
-         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, showResultsScrolled, showFileScrolled);
+         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                 showResultsScrolled, showFileScrolled);
+         splitPane.setMaximumSize(new Dimension(FRAME_WIDTH, 750));
+         splitPane.setMinimumSize(new Dimension(FRAME_WIDTH, 750));
          splitPane.setDividerSize(20);
          splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
          splitPane.setDividerLocation(400);
          splitPane.setOneTouchExpandable(true);
          splitPane.setContinuousLayout(true);
-         // aligns to other size components (box layout)
          splitPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
          resultCountLabel = new JLabel("...");
-         JPanel statusPanel = new JPanel();
-         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-         resultCountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-         statusPanel.add(resultCountLabel);
-         statusPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+         resultCountLabel.setMaximumSize(new Dimension(80, 35));
+         resultCountLabel.setMinimumSize(new Dimension(80, 35));
+         resultCountLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
+         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
          getContentPane().add(toolbar);
          getContentPane().add(searchField);
          getContentPane().add(splitPane);
-         getContentPane().add(statusPanel);
-         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+         getContentPane().add(resultCountLabel);
 
          addWindowListener(new WindowAdapter() {
              @Override
@@ -119,7 +129,7 @@
 
          Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
          Dimension dim = defaultToolkit.getScreenSize();
-         setPreferredSize(new Dimension(1200, 900));
+         setPreferredSize(new Dimension(FRAME_WIDTH, 900));
          setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
          setIconImage(new javax.swing.ImageIcon(getClass().getResource("/blue-shark.png")).getImage());
 
@@ -277,14 +287,6 @@
          }
 
          return null;
-     }
-
-     public void openFileFromToolbar() {
-         controller.onFileOpened(openFile());
-     }
-
-     public void updateFolderSearchMode(String searchMode) {
-        controller.updateSearchMode(searchMode);
      }
 
      private static boolean isBinarySupported(String filePath) {

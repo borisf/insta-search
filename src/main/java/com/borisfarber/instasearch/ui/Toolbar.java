@@ -15,22 +15,30 @@
  */
 package com.borisfarber.instasearch.ui;
 
+import com.borisfarber.instasearch.models.text.BuildVersion;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class Toolbar extends JToolBar {
+    public static final String DEFAULT_SEARCH_MODE = "Content";
     private final InstaSearch frame;
-    private JButton openButton;
-    private JComboBox searchModeCombo;
+    private final JButton openButton;
+    private final JButton aboutButton;
+    private final JComboBox searchModeCombo;
 
     public Toolbar(InstaSearch frame) {
         super();
         this.frame = frame;
         openButton = buildOpenButton();
+        aboutButton = buildAboutButton();
         searchModeCombo = buildSearchModeCombo();
 
         add(openButton);
         add(searchModeCombo);
+        add(Box.createHorizontalGlue());
+        add(aboutButton);
+
         setFloatable(false);
         setBorder(BorderFactory.createEmptyBorder());
     }
@@ -43,7 +51,6 @@ public class Toolbar extends JToolBar {
 
         JButton result = new JButton(aboutIcon);
         result.setToolTipText("Open ...");
-        //TODO not sure the line below
         result.setContentAreaFilled(false);
 
         result.addActionListener(e -> frame.openFileFromToolbar());
@@ -55,7 +62,7 @@ public class Toolbar extends JToolBar {
     }
 
     private JComboBox buildSearchModeCombo() {
-        String modes[] ={"Content", "Filenames"};
+        String modes[] ={DEFAULT_SEARCH_MODE, "Filenames"};
         JComboBox<String> result = new JComboBox<>(modes);
 
         result.addActionListener(actionEvent -> {
@@ -65,5 +72,23 @@ public class Toolbar extends JToolBar {
         });
 
         return result;
+    }
+
+    private JButton buildAboutButton() {
+        JButton result = new JButton("?");
+        ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/blue-shark.png"));
+        Image image = aboutIcon.getImage();
+        Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
+        aboutIcon = new ImageIcon(tempImage);
+        ImageIcon finalAboutIcon = aboutIcon; // to capture in the lambda
+        result.addActionListener(
+                actionEvent -> JOptionPane.showMessageDialog(
+                        this,
+                        "Version " + BuildVersion.getBuildVersion(),
+                        "ClassyShark Insta Search", JOptionPane.PLAIN_MESSAGE,
+                        finalAboutIcon));
+
+        return result;
+
     }
 }
