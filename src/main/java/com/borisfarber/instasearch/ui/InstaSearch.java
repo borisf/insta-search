@@ -281,7 +281,12 @@
          final JFileChooser fileChooser = new JFileChooser();
          fileChooser.setPreferredSize(new Dimension(700,500));
          fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+         if(controller.getCurrentFile() == null) {
+             fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+         } else {
+             fileChooser.setCurrentDirectory(controller.getCurrentFile().getParentFile());
+         }
 
          final int returnVal = fileChooser.showDialog(this, "Search");
          if (returnVal == 0) {
