@@ -23,6 +23,7 @@
  import java.awt.event.*;
  import java.io.File;
 
+ import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
  import static java.awt.event.KeyEvent.*;
 
  public final class InstaSearch extends JFrame {
@@ -51,7 +52,8 @@
          buildUI();
          controller =
                  new Controller(searchField, resultTextPane,
-                         previewTextPane, resultCountLabel, Toolbar.DEFAULT_SEARCH_MODE);
+                         previewTextPane, resultCountLabel,
+                         CONTENT_SEARCH);
          searchField.getDocument().addDocumentListener(this.controller);
          controller.onFileOpened(openFile());
      }

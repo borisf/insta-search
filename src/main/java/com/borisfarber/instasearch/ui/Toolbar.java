@@ -20,18 +20,17 @@ import com.borisfarber.instasearch.models.text.BuildVersion;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.borisfarber.instasearch.models.search.Search.*;
+
 public class Toolbar extends JToolBar {
-    public static final String DEFAULT_SEARCH_MODE = "Content";
     private final InstaSearch frame;
-    private final JButton openButton;
-    private final JButton aboutButton;
     private final JComboBox searchModeCombo;
 
     public Toolbar(InstaSearch frame) {
         super();
         this.frame = frame;
-        openButton = buildOpenButton();
-        aboutButton = buildAboutButton();
+        JButton openButton = buildOpenButton();
+        JButton aboutButton = buildAboutButton();
         searchModeCombo = buildSearchModeCombo();
 
         add(openButton);
@@ -62,7 +61,9 @@ public class Toolbar extends JToolBar {
     }
 
     private JComboBox buildSearchModeCombo() {
-        String modes[] ={DEFAULT_SEARCH_MODE, "Filenames"};
+        String[] modes ={CONTENT_SEARCH,
+                FILENAMES_SEARCH,
+                ALL_FILES_SEARCH};
         JComboBox<String> result = new JComboBox<>(modes);
 
         result.addActionListener(actionEvent -> {
@@ -89,6 +90,5 @@ public class Toolbar extends JToolBar {
                         finalAboutIcon));
 
         return result;
-
     }
 }
