@@ -39,46 +39,25 @@
      private final ArrayList<String> allLines;
      private final PrefixIndex<String> index =
              new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
+     private final String mode;
      private List<String> searchResults = new LinkedList<>();
 
-     public FilenameSearch(Controller controller) {
+     public FilenameSearch(Controller controller, String mode) {
          this.controller = controller;
-         allLines = new ArrayList<>();
+         this.mode = mode;
+         this.allLines = new ArrayList<>();
+
      }
 
      @Override
      public void crawl(File file) {
          try {
-             Files.walkFileTree(file.toPath(), new SimpleFileVisitor<>() {
+             if(mode.equals(FILENAMES_SEARCH)) {
+                 Files.walkFileTree(file.toPath(), new FilenameVisitor());
+             } else {
+                 Files.walkFileTree(file.toPath(), new AllFilesVisitor());
+             }
 
-                 @Override
-                 public FileVisitResult preVisitDirectory(Path dir,
-                                                          BasicFileAttributes attrs) {
-                     // TODO add ignore list
-                     // TODO to the result output
-                     // looks the idiomatic approach for skipping
-                     if (dir.getFileName().toString().startsWith("Unity")
-                             || dir.getFileName().toString().startsWith(".")) {
-                         return SKIP_SUBTREE;
-                     }
-                     return CONTINUE;
-                 }
-
-                 @Override
-                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-                     allLines.add(path.toString());
-                     return CONTINUE;
-                 }
-
-                 @Override
-                 public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                     if (exc instanceof AccessDeniedException) {
-                         return FileVisitResult.SKIP_SUBTREE;
-                     }
-
-                     return super.visitFileFailed(file, exc);
-                 }
-             });
          } catch (IOException e) {
              e.printStackTrace();
          }
@@ -155,5 +134,65 @@
      @Override
      public Comparator<String> getResultsSorter() {
          return (s, t1) -> 1;
+     }
+
+     private class FilenameVisitor extends SimpleFileVisitor<Path> {
+
+         @Override
+         public FileVisitResult preVisitDirectory(Path dir,
+                                                  BasicFileAttributes attrs) {
+             // TODO add ignore list
+             // TODO to the result output
+             // looks the idiomatic approach for skipping
+             String filename = dir.getFileName().toString();
+
+             if (filename.startsWith("Unity")) {
+                 return SKIP_SUBTREE;
+             }
+
+             if(mode.equals(FILENAMES_SEARCH) && filename.startsWith(".")) {
+                 return SKIP_SUBTREE;
+             }
+             return CONTINUE;
+         }
+
+         @Override
+         public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+             allLines.add(path.toString());
+             return CONTINUE;
+         }
+     }
+
+     private class AllFilesVisitor extends SimpleFileVisitor<Path> {
+
+         @Override
+         public FileVisitResult preVisitDirectory(Path dir,
+                                                  BasicFileAttributes attrs) {
+             // TODO add ignore list
+             // TODO to the result output
+             // looks the idiomatic approach for skipping
+             String filename = dir.getFileName().toString();
+
+             if (filename.startsWith("Unity")) {
+                 return SKIP_SUBTREE;
+             }
+
+             return CONTINUE;
+         }
+
+         @Override
+         public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+             allLines.add(path.toString());
+             return CONTINUE;
+         }
+
+         @Override
+         public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+             if (exc instanceof AccessDeniedException) {
+                 return FileVisitResult.SKIP_SUBTREE;
+             }
+
+             return super.visitFileFailed(file, exc);
+         }
      }
  }

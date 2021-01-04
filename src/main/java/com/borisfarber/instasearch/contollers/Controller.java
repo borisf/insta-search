@@ -218,6 +218,10 @@ public final class Controller implements DocumentListener {
         updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
     }
 
+    public File getCurrentFile() {
+        return currentFile;
+    }
+
     private void updateGUI(ResultsHighlighter.HIGHLIGHT_SPAN span) {
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());

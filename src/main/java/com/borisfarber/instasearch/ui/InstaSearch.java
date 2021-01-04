@@ -23,6 +23,7 @@
  import java.awt.event.*;
  import java.io.File;
 
+ import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
  import static java.awt.event.KeyEvent.*;
 
  public final class InstaSearch extends JFrame {
@@ -51,7 +52,8 @@
          buildUI();
          controller =
                  new Controller(searchField, resultTextPane,
-                         previewTextPane, resultCountLabel, Toolbar.DEFAULT_SEARCH_MODE);
+                         previewTextPane, resultCountLabel,
+                         CONTENT_SEARCH);
          searchField.getDocument().addDocumentListener(this.controller);
          controller.onFileOpened(openFile());
      }
@@ -279,7 +281,12 @@
          final JFileChooser fileChooser = new JFileChooser();
          fileChooser.setPreferredSize(new Dimension(700,500));
          fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+         if(controller.getCurrentFile() == null) {
+             fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+         } else {
+             fileChooser.setCurrentDirectory(controller.getCurrentFile().getParentFile());
+         }
 
          final int returnVal = fileChooser.showDialog(this, "Search");
          if (returnVal == 0) {

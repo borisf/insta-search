@@ -15,10 +15,11 @@ package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.Controller;
 import com.borisfarber.instasearch.contollers.PathMatchers;
-import com.borisfarber.instasearch.contollers.PrivateFolder;
 
 import java.io.File;
 import java.nio.file.Path;
+
+import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
 
 public enum SearchFactory {
 
@@ -30,10 +31,10 @@ public enum SearchFactory {
 
     public Search createSearch(Controller controller, File newFile, String mode) {
         if (newFile.isDirectory()) {
-            if(mode.equals("Content")) {
+            if(mode.equals(CONTENT_SEARCH)) {
                 return new ContentSearch(controller);
             } else {
-                return new FilenameSearch(controller);
+                return new FilenameSearch(controller, mode);
             }
         } else {
             if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {

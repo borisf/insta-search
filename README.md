@@ -4,7 +4,7 @@ Insta Search is a fast, incremental [fuzzy](https://en.wikipedia.org/wiki/Approx
 search inside files, folders, APK/ZIP/Jar files.
 
 A lot of your time spent on “writing” code on production systems is actually spent on reading code and 
-logs.  And a decent chunk of time spent reading, is actually spent on searching.
+logs. And a decent chunk of time spent reading, is actually spent on searching.
 
 With Insta Search you can easily and quickly find and navigate
 to any text string or regex inside any file in your folders. All done
@@ -16,8 +16,10 @@ incrementally.
 *  Toolbar
      * Open folder file - pressing the icon will pop up folder chooser dialog to select a folder 
        to search
-     * Select search mode - what you are looking for. You might look either for file (thus Filenames) or for text inside files, ala 
-       grep (thus Content).
+     * Select search mode  
+         * Content - search for content inside files (grep)
+         * Filenames - search for a file
+         * All Files - search in all files, including hidden and system ones
      * About - shows the version number
 
 * Search Line - the upper text box, where you type text that are you looking for
@@ -60,7 +62,7 @@ and run `java -jar insta-search.jar`
 ## License
 
 ```
-Copyright 2020 Google Inc.
+Copyright 2021 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 in compliance with the License. You may obtain a copy of the License at
