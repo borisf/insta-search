@@ -101,8 +101,6 @@
 
          JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                  showResultsScrolled, showFileScrolled);
-         splitPane.setMaximumSize(new Dimension(FRAME_WIDTH, 750));
-         splitPane.setMinimumSize(new Dimension(FRAME_WIDTH, 750));
          splitPane.setDividerSize(20);
          splitPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
          splitPane.setDividerLocation(400);

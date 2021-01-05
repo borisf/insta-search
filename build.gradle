@@ -32,6 +32,7 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '23.5-jre'
     implementation group: 'org.smali', name: 'dexlib2', version: '2.4.0'
     implementation 'com.illucit:instatrie:2.0.0'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
 }
 
 allprojects {

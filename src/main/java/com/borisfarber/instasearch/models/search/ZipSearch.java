@@ -120,11 +120,6 @@
      }
 
      @Override
-     public String getResultSetCount() {
-         return Integer.toString(this.getResults().size());
-     }
-
-     @Override
      public Path extractSelectedFile(String fileName) {
          String simpleName = new File(fileName).getName();
          File tempFile = PrivateFolder.INSTANCE.getTempFile(simpleName);

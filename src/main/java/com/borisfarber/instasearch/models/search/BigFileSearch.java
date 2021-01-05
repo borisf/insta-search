@@ -381,11 +381,6 @@ public class BigFileSearch implements Search {
     }
 
     @Override
-    public String getResultSetCount() {
-        return String.valueOf(result.size());
-    }
-
-    @Override
     public Path extractSelectedFile(String fileName) {
         return nameToPaths.get(fileName);
     }

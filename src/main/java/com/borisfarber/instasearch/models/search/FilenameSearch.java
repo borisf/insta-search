@@ -99,11 +99,6 @@
      }
 
      @Override
-     public String getResultSetCount() {
-         return String.valueOf(allLines.size());
-     }
-
-     @Override
      public Path extractSelectedFile(String fileName) {
          return Path.of(fileName);
      }

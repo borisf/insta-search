@@ -86,11 +86,6 @@ public class MockSearch implements Search {
     }
 
     @Override
-    public String getResultSetCount() {
-        return "1";
-    }
-
-    @Override
     public Path extractSelectedFile(String fileName) {
         return null;
     }

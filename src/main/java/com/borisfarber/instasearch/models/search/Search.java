@@ -39,8 +39,6 @@ public interface Search {
 
     List<String> getResults();
 
-    String getResultSetCount();
-
     Path extractSelectedFile(String fileName);
 
     void close();

@@ -244,11 +244,6 @@
      }
 
      @Override
-     public String getResultSetCount() {
-         return Integer.toString(this.getResults().size());
-     }
-
-     @Override
      public void close() {
          Runtime.getRuntime().addShutdownHook(new Thread(() -> {
              try {

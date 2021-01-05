@@ -44,15 +44,14 @@ public final class Controller implements DocumentListener {
     private String query;
     private Search search;
     private ResultModel resultModel;
+    private String searchMode;
+    private File currentFile;
 
     private final ThreadPoolExecutor searchExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
-
-    private String searchMode;
-    private File currentFile;
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
