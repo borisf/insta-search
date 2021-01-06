@@ -22,7 +22,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static com.borisfarber.instasearch.models.search.Search.*;
+import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
+import static com.borisfarber.instasearch.models.search.Search.FILENAMES_SEARCH;
 
 public class Toolbar extends JToolBar {
     private final InstaSearch frame;
@@ -78,7 +79,6 @@ public class Toolbar extends JToolBar {
     }
 
     private JButton buildIgnoreButton() {
-
         ImageIcon ignoreIcon = new ImageIcon(getClass().getResource("/ignore.png"));
         Image image = ignoreIcon.getImage();
         Image tempImage = image.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH);
@@ -90,14 +90,16 @@ public class Toolbar extends JToolBar {
         result.setBorderPainted(true);
         result.setFocusPainted(true);
 
-        // action listener
         result.addActionListener(actionEvent -> {
-            Desktop desktop = Desktop.getDesktop();
-            try {
-                desktop.open(new File("ignore.txt"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Runnable runnable = () -> {
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.open(new File("ignore.txt"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
+            SwingUtilities.invokeLater(runnable);
         });
         return result;
     }

@@ -14,7 +14,7 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
- import com.borisfarber.instasearch.contollers.FilenameIgnoreList;
+ import com.borisfarber.instasearch.contollers.IgnoreList;
  import com.borisfarber.instasearch.models.Pair;
  import com.illucit.instatrie.index.PrefixIndex;
  import com.illucit.instatrie.index.TriePrefixIndex;
@@ -127,11 +127,11 @@
      }
 
      private class FilenameVisitor extends SimpleFileVisitor<Path> {
-         FilenameIgnoreList ignoreList;
+         IgnoreList ignoreList;
 
          FilenameVisitor() {
              super();
-             ignoreList = new FilenameIgnoreList();
+             ignoreList = new IgnoreList();
          }
 
          @Override

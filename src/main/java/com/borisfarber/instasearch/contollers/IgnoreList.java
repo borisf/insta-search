@@ -7,10 +7,10 @@ import java.util.List;
 
 import static java.nio.file.Files.readAllLines;
 
-public class FilenameIgnoreList {
+public class IgnoreList {
     List<String> strRules = new LinkedList<>();
 
-    public FilenameIgnoreList() {
+    public IgnoreList() {
         convertGitIgnoreToRules();
     }
 
@@ -23,7 +23,7 @@ public class FilenameIgnoreList {
             strRules = readAllLines(Path.of("ignore.txt"));
         } catch (IOException e) {
            strRules = new LinkedList<>();
-           // TODO not sure if want to create a new file
+           // TODO create a new empty file, otherwise stucks
         }
     }
 }

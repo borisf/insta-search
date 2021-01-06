@@ -19,7 +19,8 @@ incrementally.
      * Select search mode  
          * Content - search for content inside files (grep)
          * Filenames - search for a file
-         * All Files - search in all files, including hidden and system ones
+     * Ignore list - opens the `ignore.txt` from your home folder via system editor. This file 
+       holds ignore paths when looking for files.
      * About - shows the version number
 
 * Search Line - the upper text box, where you type text that are you looking for
