@@ -1,5 +1,6 @@
 package com.borisfarber.instasearch.contollers;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -23,7 +24,11 @@ public class IgnoreList {
             strRules = readAllLines(Path.of("ignore.txt"));
         } catch (IOException e) {
            strRules = new LinkedList<>();
-           // TODO create a new empty file, otherwise stucks
+            try {
+                new File("ignore.txt").createNewFile();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 }
