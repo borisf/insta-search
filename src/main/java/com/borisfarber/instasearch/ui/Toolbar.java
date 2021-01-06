@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Google, Inc.
+ * Copyright 2021 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,12 @@ public class Toolbar extends JToolBar {
                 try {
                     desktop.open(new File("ignore.txt"));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Can't open ignore.txt " +
+                                    "file from your home folder",
+                            "ClassyShark Insta Search",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             };
             SwingUtilities.invokeLater(runnable);
