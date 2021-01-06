@@ -1,0 +1,2 @@
+# This file keeps all ignored folders, by their absolute paths
+/home/bfarber/Unity-2019.1.0f2/Editor

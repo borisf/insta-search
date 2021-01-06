@@ -14,6 +14,7 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.FilenameIgnoreList;
  import com.borisfarber.instasearch.models.Pair;
  import com.illucit.instatrie.index.PrefixIndex;
  import com.illucit.instatrie.index.TriePrefixIndex;
@@ -46,18 +47,12 @@
          this.controller = controller;
          this.mode = mode;
          this.allLines = new ArrayList<>();
-
      }
 
      @Override
      public void crawl(File file) {
          try {
-             if(mode.equals(FILENAMES_SEARCH)) {
-                 Files.walkFileTree(file.toPath(), new FilenameVisitor());
-             } else {
-                 Files.walkFileTree(file.toPath(), new AllFilesVisitor());
-             }
-
+             Files.walkFileTree(file.toPath(), new FilenameVisitor());
          } catch (IOException e) {
              e.printStackTrace();
          }
@@ -132,46 +127,26 @@
      }
 
      private class FilenameVisitor extends SimpleFileVisitor<Path> {
+         FilenameIgnoreList ignoreList;
+
+         FilenameVisitor() {
+             super();
+             ignoreList = new FilenameIgnoreList();
+         }
 
          @Override
          public FileVisitResult preVisitDirectory(Path dir,
                                                   BasicFileAttributes attrs) {
-             // TODO add ignore list
-             // TODO to the result output
-             // looks the idiomatic approach for skipping
              String filename = dir.getFileName().toString();
 
-             if (filename.startsWith("Unity")) {
+             if(ignoreList.contains(dir.toAbsolutePath().toString())) {
                  return SKIP_SUBTREE;
              }
 
-             if(mode.equals(FILENAMES_SEARCH) && filename.startsWith(".")) {
+             // TODO think about . files search
+             if(filename.startsWith(".")) {
                  return SKIP_SUBTREE;
              }
-             return CONTINUE;
-         }
-
-         @Override
-         public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-             allLines.add(path.toString());
-             return CONTINUE;
-         }
-     }
-
-     private class AllFilesVisitor extends SimpleFileVisitor<Path> {
-
-         @Override
-         public FileVisitResult preVisitDirectory(Path dir,
-                                                  BasicFileAttributes attrs) {
-             // TODO add ignore list
-             // TODO to the result output
-             // looks the idiomatic approach for skipping
-             String filename = dir.getFileName().toString();
-
-             if (filename.startsWith("Unity")) {
-                 return SKIP_SUBTREE;
-             }
-
              return CONTINUE;
          }
 

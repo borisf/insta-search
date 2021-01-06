@@ -26,8 +26,7 @@ public interface Search {
     int NOT_IN_FILE = -1;
 
     String CONTENT_SEARCH = "Content";
-    String FILENAMES_SEARCH = "Filenames";
-    String ALL_FILES_SEARCH = "All Files";
+    String FILENAMES_SEARCH = "Filenames";;
 
     void crawl(File file);
 
