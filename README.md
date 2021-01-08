@@ -18,7 +18,8 @@ incrementally.
        to search
      * Select search mode  
          * Content - search for content inside files (grep)
-         * Filenames - search for a file
+         * Filenames - search for a file. ClassyShark Insta search will look for dot(hidden) files, 
+           only if the hidden file was selected as root.
      * Ignore list - opens the `ignore.txt` from your home folder via the system editor. This file 
        holds the ignored paths` data while crawling for files.
      * About - shows the version number

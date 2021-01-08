@@ -42,6 +42,7 @@
              new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
      private final String mode;
      private List<String> searchResults = new LinkedList<>();
+     private File searchRoot = new File("");
 
      public FilenameSearch(Controller controller, String mode) {
          this.controller = controller;
@@ -51,6 +52,7 @@
 
      @Override
      public void crawl(File file) {
+         this.searchRoot = file;
          try {
              Files.walkFileTree(file.toPath(), new FilenameVisitor());
          } catch (IOException e) {
@@ -143,9 +145,12 @@
                  return SKIP_SUBTREE;
              }
 
-             // TODO think about . files search
              if(filename.startsWith(".")) {
-                 return SKIP_SUBTREE;
+                 if (searchRoot.getAbsolutePath().startsWith(".")) {
+                     return CONTINUE;
+                 } else {
+                     return SKIP_SUBTREE;
+                 }
              }
              return CONTINUE;
          }

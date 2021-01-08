@@ -276,19 +276,20 @@
      }
 
      private File openFile() {
-         final JFileChooser fileChooser = new JFileChooser();
-         fileChooser.setPreferredSize(new Dimension(700,500));
-         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+         final JFileChooser chooser = new JFileChooser();
+         chooser.setPreferredSize(new Dimension(700,500));
+         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+         chooser.setFileHidingEnabled(false);
 
          if(controller.getCurrentFile() == null) {
-             fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+             chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
          } else {
-             fileChooser.setCurrentDirectory(controller.getCurrentFile().getParentFile());
+             chooser.setCurrentDirectory(controller.getCurrentFile().getParentFile());
          }
 
-         final int returnVal = fileChooser.showDialog(this, "Search");
+         final int returnVal = chooser.showDialog(this, "Search");
          if (returnVal == 0) {
-             return fileChooser.getSelectedFile();
+             return chooser.getSelectedFile();
          }
 
          return null;
