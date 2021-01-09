@@ -26,7 +26,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.io.File;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.borisfarber.instasearch.contollers.FileView.viewFile;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
@@ -52,6 +54,9 @@ public final class Controller implements DocumentListener {
 
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
+
+    private ScheduledExecutorService crawlAnimationExecutor =
+            Executors.newScheduledThreadPool(1);
 
     public Controller(JTextField searchField,
                       JTextPane resultTextPane,
@@ -89,8 +94,10 @@ public final class Controller implements DocumentListener {
         resultTextPane.setText("Crawling: " + file.getAbsolutePath());
         previewTextPane.setText("");
         resultCountLabel.setText("...");
-
         currentFile = file;
+        crawlAnimationExecutor = Executors.newScheduledThreadPool(1);
+        crawlAnimationExecutor.scheduleAtFixedRate(
+                new CrawlAnimator(this), 0, 200, TimeUnit.MILLISECONDS);
 
         SwingWorker crawlWorker = new SwingWorker() {
             // crawl requests either come from either main thread
@@ -108,7 +115,13 @@ public final class Controller implements DocumentListener {
         crawlWorker.execute();
     }
 
+    public void setResultText(String text) {
+        resultTextPane.setText(text);
+    }
+
     public void onCrawlFinish(java.util.List<String> crawlResults) {
+        crawlAnimationExecutor.shutdownNow();
+
         resultModel.fillFilenameResults(crawlResults);
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());
