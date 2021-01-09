@@ -31,11 +31,14 @@ public class CrawlAnimation implements Runnable {
         String text = "";
         text += absolutePath + " >";
         for (int j = 0; j < uiCounter; j++) {
-            text += "==";
+            text += "~ ~ ";
+            if(j % 10 == 0) {
+                text += "\n";
+            }
         }
 
         uiCounter++;
-        text += ">";
+        text += "><)))'>";
 
         String finalText = text;
         SwingUtilities.invokeLater(() ->
