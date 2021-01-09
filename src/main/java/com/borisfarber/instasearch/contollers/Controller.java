@@ -91,13 +91,12 @@ public final class Controller implements DocumentListener {
         }
 
         searchField.setText("");
-        resultTextPane.setText("Crawling: " + file.getAbsolutePath());
         previewTextPane.setText("");
         resultCountLabel.setText("...");
         currentFile = file;
         crawlAnimationExecutor = Executors.newScheduledThreadPool(1);
         crawlAnimationExecutor.scheduleAtFixedRate(
-                new CrawlAnimator(this), 0, 200, TimeUnit.MILLISECONDS);
+                new CrawlAnimator(this, file.getAbsolutePath()), 0, 200, TimeUnit.MILLISECONDS);
 
         SwingWorker crawlWorker = new SwingWorker() {
             // crawl requests either come from either main thread

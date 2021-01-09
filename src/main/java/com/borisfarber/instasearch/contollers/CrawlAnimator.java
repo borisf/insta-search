@@ -17,16 +17,19 @@ import javax.swing.*;
 
 public class CrawlAnimator implements Runnable{
     private final Controller controller;
+    private final String absolutePath;
     private int uiCounter;
 
-    public CrawlAnimator(Controller controller) {
+    public CrawlAnimator(Controller controller, String absolutePath) {
         this.controller = controller;
         this.uiCounter = 0;
+        this.absolutePath = absolutePath;
     }
 
     @Override
     public void run() {
         String text = "";
+        text += absolutePath + " >";
         for (int j = 0; j < uiCounter; j++) {
             text += "==";
         }
