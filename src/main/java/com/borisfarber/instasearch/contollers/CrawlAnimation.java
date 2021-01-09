@@ -28,19 +28,20 @@ public class CrawlAnimation implements Runnable {
 
     @Override
     public void run() {
-        String text = "";
-        text += absolutePath + " >";
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(absolutePath);
+        textBuilder.append(" >");
+
         for (int j = 0; j < uiCounter; j++) {
-            text += "~ ~ ";
+            textBuilder.append("~ ~ ");
             if(j % 10 == 0) {
-                text += "\n";
+                textBuilder.append("\n");
             }
         }
-
         uiCounter++;
-        text += "><)))'>";
+        textBuilder.append("><)))'>");
 
-        String finalText = text;
+        String finalText = textBuilder.toString();
         SwingUtilities.invokeLater(() ->
                 this.controller.setResultText(finalText));
     }
