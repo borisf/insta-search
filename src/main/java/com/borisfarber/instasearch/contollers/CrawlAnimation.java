@@ -15,12 +15,12 @@ package com.borisfarber.instasearch.contollers;
 
 import javax.swing.*;
 
-public class CrawlAnimator implements Runnable{
+public class CrawlAnimation implements Runnable {
     private final Controller controller;
     private final String absolutePath;
     private int uiCounter;
 
-    public CrawlAnimator(Controller controller, String absolutePath) {
+    public CrawlAnimation(Controller controller, String absolutePath) {
         this.controller = controller;
         this.uiCounter = 0;
         this.absolutePath = absolutePath;

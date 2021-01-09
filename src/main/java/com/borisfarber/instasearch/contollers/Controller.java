@@ -96,7 +96,7 @@ public final class Controller implements DocumentListener {
         currentFile = file;
         crawlAnimationExecutor = Executors.newScheduledThreadPool(1);
         crawlAnimationExecutor.scheduleAtFixedRate(
-                new CrawlAnimator(this, file.getAbsolutePath()), 0, 200, TimeUnit.MILLISECONDS);
+                new CrawlAnimation(this, file.getAbsolutePath()), 0, 200, TimeUnit.MILLISECONDS);
 
         SwingWorker crawlWorker = new SwingWorker() {
             // crawl requests either come from either main thread
