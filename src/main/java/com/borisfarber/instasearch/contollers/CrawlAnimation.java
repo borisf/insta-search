@@ -30,13 +30,12 @@ public class CrawlAnimation implements Runnable {
     public void run() {
         StringBuilder textBuilder = new StringBuilder();
         textBuilder.append(absolutePath);
-        textBuilder.append(" >");
 
         for (int j = 0; j < uiCounter; j++) {
-            textBuilder.append("~ ~ ");
             if(j % 10 == 0) {
                 textBuilder.append("\n");
             }
+            textBuilder.append("~ ~ ");
         }
         uiCounter++;
         textBuilder.append("><)))'>");

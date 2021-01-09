@@ -106,7 +106,7 @@ public final class Controller implements DocumentListener {
                 search = SearchFactory.INSTANCE.createSearch(Controller.this,
                         file, searchMode);
                 search.crawl(file);
-                String res = "Finished Crawling";
+                String res = "";
                 return res;
             }
         };
