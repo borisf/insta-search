@@ -94,8 +94,6 @@
                  @Override
                  public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                          throws IOException {
-                     // one thread, check exception by printing path
-                     // System.out.println("Thread:" + Thread.currentThread().getName());
                      if (matcher.matches(path)) {
                          try {
                              List<String> allFileLines = Files.readAllLines(path);
