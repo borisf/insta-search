@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.ui;
 
- import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.contollers.PathMatchers;
 
  import javax.swing.*;
@@ -35,7 +35,7 @@
      private JTextPane previewTextPane;
      private JLabel resultCountLabel;
      private final JPopupMenu copyPopup = new JPopupMenu();
-     private final Controller controller;
+     private final Mediator mediator;
 
      public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
      public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
@@ -43,32 +43,32 @@
 
      public InstaSearch(String file) {
          this();
-         controller.onFileOpened(new File(file));
+         mediator.onFileOpened(new File(file));
      }
 
      public InstaSearch() {
          super("ClassyShark Insta Search");
          textFont = new Font("JetBrains Mono", Font.PLAIN, 23);
          buildUI();
-         controller =
-                 new Controller(searchField, resultTextPane,
+         mediator =
+                 new Mediator(searchField, resultTextPane,
                          previewTextPane, resultCountLabel,
                          CONTENT_SEARCH);
-         searchField.getDocument().addDocumentListener(this.controller);
-         controller.onFileOpened(openFile());
+         searchField.getDocument().addDocumentListener(this.mediator);
+         mediator.onFileOpened(openFile());
      }
 
      public final void onFileDragged(final File file) {
          setTitle("ClassySearch - " + file.getName());
-         controller.onFileOpened(file);
+         mediator.onFileOpened(file);
      }
 
      public void openFileFromToolbar() {
-         controller.onFileOpened(openFile());
+         mediator.onFileOpened(openFile());
      }
 
      public void updateFolderSearchMode(String searchMode) {
-         controller.updateSearchMode(searchMode);
+         mediator.updateSearchMode(searchMode);
      }
 
      private void buildUI() {
@@ -93,7 +93,7 @@
                  }
 
                  // each notch contributes ~3 lines with say 80 chars each
-                 controller.onMouseScrolled(currentAnchor * 240, ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
+                 mediator.onMouseScrolled(currentAnchor * 240, ResultsHighlighter.HIGHLIGHT_SPAN.LONG);
              }
          });
          previewTextPane = buildPreviewTextPane();
@@ -122,7 +122,7 @@
          addWindowListener(new WindowAdapter() {
              @Override
              public void windowClosing(WindowEvent windowEvent) {
-                 controller.onClose();
+                 mediator.onClose();
                  System.exit(0);
              }
          });
@@ -154,17 +154,17 @@
              @Override
              public void keyPressed(KeyEvent keyEvent) {
                  if (keyEvent.getKeyCode() == VK_UP) {
-                     controller.onUpPressed();
+                     mediator.onUpPressed();
                      return;
                  }
 
                  if (keyEvent.getKeyCode() == VK_DOWN) {
-                     controller.onDownPressed();
+                     mediator.onDownPressed();
                      return;
                  }
 
                  if (keyEvent.getKeyCode() == VK_ENTER) {
-                     controller.onEnterPressed();
+                     mediator.onEnterPressed();
                      return;
                  }
              }
@@ -215,9 +215,9 @@
                  }
 
                  if(line.equals(previousLine)) {
-                     controller.onMouseDoubleClick(result.getSelectedText());
+                     mediator.onMouseDoubleClick(result.getSelectedText());
                  } else {
-                     controller.onMouseSingleClick(result.getSelectedText());
+                     mediator.onMouseSingleClick(result.getSelectedText());
                      previousLine = line;
                  }
              }
@@ -232,17 +232,17 @@
              @Override
              public void keyPressed(KeyEvent keyEvent) {
                  if (keyEvent.getKeyCode() == VK_UP) {
-                     controller.onUpPressed();
+                     mediator.onUpPressed();
                      return;
                  }
 
                  if (keyEvent.getKeyCode() == VK_DOWN) {
-                     controller.onDownPressed();
+                     mediator.onDownPressed();
                      return;
                  }
 
                  if (keyEvent.getKeyCode() == VK_ENTER) {
-                     controller.onEnterPressed();
+                     mediator.onEnterPressed();
                      return;
                  }
              }
@@ -281,10 +281,10 @@
          chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
          chooser.setFileHidingEnabled(false);
 
-         if(controller.getCurrentFile() == null) {
-             chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+         if(mediator.getCurrentFile() == null) {
+             chooser.setCurrentDirectory(new File(System.getProperty("user.dir")).getParentFile());
          } else {
-             chooser.setCurrentDirectory(controller.getCurrentFile().getParentFile());
+             chooser.setCurrentDirectory(mediator.getCurrentFile().getParentFile());
          }
 
          final int returnVal = chooser.showDialog(this, "Search");

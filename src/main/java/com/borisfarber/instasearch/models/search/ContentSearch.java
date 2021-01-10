@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.models.search;
 
- import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
  import com.borisfarber.instasearch.models.ResultModel;
@@ -32,7 +32,7 @@
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public class ContentSearch implements Search {
-     private final Controller controller;
+     private final Mediator mediator;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
      private final TreeMap<String, Path> filenamesToPaths;
@@ -43,8 +43,8 @@
              Executors.newSingleThreadExecutor();
      private Map<String, Float> matchedSet;
 
-     public ContentSearch(Controller controller) {
-         this.controller = controller;
+     public ContentSearch(Mediator mediator) {
+         this.mediator = mediator;
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();
          filenamesToPaths = new TreeMap<>();
@@ -134,7 +134,7 @@
              } else {
                  matchedSet = ngramSearch(3,50, query, allLines, String::toString);
              }
-             Runnable runnable = controller::onSearchFinish;
+             Runnable runnable = mediator::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -261,7 +261,7 @@
          Runnable runnable = () -> {
              ArrayList<String> allFiles = new ArrayList<>();
              allFiles.addAll(filenamesToPaths.keySet());
-             controller.onCrawlFinish(allFiles);
+             mediator.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
      }

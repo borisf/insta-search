@@ -34,7 +34,7 @@ import static com.borisfarber.instasearch.contollers.FileView.viewFile;
 import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
 import static com.borisfarber.instasearch.ui.InstaSearch.RESULT_HIGHLIGHT_COLOR;
 
-public final class Controller implements DocumentListener {
+public final class Mediator implements DocumentListener {
     public static final int UI_VIEW_LIMIT = 1000;
 
     private final JTextField searchField;
@@ -58,11 +58,11 @@ public final class Controller implements DocumentListener {
     private ScheduledExecutorService crawlAnimationExecutor =
             Executors.newScheduledThreadPool(1);
 
-    public Controller(JTextField searchField,
-                      JTextPane resultTextPane,
-                      JTextPane previewArea,
-                      JLabel resultCountLabel,
-                      String searchMode) {
+    public Mediator(JTextField searchField,
+                    JTextPane resultTextPane,
+                    JTextPane previewArea,
+                    JLabel resultCountLabel,
+                    String searchMode) {
         this.searchField = searchField;
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
@@ -103,7 +103,7 @@ public final class Controller implements DocumentListener {
             // or from EDT when a file is opened from the toolbar
             @Override
             protected String doInBackground() {
-                search = SearchFactory.INSTANCE.createSearch(Controller.this,
+                search = SearchFactory.INSTANCE.createSearch(Mediator.this,
                         file, searchMode);
                 search.crawl(file);
                 String res = "";
@@ -114,7 +114,7 @@ public final class Controller implements DocumentListener {
         crawlWorker.execute();
     }
 
-    public void setResultText(String text) {
+    public void onCrawlUpdate(String text) {
         resultTextPane.setText(text);
     }
 

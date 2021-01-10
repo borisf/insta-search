@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.models.search;
 
- import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.contollers.IgnoreList;
  import com.borisfarber.instasearch.models.Pair;
  import com.illucit.instatrie.index.PrefixIndex;
@@ -33,7 +33,7 @@
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public class FilenameSearch implements Search {
-     private final Controller controller;
+     private final Mediator mediator;
      private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
 
@@ -44,8 +44,8 @@
      private List<String> searchResults = new LinkedList<>();
      private File searchRoot = new File("");
 
-     public FilenameSearch(Controller controller, String mode) {
-         this.controller = controller;
+     public FilenameSearch(Mediator mediator, String mode) {
+         this.mediator = mediator;
          this.mode = mode;
          this.allLines = new ArrayList<>();
      }
@@ -71,7 +71,7 @@
              }
 
              searchResults = index.search(query);
-             Runnable runnable = controller::onSearchFinish;
+             Runnable runnable = mediator::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -118,7 +118,7 @@
          Runnable runnable = () -> {
              ArrayList<String> allFiles = new ArrayList<>();
              allFiles.addAll(allLines);
-             controller.onCrawlFinish(allFiles);
+             mediator.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
      }

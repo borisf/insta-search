@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.models.search;
 
- import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.models.ResultModel;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
@@ -30,16 +30,16 @@
  import java.util.concurrent.ThreadPoolExecutor;
 
  public class ZipSearch implements Search {
-     protected final Controller controller;
+     protected final Mediator mediator;
      protected File zipFile;
      private final ArrayList<String> allLines = new ArrayList<>();
      protected final ExecutorService executorService =
              Executors.newFixedThreadPool(4);
      private TreeMap<Integer, String> resultMap;
 
-     public ZipSearch(File zipFile, Controller controller) {
+     public ZipSearch(File zipFile, Mediator mediator) {
          this.zipFile = zipFile;
-         this.controller = controller;
+         this.mediator = mediator;
          allLines.clear();
      }
 
@@ -63,7 +63,7 @@
              resultMap = new TreeMap<>();
              matchedSet.forEach((k, v) -> resultMap.put(v,k));
 
-             Runnable runnable = controller::onSearchFinish;
+             Runnable runnable = mediator::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -103,7 +103,7 @@
                      HexDump.hexdump(Arrays.copyOfRange(bytes, 0, headerSize)) +
                      "\n...\n";
 
-             Runnable runnable = () -> controller.onUpdatePreview(result);
+             Runnable runnable = () -> mediator.onUpdatePreview(result);
 
              SwingUtilities.invokeLater(runnable);
          });
@@ -141,7 +141,7 @@
                  builder.append(fileName).append("\n");
              }
 
-             controller.onCrawlFinish(allLines);
+             mediator.onCrawlFinish(allLines);
          };
          SwingUtilities.invokeLater(runnable);
      }

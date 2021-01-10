@@ -16,12 +16,12 @@ package com.borisfarber.instasearch.contollers;
 import javax.swing.*;
 
 public class CrawlAnimation implements Runnable {
-    private final Controller controller;
+    private final Mediator mediator;
     private final String absolutePath;
     private int uiCounter;
 
-    public CrawlAnimation(Controller controller, String absolutePath) {
-        this.controller = controller;
+    public CrawlAnimation(Mediator mediator, String absolutePath) {
+        this.mediator = mediator;
         this.uiCounter = 0;
         this.absolutePath = absolutePath;
     }
@@ -42,6 +42,6 @@ public class CrawlAnimation implements Runnable {
 
         String finalText = textBuilder.toString();
         SwingUtilities.invokeLater(() ->
-                this.controller.setResultText(finalText));
+                this.mediator.onCrawlUpdate(finalText));
     }
 }

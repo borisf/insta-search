@@ -13,7 +13,7 @@
  */
 package com.borisfarber.instasearch.models.search;
 
-import com.borisfarber.instasearch.contollers.Controller;
+import com.borisfarber.instasearch.contollers.Mediator;
 import com.borisfarber.instasearch.contollers.PathMatchers;
 
 import java.io.File;
@@ -25,24 +25,24 @@ public enum SearchFactory {
 
     INSTANCE;
 
-    public Search createMockSearch(Controller controller) {
-        return new MockSearch(controller);
+    public Search createMockSearch(Mediator mediator) {
+        return new MockSearch(mediator);
     }
 
-    public Search createSearch(Controller controller, File newFile, String mode) {
+    public Search createSearch(Mediator mediator, File newFile, String mode) {
         if (newFile.isDirectory()) {
             if(mode.equals(CONTENT_SEARCH)) {
-                return new ContentSearch(controller);
+                return new ContentSearch(mediator);
             } else {
-                return new FilenameSearch(controller, mode);
+                return new FilenameSearch(mediator, mode);
             }
         } else {
             if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {
-                return new ZipSearch(newFile, controller);
+                return new ZipSearch(newFile, mediator);
             } else if (PathMatchers.APK_MATCHER.matches(Path.of(newFile.toURI()))) {
-                return new APKSearch(newFile, controller);
+                return new APKSearch(newFile, mediator);
             } else {
-                return new BigFileSearch(controller);
+                return new BigFileSearch(mediator);
             }
         }
     }
