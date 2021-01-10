@@ -139,14 +139,14 @@
          @Override
          public FileVisitResult preVisitDirectory(Path dir,
                                                   BasicFileAttributes attrs) {
-             String filename = dir.getFileName().toString();
+             String currentDir = dir.getFileName().toString();
 
              if(ignoreList.contains(dir.toAbsolutePath().toString())) {
                  return SKIP_SUBTREE;
              }
-
-             if(filename.startsWith(".")) {
-                 if (searchRoot.getAbsolutePath().startsWith(".")) {
+             
+             if(currentDir.startsWith(".")) {
+                 if (searchRoot.getAbsolutePath().contains(".")) {
                      return CONTINUE;
                  } else {
                      return SKIP_SUBTREE;
