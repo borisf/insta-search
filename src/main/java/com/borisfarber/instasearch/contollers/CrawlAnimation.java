@@ -35,7 +35,7 @@ public class CrawlAnimation implements Runnable {
             if(j % 10 == 0) {
                 textBuilder.append("\n");
             }
-            textBuilder.append("~ ~ ");
+            textBuilder.append(". . ");
         }
         uiCounter++;
         textBuilder.append("><)))'>");

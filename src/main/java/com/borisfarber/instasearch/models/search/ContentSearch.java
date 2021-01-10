@@ -42,6 +42,7 @@
      private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
      private Map<String, Float> matchedSet;
+     private File searchRoot;
 
      public ContentSearch(Mediator mediator) {
          this.mediator = mediator;
@@ -58,6 +59,7 @@
          numLinesToFilenames.clear();
          filenamesToPaths.clear();
          occurrences.clear();
+         this.searchRoot = file;
 
          if (file == null || !file.exists()) {
              return;
@@ -76,9 +78,16 @@
                  @Override
                  public FileVisitResult preVisitDirectory(Path dir,
                                                           BasicFileAttributes attrs) {
-                     if (dir.getFileName().toString().startsWith(".")) {
-                         return SKIP_SUBTREE;
+                     String currentDir = dir.getFileName().toString();
+
+                     if(currentDir.startsWith(".")) {
+                         if (searchRoot.getAbsolutePath().contains(".")) {
+                             return CONTINUE;
+                         } else {
+                             return SKIP_SUBTREE;
+                         }
                      }
+
                      return CONTINUE;
                  }
 
@@ -259,8 +268,7 @@
      @Override
      public void emptyQuery() {
          Runnable runnable = () -> {
-             ArrayList<String> allFiles = new ArrayList<>();
-             allFiles.addAll(filenamesToPaths.keySet());
+             ArrayList<String> allFiles = new ArrayList<>(filenamesToPaths.keySet());
              mediator.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
