@@ -31,12 +31,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.borisfarber.instasearch.contollers.FileView.viewFile;
-import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
-import static com.borisfarber.instasearch.ui.InstaSearch.RESULT_HIGHLIGHT_COLOR;
+import static com.borisfarber.instasearch.ui.InstaSearch.*;
 
 public final class Mediator implements DocumentListener {
-    public static final int UI_VIEW_LIMIT = 1000;
-
     private final JTextField searchField;
     private final JTextPane resultTextPane;
     private final JTextPane previewTextPane;
@@ -45,7 +42,7 @@ public final class Mediator implements DocumentListener {
     private final PreviewHighlighter previewHighlighter;
     private String query;
     private Search search;
-    private ResultModel resultModel;
+    private final ResultModel resultModel;
     private String searchMode;
     private File currentFile;
 
@@ -98,7 +95,7 @@ public final class Mediator implements DocumentListener {
         crawlAnimationExecutor.scheduleAtFixedRate(
                 new CrawlAnimation(this, file.getAbsolutePath()), 0, 200, TimeUnit.MILLISECONDS);
 
-        SwingWorker crawlWorker = new SwingWorker() {
+        var crawlWorker = new SwingWorker() {
             // crawl requests either come from either main thread
             // or from EDT when a file is opened from the toolbar
             @Override
@@ -106,8 +103,7 @@ public final class Mediator implements DocumentListener {
                 search = SearchFactory.INSTANCE.createSearch(Mediator.this,
                         file, searchMode);
                 search.crawl(file);
-                String res = "";
-                return res;
+                return "";
             }
         };
 

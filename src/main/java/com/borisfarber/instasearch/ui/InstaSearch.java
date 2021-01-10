@@ -28,6 +28,7 @@
 
  public final class InstaSearch extends JFrame {
      public static final int FRAME_WIDTH = 1200;
+     public static final int UI_VIEW_LIMIT = 1000;
      private final Font textFont;
      private JTextField searchField;
 
