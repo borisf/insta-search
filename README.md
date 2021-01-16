@@ -18,8 +18,10 @@ incrementally.
        to search
      * Select search mode  
          * Content - search for content inside files (grep)
-         * Filenames - search for a file
-         * All Files - search in all files, including hidden and system ones
+         * Filenames - search for a file. ClassyShark Insta search will look for dot(hidden) files, 
+           only if the hidden file was selected as root.
+     * Ignore list - opens the `ignore.txt` from your home folder via the system editor. This file 
+       holds the ignored paths` data while crawling for files.
      * About - shows the version number
 
 * Search Line - the upper text box, where you type text that are you looking for
@@ -37,7 +39,7 @@ The Insta Search supports incremental searching in both files and folders:
 
 * Log File - Drag and drop your file into the results view
 
-* Source Folder - Open folder via the menu. 
+* Folder - Open folder via the menu, and search either for content or for a file name. 
 
 * APK/Jar/Zip File - Drag and drop your file into the results view. Insta Search will show the entries. 
 Searching will result of filtering of the filenames. Going over the entries with app/down arrows will

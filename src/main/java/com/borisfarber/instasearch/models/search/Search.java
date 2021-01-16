@@ -27,7 +27,6 @@ public interface Search {
 
     String CONTENT_SEARCH = "Content";
     String FILENAMES_SEARCH = "Filenames";
-    String ALL_FILES_SEARCH = "All Files";
 
     void crawl(File file);
 
@@ -38,8 +37,6 @@ public interface Search {
     String getPreview(String resultLine);
 
     List<String> getResults();
-
-    String getResultSetCount();
 
     Path extractSelectedFile(String fileName);
 

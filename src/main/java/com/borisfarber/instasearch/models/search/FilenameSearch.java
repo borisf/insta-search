@@ -13,7 +13,8 @@
   */
  package com.borisfarber.instasearch.models.search;
 
- import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.Mediator;
+ import com.borisfarber.instasearch.contollers.IgnoreList;
  import com.borisfarber.instasearch.models.Pair;
  import com.illucit.instatrie.index.PrefixIndex;
  import com.illucit.instatrie.index.TriePrefixIndex;
@@ -32,7 +33,7 @@
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public class FilenameSearch implements Search {
-     private final Controller controller;
+     private final Mediator mediator;
      private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
 
@@ -41,23 +42,19 @@
              new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
      private final String mode;
      private List<String> searchResults = new LinkedList<>();
+     private File searchRoot = new File("");
 
-     public FilenameSearch(Controller controller, String mode) {
-         this.controller = controller;
+     public FilenameSearch(Mediator mediator, String mode) {
+         this.mediator = mediator;
          this.mode = mode;
          this.allLines = new ArrayList<>();
-
      }
 
      @Override
      public void crawl(File file) {
+         this.searchRoot = file;
          try {
-             if(mode.equals(FILENAMES_SEARCH)) {
-                 Files.walkFileTree(file.toPath(), new FilenameVisitor());
-             } else {
-                 Files.walkFileTree(file.toPath(), new AllFilesVisitor());
-             }
-
+             Files.walkFileTree(file.toPath(), new FilenameVisitor());
          } catch (IOException e) {
              e.printStackTrace();
          }
@@ -74,7 +71,7 @@
              }
 
              searchResults = index.search(query);
-             Runnable runnable = controller::onSearchFinish;
+             Runnable runnable = mediator::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -96,11 +93,6 @@
      @Override
      public List<String> getResults() {
          return searchResults;
-     }
-
-     @Override
-     public String getResultSetCount() {
-         return String.valueOf(allLines.size());
      }
 
      @Override
@@ -126,7 +118,7 @@
          Runnable runnable = () -> {
              ArrayList<String> allFiles = new ArrayList<>();
              allFiles.addAll(allLines);
-             controller.onCrawlFinish(allFiles);
+             mediator.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
      }
@@ -137,46 +129,29 @@
      }
 
      private class FilenameVisitor extends SimpleFileVisitor<Path> {
+         IgnoreList ignoreList;
+
+         FilenameVisitor() {
+             super();
+             ignoreList = new IgnoreList();
+         }
 
          @Override
          public FileVisitResult preVisitDirectory(Path dir,
                                                   BasicFileAttributes attrs) {
-             // TODO add ignore list
-             // TODO to the result output
-             // looks the idiomatic approach for skipping
-             String filename = dir.getFileName().toString();
+             String currentDir = dir.getFileName().toString();
 
-             if (filename.startsWith("Unity")) {
+             if(ignoreList.contains(dir.toAbsolutePath().toString())) {
                  return SKIP_SUBTREE;
              }
-
-             if(mode.equals(FILENAMES_SEARCH) && filename.startsWith(".")) {
-                 return SKIP_SUBTREE;
+             
+             if(currentDir.startsWith(".")) {
+                 if (searchRoot.getAbsolutePath().contains(".")) {
+                     return CONTINUE;
+                 } else {
+                     return SKIP_SUBTREE;
+                 }
              }
-             return CONTINUE;
-         }
-
-         @Override
-         public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-             allLines.add(path.toString());
-             return CONTINUE;
-         }
-     }
-
-     private class AllFilesVisitor extends SimpleFileVisitor<Path> {
-
-         @Override
-         public FileVisitResult preVisitDirectory(Path dir,
-                                                  BasicFileAttributes attrs) {
-             // TODO add ignore list
-             // TODO to the result output
-             // looks the idiomatic approach for skipping
-             String filename = dir.getFileName().toString();
-
-             if (filename.startsWith("Unity")) {
-                 return SKIP_SUBTREE;
-             }
-
              return CONTINUE;
          }
 

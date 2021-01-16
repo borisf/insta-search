@@ -13,7 +13,7 @@
   */
  package com.borisfarber.instasearch.models.search;
 
- import com.borisfarber.instasearch.contollers.Controller;
+ import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
  import com.borisfarber.instasearch.models.ResultModel;
@@ -32,7 +32,7 @@
  import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
  public class ContentSearch implements Search {
-     private final Controller controller;
+     private final Mediator mediator;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
      private final TreeMap<String, Path> filenamesToPaths;
@@ -42,9 +42,10 @@
      private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
      private Map<String, Float> matchedSet;
+     private File searchRoot;
 
-     public ContentSearch(Controller controller) {
-         this.controller = controller;
+     public ContentSearch(Mediator mediator) {
+         this.mediator = mediator;
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();
          filenamesToPaths = new TreeMap<>();
@@ -58,6 +59,7 @@
          numLinesToFilenames.clear();
          filenamesToPaths.clear();
          occurrences.clear();
+         this.searchRoot = file;
 
          if (file == null || !file.exists()) {
              return;
@@ -76,17 +78,22 @@
                  @Override
                  public FileVisitResult preVisitDirectory(Path dir,
                                                           BasicFileAttributes attrs) {
-                     if (dir.getFileName().toString().startsWith(".")) {
-                         return SKIP_SUBTREE;
+                     String currentDir = dir.getFileName().toString();
+
+                     if(currentDir.startsWith(".")) {
+                         if (searchRoot.getAbsolutePath().contains(".")) {
+                             return CONTINUE;
+                         } else {
+                             return SKIP_SUBTREE;
+                         }
                      }
+
                      return CONTINUE;
                  }
 
                  @Override
                  public FileVisitResult visitFile(Path path, BasicFileAttributes attrs)
                          throws IOException {
-                     // one thread, check exception by printing path
-                     // System.out.println("Thread:" + Thread.currentThread().getName());
                      if (matcher.matches(path)) {
                          try {
                              List<String> allFileLines = Files.readAllLines(path);
@@ -134,7 +141,7 @@
              } else {
                  matchedSet = ngramSearch(3,50, query, allLines, String::toString);
              }
-             Runnable runnable = controller::onSearchFinish;
+             Runnable runnable = mediator::onSearchFinish;
              SwingUtilities.invokeLater(runnable);
          });
      }
@@ -244,11 +251,6 @@
      }
 
      @Override
-     public String getResultSetCount() {
-         return Integer.toString(this.getResults().size());
-     }
-
-     @Override
      public void close() {
          Runtime.getRuntime().addShutdownHook(new Thread(() -> {
              try {
@@ -264,9 +266,8 @@
      @Override
      public void emptyQuery() {
          Runnable runnable = () -> {
-             ArrayList<String> allFiles = new ArrayList<>();
-             allFiles.addAll(filenamesToPaths.keySet());
-             controller.onCrawlFinish(allFiles);
+             ArrayList<String> allFiles = new ArrayList<>(filenamesToPaths.keySet());
+             mediator.onCrawlFinish(allFiles);
          };
          SwingUtilities.invokeLater(runnable);
      }

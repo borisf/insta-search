@@ -19,7 +19,7 @@ package com.borisfarber.instasearch.models.search;
 import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.formats.BinaryXml;
-import com.borisfarber.instasearch.contollers.Controller;
+import com.borisfarber.instasearch.contollers.Mediator;
 import com.borisfarber.instasearch.models.text.HexDump;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -31,8 +31,8 @@ import java.util.Comparator;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class APKSearch extends ZipSearch {
-    public APKSearch(File zipFile, Controller controller) {
-        super(zipFile, controller);
+    public APKSearch(File zipFile, Mediator mediator) {
+        super(zipFile, mediator);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class APKSearch extends ZipSearch {
             }
 
             String finalResult = result;
-            Runnable runnable = () -> controller.onUpdatePreview(finalResult);
+            Runnable runnable = () -> mediator.onUpdatePreview(finalResult);
 
             SwingUtilities.invokeLater(runnable);
         });

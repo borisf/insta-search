@@ -21,7 +21,7 @@
  import java.util.LinkedList;
  import java.util.List;
 
- import static com.borisfarber.instasearch.contollers.Controller.UI_VIEW_LIMIT;
+ import static com.borisfarber.instasearch.ui.InstaSearch.UI_VIEW_LIMIT;
 
  /** 2 format lines: files and search, optional selector and mandatory
   * new line

@@ -26,15 +26,14 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.io.File;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.borisfarber.instasearch.contollers.FileView.viewFile;
-import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
-import static com.borisfarber.instasearch.ui.InstaSearch.RESULT_HIGHLIGHT_COLOR;
+import static com.borisfarber.instasearch.ui.InstaSearch.*;
 
-public final class Controller implements DocumentListener {
-    public static final int UI_VIEW_LIMIT = 1000;
-
+public final class Mediator implements DocumentListener {
     private final JTextField searchField;
     private final JTextPane resultTextPane;
     private final JTextPane previewTextPane;
@@ -43,7 +42,9 @@ public final class Controller implements DocumentListener {
     private final PreviewHighlighter previewHighlighter;
     private String query;
     private Search search;
-    private ResultModel resultModel;
+    private final ResultModel resultModel;
+    private String searchMode;
+    private File currentFile;
 
     private final ThreadPoolExecutor searchExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
@@ -51,14 +52,14 @@ public final class Controller implements DocumentListener {
     private final ThreadPoolExecutor previewExecutor =
             (ThreadPoolExecutor)Executors.newFixedThreadPool(1);
 
-    private String searchMode;
-    private File currentFile;
+    private ScheduledExecutorService crawlAnimationExecutor =
+            Executors.newScheduledThreadPool(1);
 
-    public Controller(JTextField searchField,
-                      JTextPane resultTextPane,
-                      JTextPane previewArea,
-                      JLabel resultCountLabel,
-                      String searchMode) {
+    public Mediator(JTextField searchField,
+                    JTextPane resultTextPane,
+                    JTextPane previewArea,
+                    JLabel resultCountLabel,
+                    String searchMode) {
         this.searchField = searchField;
         this.resultTextPane = resultTextPane;
         this.previewTextPane = previewArea;
@@ -87,29 +88,35 @@ public final class Controller implements DocumentListener {
         }
 
         searchField.setText("");
-        resultTextPane.setText("Crawling: " + file.getAbsolutePath());
         previewTextPane.setText("");
         resultCountLabel.setText("...");
-
         currentFile = file;
+        crawlAnimationExecutor = Executors.newScheduledThreadPool(1);
+        crawlAnimationExecutor.scheduleAtFixedRate(
+                new CrawlAnimation(this, file.getAbsolutePath()), 0, 200, TimeUnit.MILLISECONDS);
 
-        SwingWorker crawlWorker = new SwingWorker() {
+        var crawlWorker = new SwingWorker() {
             // crawl requests either come from either main thread
             // or from EDT when a file is opened from the toolbar
             @Override
             protected String doInBackground() {
-                search = SearchFactory.INSTANCE.createSearch(Controller.this,
+                search = SearchFactory.INSTANCE.createSearch(Mediator.this,
                         file, searchMode);
                 search.crawl(file);
-                String res = "Finished Crawling";
-                return res;
+                return "";
             }
         };
 
         crawlWorker.execute();
     }
 
+    public void onCrawlUpdate(String text) {
+        resultTextPane.setText(text);
+    }
+
     public void onCrawlFinish(java.util.List<String> crawlResults) {
+        crawlAnimationExecutor.shutdownNow();
+
         resultModel.fillFilenameResults(crawlResults);
         resultModel.generateResultView();
         resultTextPane.setText(resultModel.getResultView());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Google, Inc.
+ * Copyright 2021 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ import com.borisfarber.instasearch.models.text.BuildVersion;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
-import static com.borisfarber.instasearch.models.search.Search.*;
+import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
+import static com.borisfarber.instasearch.models.search.Search.FILENAMES_SEARCH;
 
 public class Toolbar extends JToolBar {
     private final InstaSearch frame;
@@ -30,12 +33,14 @@ public class Toolbar extends JToolBar {
         super();
         this.frame = frame;
         JButton openButton = buildOpenButton();
+        JButton ignoreButton = buildIgnoreButton();
         JButton aboutButton = buildAboutButton();
         searchModeCombo = buildSearchModeCombo();
 
         add(openButton);
         add(searchModeCombo);
         add(Box.createHorizontalGlue());
+        add(ignoreButton);
         add(aboutButton);
 
         setFloatable(false);
@@ -51,19 +56,17 @@ public class Toolbar extends JToolBar {
         JButton result = new JButton(aboutIcon);
         result.setToolTipText("Open ...");
         result.setContentAreaFilled(false);
-
-        result.addActionListener(e -> frame.openFileFromToolbar());
-
         result.setBorderPainted(true);
         result.setFocusPainted(true);
+
+        result.addActionListener(e -> frame.openFileFromToolbar());
 
         return result;
     }
 
     private JComboBox buildSearchModeCombo() {
         String[] modes ={CONTENT_SEARCH,
-                FILENAMES_SEARCH,
-                ALL_FILES_SEARCH};
+                FILENAMES_SEARCH};
         JComboBox<String> result = new JComboBox<>(modes);
 
         result.addActionListener(actionEvent -> {
@@ -75,8 +78,43 @@ public class Toolbar extends JToolBar {
         return result;
     }
 
+    private JButton buildIgnoreButton() {
+        ImageIcon ignoreIcon = new ImageIcon(getClass().getResource("/ignore.png"));
+        Image image = ignoreIcon.getImage();
+        Image tempImage = image.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH);
+        ignoreIcon = new ImageIcon(tempImage);
+
+        JButton result = new JButton(ignoreIcon);
+        result.setToolTipText("Edit global folder ignore list");
+        result.setContentAreaFilled(false);
+        result.setBorderPainted(true);
+        result.setFocusPainted(true);
+
+        result.addActionListener(actionEvent -> {
+            Runnable runnable = () -> {
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.open(new File("ignore.txt"));
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Can't open ignore.txt " +
+                                    "file from your home folder",
+                            "ClassyShark Insta Search",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            };
+            SwingUtilities.invokeLater(runnable);
+        });
+        return result;
+    }
+
     private JButton buildAboutButton() {
         JButton result = new JButton("?");
+        result.setContentAreaFilled(false);
+        result.setBorderPainted(true);
+        result.setFocusPainted(true);
+
         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/blue-shark.png"));
         Image image = aboutIcon.getImage();
         Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);

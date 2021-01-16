@@ -34,7 +34,7 @@ import com.borisfarber.instasearch.contollers.*;
 import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.models.ResultModel;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
-import com.borisfarber.instasearch.contollers.Controller;
+import com.borisfarber.instasearch.contollers.Mediator;
 import com.jramoyo.io.IndexedFileReader;
 
 import javax.swing.*;
@@ -69,7 +69,7 @@ public class BigFileSearch implements Search {
 
     // The input pattern that we're looking for
     private static Pattern pattern;
-    private final Controller controller;
+    private final Mediator mediator;
 
     private File file = new File("test.txt");
     private CharBuffer cb1;
@@ -88,8 +88,8 @@ public class BigFileSearch implements Search {
             new ConcurrentLinkedQueue<>();
     private String query;
 
-    public BigFileSearch(Controller controller) {
-        this.controller = controller;
+    public BigFileSearch(Mediator mediator) {
+        this.mediator = mediator;
         nameToPaths = new TreeMap<>();
     }
 
@@ -139,7 +139,7 @@ public class BigFileSearch implements Search {
         }
 
         builder.append("...");
-        controller.onCrawlFinish(preview.subList(0,upper));
+        mediator.onCrawlFinish(preview.subList(0,upper));
     }
 
     private File dumpFolderToFile(File file) {
@@ -244,21 +244,21 @@ public class BigFileSearch implements Search {
     }
 
     private void executeGrep() {
-        executorService.execute(() -> grepTask(file, result, controller, cb1));
-        executorService.execute(() -> grepTask(file, result, controller, cb2));
-        executorService.execute(() -> grepTask(file, result, controller, cb3));
-        executorService.execute(() -> grepTask(file, result, controller, cb4));
+        executorService.execute(() -> grepTask(file, result, mediator, cb1));
+        executorService.execute(() -> grepTask(file, result, mediator, cb2));
+        executorService.execute(() -> grepTask(file, result, mediator, cb3));
+        executorService.execute(() -> grepTask(file, result, mediator, cb4));
     }
 
     private static void grepTask(File file, ConcurrentLinkedQueue<String> result,
-                                 Controller controller, CharBuffer charBuffer) {
+                                 Mediator mediator, CharBuffer charBuffer) {
         ArrayList<String> partialResults = grep(file, charBuffer);
         result.addAll(partialResults);
 
         int task = finishedTasks.incrementAndGet();
 
         if(task == NUMBER_OF_TASKS) {
-            Runnable runnable = () -> controller.onSearchFinish();
+            Runnable runnable = () -> mediator.onSearchFinish();
             SwingUtilities.invokeLater(runnable);
             finishedTasks.set(0);
         }
@@ -362,7 +362,7 @@ public class BigFileSearch implements Search {
 
                 String result =  builder.toString();
 
-                Runnable runnable = () -> controller.onUpdatePreview(result);
+                Runnable runnable = () -> mediator.onUpdatePreview(result);
 
                 SwingUtilities.invokeLater(runnable);
             } catch (IOException e) {
@@ -378,11 +378,6 @@ public class BigFileSearch implements Search {
         String[] tmpArray = new String[result.size()];
         result.toArray(tmpArray);
         return Arrays.asList(tmpArray);
-    }
-
-    @Override
-    public String getResultSetCount() {
-        return String.valueOf(result.size());
     }
 
     @Override

@@ -30,7 +30,7 @@
  */
 package com.borisfarber.instasearch.models.search;
 
-import com.borisfarber.instasearch.contollers.Controller;
+import com.borisfarber.instasearch.contollers.Mediator;
 import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 
@@ -41,11 +41,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MockSearch implements Search {
-    private final Controller controller;
+    private final Mediator mediator;
     private String query = "query";
 
-    public MockSearch(Controller controller) {
-        this.controller = controller;
+    public MockSearch(Mediator mediator) {
+        this.mediator = mediator;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MockSearch implements Search {
     @Override
     public void search(String query) {
         this.query = query;
-        controller.onSearchFinish();
+        mediator.onSearchFinish();
     }
 
     @Override
@@ -83,11 +83,6 @@ public class MockSearch implements Search {
 
     private String getSearchValue() {
         return "Dummy Search result" + query + "\n\n";
-    }
-
-    @Override
-    public String getResultSetCount() {
-        return "1";
     }
 
     @Override
