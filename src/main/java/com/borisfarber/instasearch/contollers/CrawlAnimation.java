@@ -31,8 +31,10 @@ public class CrawlAnimation implements Runnable {
         StringBuilder textBuilder = new StringBuilder();
         textBuilder.append(absolutePath);
 
+        textBuilder.append("\nYour results will appear here shortly, crawling   ");
+
         for (int j = 0; j < uiCounter; j++) {
-            if(j % 10 == 0) {
+            if(j % 12 == 0) {
                 textBuilder.append("\n");
             }
             textBuilder.append(". . ");

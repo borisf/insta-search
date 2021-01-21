@@ -15,8 +15,6 @@
  */
 package com.borisfarber.instasearch.ui;
 
-import com.borisfarber.instasearch.models.text.BuildVersion;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -115,17 +113,7 @@ public class Toolbar extends JToolBar {
         result.setBorderPainted(true);
         result.setFocusPainted(true);
 
-        ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/blue-shark.png"));
-        Image image = aboutIcon.getImage();
-        Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
-        aboutIcon = new ImageIcon(tempImage);
-        ImageIcon finalAboutIcon = aboutIcon; // to capture in the lambda
-        result.addActionListener(
-                actionEvent -> JOptionPane.showMessageDialog(
-                        this,
-                        "Version " + BuildVersion.getBuildVersion(),
-                        "ClassyShark Insta Search", JOptionPane.PLAIN_MESSAGE,
-                        finalAboutIcon));
+        result.addActionListener(actionEvent -> AboutDialog.show());
 
         return result;
     }
