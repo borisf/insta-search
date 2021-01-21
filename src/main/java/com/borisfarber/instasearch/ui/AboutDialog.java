@@ -21,8 +21,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class AboutDialog {
-
     private static String message;
+    private static String info = "\n\nFast incremental search  " +
+            "\nby Boris Farber";
 
     public static void show() {
         ImageIcon aboutIcon = new ImageIcon(AboutDialog.class.getResource("/blue-shark.png"));
@@ -30,10 +31,10 @@ public class AboutDialog {
         Image tempImage = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
         aboutIcon = new ImageIcon(tempImage);
 
-        message = "Version " + BuildVersion.getBuildVersion();
-        final JOptionPane pane = new JOptionPane(message);
+        message = "Version: " + BuildVersion.getBuildVersion();
+        final JOptionPane pane = new JOptionPane(message + info);
         pane.setIcon(aboutIcon);
-        final JDialog dialog = pane.createDialog(null, "ClassyShark Insta Search");
+        final JDialog dialog = pane.createDialog(null, "Insta Search");
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         dialog.setLocation(dim.width/2  - dialog.getSize().width / 2,
