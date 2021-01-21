@@ -22,7 +22,7 @@ import java.awt.*;
 
 public class AboutDialog {
     private static String message;
-    private static String info = "\n\nFast incremental search  " +
+    private static final String INFO = "\n\nFast incremental search  " +
             "\nby Boris Farber";
 
     public static void show() {
@@ -32,7 +32,7 @@ public class AboutDialog {
         aboutIcon = new ImageIcon(tempImage);
 
         message = "Version: " + BuildVersion.getBuildVersion();
-        final JOptionPane pane = new JOptionPane(message + info);
+        final JOptionPane pane = new JOptionPane(message + INFO);
         pane.setIcon(aboutIcon);
         final JDialog dialog = pane.createDialog(null, "Insta Search");
 
