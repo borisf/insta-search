@@ -18,7 +18,7 @@ public class BuildVersion {
         String result = BuildVersion.class.getPackage().getImplementationVersion();
 
         if (result == null) {
-            result = "Development Version";
+            result = "development";
         }
 
         return result;

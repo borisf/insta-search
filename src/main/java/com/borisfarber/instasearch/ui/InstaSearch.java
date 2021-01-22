@@ -128,8 +128,7 @@
              }
          });
 
-         Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-         Dimension dim = defaultToolkit.getScreenSize();
+         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
          setPreferredSize(new Dimension(FRAME_WIDTH, 900));
          setLocation(dim.width / 6 - this.getSize().width / 4, dim.height / 2 - this.getSize().height / 2);
          setIconImage(new javax.swing.ImageIcon(getClass().getResource("/blue-shark.png")).getImage());
