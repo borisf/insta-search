@@ -25,7 +25,6 @@ import static com.borisfarber.instasearch.models.search.Search.FILENAMES_SEARCH;
 
 public class Toolbar extends JToolBar {
     private final InstaSearch frame;
-    private final JComboBox searchModeCombo;
 
     public Toolbar(InstaSearch frame) {
         super();
@@ -33,10 +32,10 @@ public class Toolbar extends JToolBar {
         JButton openButton = buildOpenButton();
         JButton ignoreButton = buildIgnoreButton();
         JButton aboutButton = buildAboutButton();
-        searchModeCombo = buildSearchModeCombo();
+        JPanel searchPanel = buildSearchPanel();
 
         add(openButton);
-        add(searchModeCombo);
+        add(searchPanel);
         add(Box.createHorizontalGlue());
         add(ignoreButton);
         add(aboutButton);
@@ -62,16 +61,26 @@ public class Toolbar extends JToolBar {
         return result;
     }
 
-    private JComboBox buildSearchModeCombo() {
-        String[] modes ={CONTENT_SEARCH,
-                FILENAMES_SEARCH};
-        JComboBox<String> result = new JComboBox<>(modes);
+    private JPanel buildSearchPanel() {
+        JRadioButton contentButton = new JRadioButton(CONTENT_SEARCH);
+        contentButton.setActionCommand(CONTENT_SEARCH);
+        contentButton.setSelected(true);
 
-        result.addActionListener(actionEvent -> {
-            JComboBox cb = (JComboBox)actionEvent.getSource();
-            String selection = (String)cb.getSelectedItem();
-            frame.updateFolderSearchMode(selection);
-        });
+        JRadioButton filenamesButton = new JRadioButton(FILENAMES_SEARCH);
+        filenamesButton.setActionCommand(FILENAMES_SEARCH);
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(contentButton);
+        group.add(filenamesButton);
+
+        contentButton.addActionListener(
+                actionEvent -> frame.updateFolderSearchMode(actionEvent.getActionCommand()));
+        filenamesButton.addActionListener(
+                actionEvent -> frame.updateFolderSearchMode(actionEvent.getActionCommand()));
+
+        JPanel result = new JPanel(new GridLayout(1, 0));
+        result.add(contentButton);
+        result.add(filenamesButton);
 
         return result;
     }
