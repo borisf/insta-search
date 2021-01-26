@@ -24,15 +24,13 @@ import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
 import static com.borisfarber.instasearch.models.search.Search.FILENAMES_SEARCH;
 
 public class Toolbar extends JToolBar {
-    private final InstaSearch frame;
 
     public Toolbar(InstaSearch frame) {
         super();
-        this.frame = frame;
-        JButton openButton = buildOpenButton();
-        JButton ignoreButton = buildIgnoreButton();
+        JButton openButton = buildOpenButton(frame);
+        JPanel searchPanel = buildSearchPanel(frame);
         JButton aboutButton = buildAboutButton();
-        JPanel searchPanel = buildSearchPanel();
+        JButton ignoreButton = buildIgnoreButton();
 
         add(openButton);
         add(searchPanel);
@@ -44,7 +42,7 @@ public class Toolbar extends JToolBar {
         setBorder(BorderFactory.createEmptyBorder());
     }
 
-    private JButton buildOpenButton() {
+    private JButton buildOpenButton(InstaSearch frame) {
         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/open_folder.png"));
         Image image = aboutIcon.getImage();
         Image tempImage = image.getScaledInstance(28, 28,  java.awt.Image.SCALE_SMOOTH);
@@ -61,12 +59,12 @@ public class Toolbar extends JToolBar {
         return result;
     }
 
-    private JPanel buildSearchPanel() {
+    private JPanel buildSearchPanel(InstaSearch frame) {
         JRadioButton contentButton = new JRadioButton(CONTENT_SEARCH);
         contentButton.setActionCommand(CONTENT_SEARCH);
         contentButton.setSelected(true);
 
-        JRadioButton filenamesButton = new JRadioButton(FILENAMES_SEARCH);
+        JRadioButton filenamesButton = new JRadioButton(FILENAMES_SEARCH + " ");
         filenamesButton.setActionCommand(FILENAMES_SEARCH);
 
         ButtonGroup group = new ButtonGroup();
@@ -79,6 +77,7 @@ public class Toolbar extends JToolBar {
                 actionEvent -> frame.updateFolderSearchMode(actionEvent.getActionCommand()));
 
         JPanel result = new JPanel(new GridLayout(1, 0));
+        result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         result.add(contentButton);
         result.add(filenamesButton);
 
