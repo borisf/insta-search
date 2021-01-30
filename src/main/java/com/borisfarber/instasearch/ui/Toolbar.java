@@ -24,19 +24,16 @@ import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
 import static com.borisfarber.instasearch.models.search.Search.FILENAMES_SEARCH;
 
 public class Toolbar extends JToolBar {
-    private final InstaSearch frame;
-    private final JComboBox searchModeCombo;
 
     public Toolbar(InstaSearch frame) {
         super();
-        this.frame = frame;
-        JButton openButton = buildOpenButton();
-        JButton ignoreButton = buildIgnoreButton();
+        JButton openButton = buildOpenButton(frame);
+        JPanel searchPanel = buildSearchPanel(frame);
         JButton aboutButton = buildAboutButton();
-        searchModeCombo = buildSearchModeCombo();
+        JButton ignoreButton = buildIgnoreButton();
 
         add(openButton);
-        add(searchModeCombo);
+        add(searchPanel);
         add(Box.createHorizontalGlue());
         add(ignoreButton);
         add(aboutButton);
@@ -45,7 +42,7 @@ public class Toolbar extends JToolBar {
         setBorder(BorderFactory.createEmptyBorder());
     }
 
-    private JButton buildOpenButton() {
+    private JButton buildOpenButton(InstaSearch frame) {
         ImageIcon aboutIcon = new ImageIcon(getClass().getResource("/open_folder.png"));
         Image image = aboutIcon.getImage();
         Image tempImage = image.getScaledInstance(28, 28,  java.awt.Image.SCALE_SMOOTH);
@@ -62,16 +59,27 @@ public class Toolbar extends JToolBar {
         return result;
     }
 
-    private JComboBox buildSearchModeCombo() {
-        String[] modes ={CONTENT_SEARCH,
-                FILENAMES_SEARCH};
-        JComboBox<String> result = new JComboBox<>(modes);
+    private JPanel buildSearchPanel(InstaSearch frame) {
+        JRadioButton contentButton = new JRadioButton(CONTENT_SEARCH);
+        contentButton.setActionCommand(CONTENT_SEARCH);
+        contentButton.setSelected(true);
 
-        result.addActionListener(actionEvent -> {
-            JComboBox cb = (JComboBox)actionEvent.getSource();
-            String selection = (String)cb.getSelectedItem();
-            frame.updateFolderSearchMode(selection);
-        });
+        JRadioButton filenamesButton = new JRadioButton(FILENAMES_SEARCH + " ");
+        filenamesButton.setActionCommand(FILENAMES_SEARCH);
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(contentButton);
+        group.add(filenamesButton);
+
+        contentButton.addActionListener(
+                actionEvent -> frame.updateFolderSearchMode(actionEvent.getActionCommand()));
+        filenamesButton.addActionListener(
+                actionEvent -> frame.updateFolderSearchMode(actionEvent.getActionCommand()));
+
+        JPanel result = new JPanel(new GridLayout(1, 0));
+        result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        result.add(contentButton);
+        result.add(filenamesButton);
 
         return result;
     }
