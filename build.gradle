@@ -14,12 +14,11 @@ repositories {
 apply plugin : "java"
 
 ext {
-    def mainClass = "com.borisfarber.instasearch.ui.InstaSearch"
-    javaMainClass = mainClass
+    javaMainClass = "com.borisfarber.instasearch.ui.InstaSearch"
 }
 
 application {
-    mainClassName = javaMainClass
+    mainClass.set(javaMainClass)
 }
 
 dependencies {
