@@ -27,8 +27,8 @@ import javax.swing.border.*;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.borisfarber.instasearch.ui.InstaSearch.BACKGROUND_COLOR;
-import static com.borisfarber.instasearch.ui.InstaSearch.FOREGROUND_COLOR;
+import static com.borisfarber.instasearch.ui.ColorScheme.*;
+import static com.borisfarber.instasearch.ui.InstaSearch.*;
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 
  public final class HexPanel extends JPanel implements CaretListener {
@@ -118,10 +118,10 @@ import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
         asciiView.setSelectedTextColor(FOREGROUND_COLOR);
         hexView.setSelectedTextColor(FOREGROUND_COLOR);
 
-        asciiView.setSelectionColor(Color.BLACK);
-        hexView.setSelectionColor(Color.BLACK);
+        asciiView.setSelectionColor(RESULTS_HIGHLIGHT_COLOR);
+        hexView.setSelectionColor(RESULTS_HIGHLIGHT_COLOR);
 
-        Color highlightColor = Color.BLACK;
+        Color highlightColor = RESULTS_HIGHLIGHT_COLOR;
         this.highlighterPainter = new DefaultHighlighter.DefaultHighlightPainter(highlightColor);
     }
 

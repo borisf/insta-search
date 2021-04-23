@@ -31,6 +31,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.borisfarber.instasearch.contollers.FileView.viewFile;
+import static com.borisfarber.instasearch.ui.ColorScheme.FOREGROUND_COLOR;
+import static com.borisfarber.instasearch.ui.ColorScheme.RESULTS_HIGHLIGHT_COLOR;
 import static com.borisfarber.instasearch.ui.InstaSearch.*;
 
 public final class Mediator implements DocumentListener {
@@ -65,7 +67,7 @@ public final class Mediator implements DocumentListener {
         this.previewTextPane = previewArea;
         this.resultCountLabel = resultCountLabel;
         this.search = SearchFactory.INSTANCE.createMockSearch(this);
-        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, RESULT_HIGHLIGHT_COLOR);
+        this.resultsHighlighter = new ResultsHighlighter(resultTextPane, RESULTS_HIGHLIGHT_COLOR);
         this.previewHighlighter = new PreviewHighlighter();
         this.resultModel = new ResultModel();
         this.searchMode = searchMode;
@@ -274,8 +276,7 @@ public final class Mediator implements DocumentListener {
         if(query != null) {
             previewHighlighter.highlight(previewTextPane,
                     ResultModel.extractPreviewLine(
-                            resultModel.getSelectedLine()),
-                    FOREGROUND_COLOR);
+                            resultModel.getSelectedLine()), FOREGROUND_COLOR);
         }
     }
 
