@@ -16,11 +16,8 @@ package com.borisfarber.instasearch.ui;
 
 import java.awt.*;
 
-// todo make class singleton
 public class ColorScheme {
     public static final Color BACKGROUND_COLOR = new Color(0x07, 0x36, 0x42);
     public static final Color FOREGROUND_COLOR = new Color(0x93, 0xa1, 0xa1);
     public static final Color RESULTS_HIGHLIGHT_COLOR = new Color(0xd3,36, 0x82);
-
-    //todo add methods get background/foreground/highlighter
 }
