@@ -128,7 +128,7 @@ public final class HexDump {
                 out.append('\u00a4'); // CR
                 break;
             default:
-                out.append((32 <= b && b <= 126) ? (char) b : NON_PRINTABLE); // ' ' to '~', non-printable is WHITE SQUARE □
+                out.append((32 <= b && b <= 126) ? (char) b : NON_PRINTABLE); // ' ' to '~', non-printable is WHITE SQUARE
         }
     }
 }
