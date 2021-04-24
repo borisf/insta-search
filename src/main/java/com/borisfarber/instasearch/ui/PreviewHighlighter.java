@@ -17,6 +17,9 @@
  import javax.swing.text.*;
  import java.awt.*;
 
+ import static com.borisfarber.instasearch.ui.ColorScheme.BACKGROUND_COLOR;
+ import static com.borisfarber.instasearch.ui.ColorScheme.FOREGROUND_COLOR;
+
  public class PreviewHighlighter {
 
      public void highlight(JTextPane previewTextPane, String previewLine, Color color) {
@@ -50,9 +53,9 @@
              // back, UX less focus on the preview
              MutableAttributeSet attrs = previewTextPane.getInputAttributes();
              StyledDocument doc1 = previewTextPane.getStyledDocument();
-             StyleConstants.setForeground(attrs, InstaSearch.BACKGROUND_COLOR);
+             StyleConstants.setForeground(attrs, BACKGROUND_COLOR);
              doc1.setCharacterAttributes(startPosition, endPosition, attrs, false);
-             StyleConstants.setForeground(attrs, InstaSearch.FOREGROUND_COLOR);
+             StyleConstants.setForeground(attrs, FOREGROUND_COLOR);
              doc1.setCharacterAttributes(endPosition, text.length(),attrs, false);
              // end back
          } catch (final BadLocationException ble) {

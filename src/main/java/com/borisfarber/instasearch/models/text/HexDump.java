@@ -116,19 +116,19 @@ public final class HexDump {
     private static void appendDisplayChar(byte b, StringBuilder out) {
         switch (b) {
             case 0x20:
-                out.append("\u2423"); //
+                out.append("\u2423"); // SPACE
                 break;
             case 0x09:
-                out.append('\u2192'); //
+                out.append('\u2192'); // TAB
                 break;
             case 0x0a:
-                out.append('\u00b6'); //
+                out.append('\u00b6'); // LF
                 break;
             case 0x0d:
-                out.append('\u00a4'); //
+                out.append('\u00a4'); // CR
                 break;
             default:
-                out.append((32 <= b && b <= 126) ? (char) b : NON_PRINTABLE); // ' ' to '~', non-printable is WHITE SQUARE □
+                out.append((32 <= b && b <= 126) ? (char) b : NON_PRINTABLE); // ' ' to '~', non-printable is WHITE SQUARE
         }
     }
 }

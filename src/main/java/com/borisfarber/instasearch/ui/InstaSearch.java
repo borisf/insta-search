@@ -24,6 +24,8 @@
  import java.io.File;
 
  import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
+ import static com.borisfarber.instasearch.ui.ColorScheme.BACKGROUND_COLOR;
+ import static com.borisfarber.instasearch.ui.ColorScheme.FOREGROUND_COLOR;
  import static java.awt.event.KeyEvent.*;
 
  public final class InstaSearch extends JFrame {
@@ -37,10 +39,6 @@
      private JLabel resultCountLabel;
      private final JPopupMenu copyPopup = new JPopupMenu();
      private final Mediator mediator;
-
-     public static final Color BACKGROUND_COLOR = new Color(0x00, 0x2b, 0x36);
-     public static final Color FOREGROUND_COLOR = new Color(0x83, 0x94, 0x96);
-     public static final Color RESULT_HIGHLIGHT_COLOR = new Color(0x9b,0, 0x9b);
 
      public InstaSearch(String file) {
          this();
