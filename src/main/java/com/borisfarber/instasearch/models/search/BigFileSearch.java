@@ -32,7 +32,7 @@ package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.*;
 import com.borisfarber.instasearch.models.Pair;
-import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.text.ResultModel;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 import com.borisfarber.instasearch.contollers.Mediator;
 import com.jramoyo.io.IndexedFileReader;

@@ -13,7 +13,7 @@
  */
 package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.text.ResultModel;
 import com.borisfarber.instasearch.models.search.Search;
 import com.borisfarber.instasearch.models.search.SearchFactory;
 import com.borisfarber.instasearch.ui.PreviewHighlighter;

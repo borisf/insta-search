@@ -11,8 +11,9 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.borisfarber.instasearch.models;
+ package com.borisfarber.instasearch.models.text;
 
+ import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.models.search.Search;
  import com.borisfarber.instasearch.models.text.Background;
 

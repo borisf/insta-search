@@ -16,7 +16,7 @@
  import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
- import com.borisfarber.instasearch.models.ResultModel;
+ import com.borisfarber.instasearch.models.text.ResultModel;
 
  import javax.swing.*;
  import java.io.File;

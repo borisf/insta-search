@@ -16,7 +16,6 @@
 package com.borisfarber.instasearch.models.formats;
 
 import com.borisfarber.instasearch.contollers.PrivateFolder;
-import com.borisfarber.instasearch.models.Pair;
 import com.google.common.io.LittleEndianDataInputStream;
 
 import java.io.*;
@@ -108,7 +107,7 @@ public class BinaryXml {
         Arrays.fill(SPACE_FILL, ' ');
     }
 
-    public static Pair<File, String> decompile(Path selectedPath) {
+    public static BinaryFileModel.DecompilationModel decompile(Path selectedPath) {
         File man = PrivateFolder.INSTANCE.getTempFile("AndroidManifest", "xml");
         String content = "";
 
@@ -128,7 +127,10 @@ public class BinaryXml {
             e.printStackTrace();
         }
 
-        Pair <File, String> result = new Pair<>(man, content);
+        BinaryFileModel.DecompilationModel result = new BinaryFileModel.DecompilationModel();
+        result.fileName = man;
+        result.text = content;
+
         return result;
     }
 
