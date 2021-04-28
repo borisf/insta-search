@@ -12,8 +12,7 @@
   * limitations under the License.
   */
 package com.borisfarber.instasearch.models.search;
-
-import com.borisfarber.instasearch.models.Pair;
+import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -32,7 +31,7 @@ public interface Search {
 
     void search(String query);
 
-    LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line);
+    LinkedList<FilenameAndLineNumber> getFilenamesAndLineNumbers(String line);
 
     String getPreview(String resultLine);
 

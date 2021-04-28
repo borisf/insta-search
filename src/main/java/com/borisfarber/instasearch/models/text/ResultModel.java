@@ -12,8 +12,6 @@
   * limitations under the License.
   */
  package com.borisfarber.instasearch.models.text;
-
- import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.models.search.Search;
 
  import java.util.ArrayList;
@@ -45,12 +43,12 @@
      private int selectedLineIndex = 0;
 
      // export
-     private final Pair<String, Integer> exportedFileAndLineIndex;
+     private final FilenameAndLineNumber exportedFileAndLineIndex;
 
      public ResultModel() {
          this.searchResultLines = new ArrayList<>();
          this.exportedFileAndLineIndex =
-                 new Pair<>("test.txt", 0);
+                 new FilenameAndLineNumber("test.txt", 0);
      }
 
      public String getBackground() {
@@ -78,7 +76,7 @@
      public void fillSearchResults(Search search) {
          int resultCount = 0;
          boolean isViewLimitReached = false;
-         LinkedList<Pair<String, Integer>> locations;
+         LinkedList<FilenameAndLineNumber> locations;
          searchResultLines.clear();
          List<String> rawResults = search.getResults();
 
@@ -91,13 +89,13 @@
                  return;
              }
 
-             locations = search.getFileNameAndPosition(rawLine);
+             locations = search.getFilenamesAndLineNumbers(rawLine);
 
-             for (Pair<String, Integer> location : locations) {
+             for (FilenameAndLineNumber location : locations) {
                  String result;
 
-                 if(location.u != Search.NOT_IN_FILE) {
-                     result = location.t + ":" + location.u + ":"
+                 if(location.lineNumber != Search.NOT_IN_FILE) {
+                     result = location.fileName + ":" + location.lineNumber + ":"
                              + rawLine;
                  } else {
                      result = rawLine;
@@ -135,12 +133,12 @@
                  presentation.append(SELECTOR).append(str);
 
                  FilenameAndLineNumber extract = extractFilenameAndLineNumber(str);
-                 exportedFileAndLineIndex.t = extract.fileName;
+                 exportedFileAndLineIndex.fileName = extract.fileName;
 
                  try {
-                     exportedFileAndLineIndex.u = extract.lineNumber;
+                     exportedFileAndLineIndex.lineNumber = extract.lineNumber;
                  } catch (NumberFormatException nfe) {
-                     exportedFileAndLineIndex.u = 0;
+                     exportedFileAndLineIndex.lineNumber = 0;
                  }
              } else {
                  presentation.append(str);
@@ -207,8 +205,8 @@
                  fileName = fileName.substring(4);
              }
 
-             exportedFileAndLineIndex.t = fileName;
-             exportedFileAndLineIndex.u = 0;
+             exportedFileAndLineIndex.fileName = fileName;
+             exportedFileAndLineIndex.lineNumber = 0;
          } else {
              String[] parts = line.split(":");
              String fileName = parts[0];
@@ -218,13 +216,13 @@
                  fileName = fileName.substring(4);
              }
 
-             exportedFileAndLineIndex.t = fileName;
-             exportedFileAndLineIndex.u = Integer.parseInt(index);
+             exportedFileAndLineIndex.fileName = fileName;
+             exportedFileAndLineIndex.lineNumber = Integer.parseInt(index);
          }
      }
 
      public String getExportedFilename() {
-         String result = exportedFileAndLineIndex.t;
+         String result = exportedFileAndLineIndex.fileName;
 
          if(result.endsWith("\n")) {
              result = result.substring(0, result.length() - 1);
@@ -234,7 +232,7 @@
      }
 
      public Integer getExportedLineIndex() {
-         return exportedFileAndLineIndex.u;
+         return exportedFileAndLineIndex.lineNumber;
      }
 
      public static String extractPreviewLine(String line) {

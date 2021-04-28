@@ -31,7 +31,7 @@
 package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.Mediator;
-import com.borisfarber.instasearch.models.Pair;
+import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 
 import java.io.File;
@@ -60,9 +60,9 @@ public class MockSearch implements Search {
     }
 
     @Override
-    public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
-        Pair<String, Integer> pair = new Pair<>("DummyFile.txt", 0);
-        LinkedList<Pair<String, Integer>> result = new LinkedList<>();
+    public LinkedList<FilenameAndLineNumber> getFilenamesAndLineNumbers(String line) {
+        FilenameAndLineNumber pair = new FilenameAndLineNumber("DummyFile.txt", 0);
+        LinkedList<FilenameAndLineNumber> result = new LinkedList<>();
         result.add(pair);
 
         return result;

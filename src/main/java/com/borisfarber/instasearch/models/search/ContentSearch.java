@@ -36,9 +36,12 @@
      private final Mediator mediator;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
+
+     // TODO deeper refactor might be duplicate in correct string entries (hash code etc')
      private final TreeMap<String, Path> filenamesToPaths;
-     private final ArrayList<Pair<Integer, String>> numLinesToFilenames;
-     private final HashMap<String, List<Integer>> occurrences;
+     private final ArrayList<Pair<Integer, String>> lineCountsToFilenames;
+
+     private final HashMap<String, List<Integer>> linesToLineNumbers;
 
      private final ExecutorService executorService =
              Executors.newSingleThreadExecutor();
@@ -50,16 +53,16 @@
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();
          filenamesToPaths = new TreeMap<>();
-         numLinesToFilenames = new ArrayList<>();
-         occurrences = new HashMap<>();
+         lineCountsToFilenames = new ArrayList<>();
+         linesToLineNumbers = new HashMap<>();
      }
 
      @Override
      public void crawl(File file) {
          allLines.clear();
-         numLinesToFilenames.clear();
+         lineCountsToFilenames.clear();
          filenamesToPaths.clear();
-         occurrences.clear();
+         linesToLineNumbers.clear();
          this.searchRoot = file;
 
          if (file == null || !file.exists()) {
@@ -101,7 +104,7 @@
                              allLines.addAll(allFileLines);
                              Pair<Integer, String> pair = new Pair<>(allFileLines.size(),
                                      path.getFileName().toString());
-                             numLinesToFilenames.add(pair);
+                             lineCountsToFilenames.add(pair);
                              filenamesToPaths.put(path.getFileName().toString(), path);
                          } catch (java.nio.charset.MalformedInputException e) {
                              System.out.println("Bad file format " + path.getFileName().toString());
@@ -120,12 +123,12 @@
 
      private void processDuplicates(List<String> allLines) {
          for(int index=0; index < allLines.size(); index++){
-             if(occurrences.containsKey(allLines.get(index))) {
-                 occurrences.get(allLines.get(index)).add(index);
+             if(linesToLineNumbers.containsKey(allLines.get(index))) {
+                 linesToLineNumbers.get(allLines.get(index)).add(index);
              } else {
                  LinkedList<Integer> list = new LinkedList<>();
                  list.add(index);
-                 occurrences.put(allLines.get(index), list);
+                 linesToLineNumbers.put(allLines.get(index), list);
              }
          }
      }
@@ -148,26 +151,26 @@
      }
 
      @Override
-     public LinkedList <Pair<String,Integer>> getFileNameAndPosition(String line) {
-         LinkedList <Pair<String,Integer>> result = new LinkedList<>();
+     public LinkedList <FilenameAndLineNumber> getFilenamesAndLineNumbers(String line) {
+         LinkedList <FilenameAndLineNumber> result = new LinkedList<>();
 
-         for (Integer occ : occurrences.get(line)) {
-             Pair<String, Integer> pair = getFileNameAndPositionFromLineIndex(occ);
+         for (Integer occ : linesToLineNumbers.get(line)) {
+             FilenameAndLineNumber pair = getFileNameAndPositionFromLineIndex(occ);
              result.add(pair);
          }
 
          return result;
      }
 
-     private Pair<String, Integer> getFileNameAndPositionFromLineIndex(int index) {
+     private FilenameAndLineNumber getFileNameAndPositionFromLineIndex(int index) {
          int base = 0;
-         for (Pair<Integer, String> pair : numLinesToFilenames) {
+         for (Pair<Integer, String> pair : lineCountsToFilenames) {
              if ((index >= base) && index < (base + pair.t - 1)) {
-                 return new Pair<>(pair.u, (index - base));
+                 return new FilenameAndLineNumber(pair.u, (index - base));
              }
              base += pair.t;
          }
-         return new Pair<>("", 0);
+         return new FilenameAndLineNumber("", 0);
      }
 
      /**
@@ -225,7 +228,7 @@
      private int getFileBaseline(String fileName) {
          int bline = 0;
 
-         for(Pair<Integer,String> fData : numLinesToFilenames) {
+         for(Pair<Integer,String> fData : lineCountsToFilenames) {
              if(fData.u.equals(fileName)) {
                  break;
              }
