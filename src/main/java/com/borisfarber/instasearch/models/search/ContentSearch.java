@@ -14,7 +14,6 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Mediator;
- import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
  import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
  import com.borisfarber.instasearch.models.text.ResultModel;
@@ -36,11 +35,8 @@
      private final Mediator mediator;
      // key design idea, no such thing file, it is recreated by line numbers
      private final ArrayList<String> allLines;
-
-     // TODO deeper refactor might be duplicate in correct string entries (hash code etc')
      private final TreeMap<String, Path> filenamesToPaths;
-     private final ArrayList<Pair<Integer, String>> lineCountsToFilenames;
-
+     private final ArrayList<LineCountAndFile> lineCountAndFiles;
      private final HashMap<String, List<Integer>> linesToLineNumbers;
 
      private final ExecutorService executorService =
@@ -53,14 +49,14 @@
          allLines = new ArrayList<>();
          matchedSet = new TreeMap<>();
          filenamesToPaths = new TreeMap<>();
-         lineCountsToFilenames = new ArrayList<>();
+         lineCountAndFiles = new ArrayList<>();
          linesToLineNumbers = new HashMap<>();
      }
 
      @Override
      public void crawl(File file) {
          allLines.clear();
-         lineCountsToFilenames.clear();
+         lineCountAndFiles.clear();
          filenamesToPaths.clear();
          linesToLineNumbers.clear();
          this.searchRoot = file;
@@ -100,11 +96,11 @@
                          throws IOException {
                      if (matcher.matches(path)) {
                          try {
-                             List<String> allFileLines = Files.readAllLines(path);
-                             allLines.addAll(allFileLines);
-                             Pair<Integer, String> pair = new Pair<>(allFileLines.size(),
+                             List<String> allLinesPerFile = Files.readAllLines(path);
+                             allLines.addAll(allLinesPerFile);
+                             LineCountAndFile pair = new LineCountAndFile(allLinesPerFile.size(),
                                      path.getFileName().toString());
-                             lineCountsToFilenames.add(pair);
+                             lineCountAndFiles.add(pair);
                              filenamesToPaths.put(path.getFileName().toString(), path);
                          } catch (java.nio.charset.MalformedInputException e) {
                              System.out.println("Bad file format " + path.getFileName().toString());
@@ -164,11 +160,11 @@
 
      private FilenameAndLineNumber getFileNameAndPositionFromLineIndex(int index) {
          int base = 0;
-         for (Pair<Integer, String> pair : lineCountsToFilenames) {
-             if ((index >= base) && index < (base + pair.t - 1)) {
-                 return new FilenameAndLineNumber(pair.u, (index - base));
+         for (LineCountAndFile pair : lineCountAndFiles) {
+             if ((index >= base) && index < (base + pair.lineCount - 1)) {
+                 return new FilenameAndLineNumber(pair.filename, (index - base));
              }
-             base += pair.t;
+             base += pair.lineCount;
          }
          return new FilenameAndLineNumber("", 0);
      }
@@ -228,11 +224,11 @@
      private int getFileBaseline(String fileName) {
          int bline = 0;
 
-         for(Pair<Integer,String> fData : lineCountsToFilenames) {
-             if(fData.u.equals(fileName)) {
+         for(LineCountAndFile fData : lineCountAndFiles) {
+             if(fData.filename.equals(fileName)) {
                  break;
              }
-             bline += fData.t;
+             bline += fData.lineCount;
          }
          return bline;
      }
@@ -286,5 +282,15 @@
              System.out.println(res);
          }
          return "";
+     }
+
+     private static class LineCountAndFile {
+         public String filename;
+         public int lineCount;
+
+         public LineCountAndFile(int lineCount, String filename) {
+             this.filename = filename;
+             this.lineCount = lineCount;
+         }
      }
  }
