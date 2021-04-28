@@ -16,6 +16,7 @@
  import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.contollers.PathMatchers;
+ import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
  import com.borisfarber.instasearch.models.text.ResultModel;
 
  import javax.swing.*;
@@ -184,10 +185,10 @@
          }
 
          boolean isFileInternals = true;
-
-         Pair<String, String> previewData = ResultModel.extractFilenameAndLineNumber(resultLine);
-         String fileName = previewData.t;
-         String line = previewData.u;
+         FilenameAndLineNumber filenameAndLineNumber
+                 = ResultModel.extractFilenameAndLineNumber(resultLine);
+         String fileName = filenameAndLineNumber.fileName;
+         int line = filenameAndLineNumber.lineNumber;
 
          if(!resultLine.contains(":")) {
              isFileInternals = false;
@@ -195,7 +196,7 @@
 
          int bline = getFileBaseline(fileName);
          StringBuilder builder = new StringBuilder();
-         int allLinesIndex = Integer.parseInt(line) + bline;
+         int allLinesIndex = line + bline;
          int lower, upper;
 
          if(isFileInternals) {

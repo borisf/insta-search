@@ -15,7 +15,6 @@
 
  import com.borisfarber.instasearch.models.Pair;
  import com.borisfarber.instasearch.models.search.Search;
- import com.borisfarber.instasearch.models.text.Background;
 
  import java.util.ArrayList;
  import java.util.Arrays;
@@ -135,11 +134,11 @@
              if (previewLinesIndex == selectedLineIndex) {
                  presentation.append(SELECTOR).append(str);
 
-                 Pair<String, String> extract = extractFilenameAndLineNumber(str);
-                 exportedFileAndLineIndex.t = extract.t;
+                 FilenameAndLineNumber extract = extractFilenameAndLineNumber(str);
+                 exportedFileAndLineIndex.t = extract.fileName;
 
                  try {
-                     exportedFileAndLineIndex.u = Integer.parseInt(extract.u);
+                     exportedFileAndLineIndex.u = extract.lineNumber;
                  } catch (NumberFormatException nfe) {
                      exportedFileAndLineIndex.u = 0;
                  }
@@ -268,7 +267,7 @@
          return lineNumInt;
      }
 
-     public static Pair<String, String> extractFilenameAndLineNumber(String line) {
+     public static FilenameAndLineNumber extractFilenameAndLineNumber(String line) {
          String fileName;
          String lineNumber;
 
@@ -290,6 +289,6 @@
              fileName = fileName.substring(0, fileName.length() - 1);
          }
 
-         return new Pair<>(fileName, lineNumber);
+         return new FilenameAndLineNumber(fileName, Integer.parseInt(lineNumber));
      }
  }
