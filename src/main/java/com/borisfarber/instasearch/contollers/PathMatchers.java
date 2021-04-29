@@ -18,10 +18,10 @@
  import java.nio.file.PathMatcher;
 
  public class PathMatchers {
-     public static final PathMatcher SOURCE_MATCHER =
-             FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,cs}");
      public static final PathMatcher SOURCE_OR_TEXT_MATCHER =
              FileSystems.getDefault().getPathMatcher("glob:**.{java,kt,md,h,c,cpp,gradle,rs,txt,cs}");
+     public static final PathMatcher BINARY_MATCHER =
+             FileSystems.getDefault().getPathMatcher("glob:**.{class,dex,xml}");
      public static final PathMatcher CLASS_MATCHER =
              FileSystems.getDefault().getPathMatcher("glob:**.{class}");
      public static final PathMatcher ZIP_MATCHER =

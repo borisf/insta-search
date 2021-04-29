@@ -14,7 +14,6 @@
 package com.borisfarber.instasearch.models.formats;
 
 import com.borisfarber.instasearch.contollers.PrivateFolder;
-import com.borisfarber.instasearch.models.Pair;
 import com.strobel.decompiler.Decompiler;
 import com.strobel.decompiler.PlainTextOutput;
 
@@ -26,8 +25,8 @@ import java.nio.file.Path;
 
  public class Clazz {
 
-    public static Pair<File, String> decompile(Path selectedPath) {
-        Pair<File, String> result = new Pair<>(new File(""), "");
+    public static BinaryFileModel.DecompilationModel decompile(Path selectedPath) {
+        BinaryFileModel.DecompilationModel result = new BinaryFileModel.DecompilationModel();
 
         String fileNameWithoutExt =
                 new File(selectedPath.toString()).
@@ -48,8 +47,8 @@ import java.nio.file.Path;
                 e.printStackTrace();
             }
 
-            result.u = content;
-            result.t = javaFile;
+            result.text = content;
+            result.fileName = javaFile;
 
         } finally {
             writer.flush();

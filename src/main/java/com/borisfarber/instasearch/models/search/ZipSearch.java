@@ -14,10 +14,10 @@
  package com.borisfarber.instasearch.models.search;
 
  import com.borisfarber.instasearch.contollers.Mediator;
- import com.borisfarber.instasearch.models.ResultModel;
+ import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
+ import com.borisfarber.instasearch.models.text.ResultModel;
  import com.borisfarber.instasearch.models.text.HexDump;
  import com.borisfarber.instasearch.contollers.PrivateFolder;
- import com.borisfarber.instasearch.models.Pair;
  import com.github.eugenelesnov.LevenshteinSearch;
  import org.zeroturnaround.zip.ZipUtil;
 
@@ -69,11 +69,11 @@
      }
 
      @Override
-     public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
+     public LinkedList<FilenameAndLineNumber> getFilenamesAndLineNumbers(String line) {
          // may be to add mapping to simple file names, not sure
-         LinkedList<Pair<String, Integer>> result = new LinkedList<>();
+         LinkedList<FilenameAndLineNumber> result = new LinkedList<>();
 
-         Pair<String, Integer> pair = new Pair<>(line, Search.NOT_IN_FILE);
+         FilenameAndLineNumber pair = new FilenameAndLineNumber(line, Search.NOT_IN_FILE);
          result.add(pair);
          return result;
      }

@@ -34,7 +34,7 @@ public enum SearchFactory {
             if(mode.equals(CONTENT_SEARCH)) {
                 return new ContentSearch(mediator);
             } else {
-                return new FilenameSearch(mediator, mode);
+                return new FilenameSearch(mediator);
             }
         } else {
             if (PathMatchers.ZIP_MATCHER.matches(Path.of(newFile.toURI()))) {

@@ -31,8 +31,8 @@
 package com.borisfarber.instasearch.models.search;
 
 import com.borisfarber.instasearch.contollers.*;
-import com.borisfarber.instasearch.models.Pair;
-import com.borisfarber.instasearch.models.ResultModel;
+import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
+import com.borisfarber.instasearch.models.text.ResultModel;
 import com.borisfarber.instasearch.models.text.SearchResultsSorter;
 import com.borisfarber.instasearch.contollers.Mediator;
 import com.jramoyo.io.IndexedFileReader;
@@ -79,7 +79,7 @@ public class BigFileSearch implements Search {
     private final TreeMap<String, Path> nameToPaths;
     private int qq;
     private List<String> preview= new ArrayList<>();
-    private HashMap<String, LinkedList<Integer>> occurrences;
+    private HashMap<String, LinkedList<Integer>> linesToLineNumbers;
     private final ExecutorService executorService =
             Executors.newFixedThreadPool(NUMBER_OF_TASKS);
     static AtomicInteger finishedTasks = new AtomicInteger(0);
@@ -196,14 +196,14 @@ public class BigFileSearch implements Search {
     }
 
     private void processDuplicates(List<String> preview) {
-        occurrences = new HashMap<>();
+        linesToLineNumbers = new HashMap<>();
         for(int index=0; index < preview.size(); index++){
-            if(occurrences.containsKey(preview.get(index))) {
-                occurrences.get(preview.get(index)).add(index);
+            if(linesToLineNumbers.containsKey(preview.get(index))) {
+                linesToLineNumbers.get(preview.get(index)).add(index);
             } else {
                 LinkedList<Integer> list = new LinkedList<>();
                 list.add(index);
-                occurrences.put(preview.get(index), list);
+                linesToLineNumbers.put(preview.get(index), list);
             }
         }
     }
@@ -298,28 +298,29 @@ public class BigFileSearch implements Search {
     }
 
     @Override
-    public LinkedList <Pair<String,Integer>> getFileNameAndPosition(String line) {
+    public LinkedList <FilenameAndLineNumber> getFilenamesAndLineNumbers(String line) {
         if(line == null) {
             return new LinkedList<>();
         }
 
         // TODO new line to result model
         String strkey = line.substring(0, line.length() - 1);
-        LinkedList <Pair<String,Integer>> result = new LinkedList<>();
+        LinkedList <FilenameAndLineNumber> result = new LinkedList<>();
 
-        if(!occurrences.containsKey(strkey)) {
+        if(!linesToLineNumbers.containsKey(strkey)) {
             String awkMessage =
                     "awk 'BEGIN{RS=\"\\1\";ORS=\"\";getline;gsub(\"\\r\",\"\");" +
                             "print>ARGV[1]}' logcat.txt";
             System.err.println("Wrong new line formatting of the text file. If you are on linux and " +
                     "the file was generated with Windows use this:" + awkMessage);
-            Pair<String, Integer> pair = new Pair<>(file.getName(), 0);
+            FilenameAndLineNumber  pair = new FilenameAndLineNumber(file.getName(), 0);
             result.add(pair);
             return result;
         }
 
-        for (Integer occ : occurrences.get(strkey)) {
-            Pair<String, Integer> pair = new Pair<>(file.getName(), occ);
+        for (Integer lineNumber : linesToLineNumbers.get(strkey)) {
+            FilenameAndLineNumber pair =
+                    new FilenameAndLineNumber(file.getName(), lineNumber.intValue());
             result.add(pair);
         }
 

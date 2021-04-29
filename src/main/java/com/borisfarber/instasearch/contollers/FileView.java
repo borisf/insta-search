@@ -13,11 +13,8 @@
   */
 package com.borisfarber.instasearch.contollers;
 
-import com.borisfarber.instasearch.models.formats.BinaryXml;
-import com.borisfarber.instasearch.models.formats.Clazz;
-import com.borisfarber.instasearch.models.formats.Dex;
+import com.borisfarber.instasearch.models.formats.BinaryFileModel;
 import com.borisfarber.instasearch.models.search.Search;
-import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.ui.HexPanel;
 import dorkbox.notify.Notify;
 import dorkbox.notify.Pos;
@@ -31,7 +28,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class FileView {
 
-    private FileView(){
+    private FileView() {
 
     }
 
@@ -48,41 +45,31 @@ public class FileView {
         }
 
         if (PathMatchers.SOURCE_OR_TEXT_MATCHER.matches(viewPath)) {
-            showFileExternally(viewPath, position);
-        } else if (PathMatchers.CLASS_MATCHER.matches(viewPath)) {
-            previewExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(viewPath);
-                showFile(previewTextPane, result);
-            });
-        } else if (PathMatchers.CLASS_MATCHER.matches(viewPath)) {
-            previewExecutor.execute(() -> {
-                Pair<File, String> result = Clazz.decompile(viewPath);
-                showFile(previewTextPane, result);
-            });
-        } else if (PathMatchers.DEX_MATCHER.matches(viewPath)) {
-            previewExecutor.execute(() -> {
-                Pair<File, String> result = Dex.decompile(file.toPath());
-                showFile(previewTextPane, result);
-            });
-        } else if(PathMatchers.ANDROID_BINARY_XML_MATCHER.matches(viewPath)) {
-            previewExecutor.execute(() -> {
-                Pair<File, String> result = BinaryXml.decompile(viewPath);
-                showFile(previewTextPane, result);
-            });
-        } else {
-            HexPanel.createJFrameWithHexPanel(viewPath.toFile());
+            showFileInEditor(viewPath, position);
+            return;
         }
+
+        // todo can not see  xml files inside jar/zip, only in APK
+        if (PathMatchers.BINARY_MATCHER.matches(viewPath)) {
+            previewExecutor.execute(() -> {
+                BinaryFileModel fileModel = new BinaryFileModel(viewPath, file);
+                showFile(previewTextPane, fileModel.getFileName(), fileModel.getText());
+            });
+            return;
+        }
+
+        HexPanel.createJFrameWithHexPanel(viewPath.toFile());
     }
 
-    private static void showFile(JTextPane previewTextPane, Pair<File, String> result) {
+    private static void showFile(JTextPane previewTextPane, File file, String text) {
         Runnable runnable = () -> {
-            previewTextPane.setText(result.u);
-            showFileExternally(result.t.toPath(), 0);
+            previewTextPane.setText(text);
+            showFileInEditor(file.toPath(), 0);
         };
         SwingUtilities.invokeLater(runnable);
     }
 
-    private static void showFileExternally(Path path, int line) {
+    private static void showFileInEditor(Path path, int line) {
         try {
             Desktop desktop = Desktop.getDesktop();
             desktop.open(new File(path.toString()));

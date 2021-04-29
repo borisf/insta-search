@@ -15,7 +15,7 @@
 
  import com.borisfarber.instasearch.contollers.Mediator;
  import com.borisfarber.instasearch.contollers.IgnoreList;
- import com.borisfarber.instasearch.models.Pair;
+ import com.borisfarber.instasearch.models.text.FilenameAndLineNumber;
  import com.illucit.instatrie.index.PrefixIndex;
  import com.illucit.instatrie.index.TriePrefixIndex;
  import com.illucit.instatrie.splitter.StringWordSplitter;
@@ -40,13 +40,11 @@
      private final ArrayList<String> allLines;
      private final PrefixIndex<String> index =
              new TriePrefixIndex<>(StringWordSplitter.IdentityStringWordSplitter.instance());
-     private final String mode;
      private List<String> searchResults = new LinkedList<>();
      private File searchRoot = new File("");
 
-     public FilenameSearch(Mediator mediator, String mode) {
+     public FilenameSearch(Mediator mediator) {
          this.mediator = mediator;
-         this.mode = mode;
          this.allLines = new ArrayList<>();
      }
 
@@ -77,10 +75,9 @@
      }
 
      @Override
-     public LinkedList<Pair<String, Integer>> getFileNameAndPosition(String line) {
-         Pair<String,Integer> pair = new Pair<>(line,Search.NOT_IN_FILE);
-
-         LinkedList<Pair<String, Integer>> result = new LinkedList<>();
+     public LinkedList<FilenameAndLineNumber> getFilenamesAndLineNumbers(String line) {
+         FilenameAndLineNumber pair = new FilenameAndLineNumber(line,Search.NOT_IN_FILE);
+         LinkedList<FilenameAndLineNumber> result = new LinkedList<>();
          result.add(pair);
          return result;
      }

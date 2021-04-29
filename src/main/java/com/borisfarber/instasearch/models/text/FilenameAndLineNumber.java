@@ -11,15 +11,16 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.borisfarber.instasearch.models;
 
-// value class to represent pairs data structure
-public class Pair<T, U> {
-    public T t;
-    public U u;
+package com.borisfarber.instasearch.models.text;
 
-    public Pair(T t, U u) {
-        this.t= t;
-        this.u= u;
+public class FilenameAndLineNumber {
+
+    public String fileName;
+    public int lineNumber;
+
+    public FilenameAndLineNumber(String fileName, int lineNumber) {
+        this.fileName = fileName;
+        this.lineNumber = lineNumber;
     }
 }

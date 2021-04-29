@@ -16,7 +16,6 @@
 
 package com.borisfarber.instasearch.models.formats;
 
-import com.borisfarber.instasearch.models.Pair;
 import com.borisfarber.instasearch.contollers.PrivateFolder;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
@@ -31,8 +30,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Dex {
-    public static Pair<File, String> decompile(Path selectedPath) {
-        Pair<File, String> result = new Pair<>(new File(""), "");
+    public static BinaryFileModel.DecompilationModel decompile(Path selectedPath) {
+        BinaryFileModel.DecompilationModel result = new BinaryFileModel.DecompilationModel();
 
         String fileNameWithoutExt =
                 new File(selectedPath.toString()).
@@ -57,8 +56,8 @@ public class Dex {
             }
         }
 
-        result.u = allStrings.substring(0, 120) + "/n/n...";
-        result.t = resultPrivateFile;
+        result.text = allStrings.substring(0, 120) + "/n/n...";
+        result.fileName = resultPrivateFile;
 
         return result;
     }
