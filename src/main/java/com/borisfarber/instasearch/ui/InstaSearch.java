@@ -63,14 +63,13 @@
      private void loadFonts() {
          InputStream is = getClass().getResourceAsStream("/fonts/JetBrainsMono-Medium.ttf");
          try {
-             System.out.println("here " + is);
              Font loadedFont = Font.createFont(Font.TRUETYPE_FONT, is);
              textFont = loadedFont.deriveFont(23.0f);
          } catch (FontFormatException e) {
              e.printStackTrace();
          } catch (IOException e) {
              e.printStackTrace();
-             textFont = new Font("JetBrains Mono", Font.PLAIN, 23);
+             textFont = new Font(Font.MONOSPACED, Font.PLAIN, 23);
          }
      }
 
