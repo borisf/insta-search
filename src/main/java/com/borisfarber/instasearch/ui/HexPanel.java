@@ -61,7 +61,7 @@ import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
     public HexPanel(final ByteBuffer bytes, final int bytesPerLine) {
         super(new BorderLayout());
         this.bytesPerLine = bytesPerLine;
-        final Font font = new Font("JetBrains Mono", Font.PLAIN, 23);
+        final Font font = new Font(Font.MONOSPACED, Font.PLAIN, 23);
         offsetView = new JTextArea();
         hexView = new JTextArea();
         asciiView = new JTextArea();

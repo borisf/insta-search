@@ -22,6 +22,8 @@
  import java.awt.*;
  import java.awt.event.*;
  import java.io.File;
+ import java.io.IOException;
+ import java.io.InputStream;
 
  import static com.borisfarber.instasearch.models.search.Search.CONTENT_SEARCH;
  import static com.borisfarber.instasearch.ui.ColorScheme.BACKGROUND_COLOR;
@@ -31,7 +33,7 @@
  public final class InstaSearch extends JFrame {
      public static final int FRAME_WIDTH = 1200;
      public static final int UI_VIEW_LIMIT = 1000;
-     private final Font textFont;
+     private Font textFont;
      private JTextField searchField;
 
      private JTextPane resultTextPane;
@@ -47,7 +49,8 @@
 
      public InstaSearch() {
          super("ClassyShark Insta Search");
-         textFont = new Font("JetBrains Mono", Font.PLAIN, 23);
+
+         loadFonts();
          buildUI();
          mediator =
                  new Mediator(searchField, resultTextPane,
@@ -55,6 +58,19 @@
                          CONTENT_SEARCH);
          searchField.getDocument().addDocumentListener(this.mediator);
          mediator.onFileOpened(openFile());
+     }
+
+     private void loadFonts() {
+         InputStream is = getClass().getResourceAsStream("/fonts/JetBrainsMono-Medium.ttf");
+         try {
+             Font loadedFont = Font.createFont(Font.TRUETYPE_FONT, is);
+             textFont = loadedFont.deriveFont(23.0f);
+         } catch (FontFormatException e) {
+             e.printStackTrace();
+         } catch (IOException e) {
+             e.printStackTrace();
+             textFont = new Font(Font.MONOSPACED, Font.PLAIN, 23);
+         }
      }
 
      public final void onFileDragged(final File file) {
