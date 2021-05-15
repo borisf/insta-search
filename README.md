@@ -57,13 +57,11 @@ Pressing Enter or double-clicking on an entry will open its own hex editor in a 
 
 ### Download & Run
 ## Jar
-To run, grab the [latest JAR](https://github.com/borisf/insta-search/releases)
+Grab the [latest JAR](https://github.com/borisf/insta-search/releases)
 and run `java -jar insta-search.jar`
 
 ## Native Executable
-Steps
-
-
+Run the [steps](https://github.com/borisf/insta-search/blob/master/NativeExecutable.md) to create a platform specific executable.
 
 **This is not an official Google product.**
 
