@@ -56,8 +56,14 @@ Pressing Enter or double-clicking on an entry will open its own hex editor in a 
 * File name - a large log file to crawl
 
 ### Download & Run
+## Jar
 To run, grab the [latest JAR](https://github.com/borisf/insta-search/releases)
 and run `java -jar insta-search.jar`
+
+## Native Executable
+Steps
+
+
 
 **This is not an official Google product.**
 
