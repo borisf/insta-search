@@ -17,7 +17,7 @@ This page lists the steps to create a native executable from a jar file.
 ```
 More [info](https://docs.oracle.com/en/java/javase/15/docs/specs/man/jpackage.html)
 
-### APT Install
+### Linux Install(APT)
 
 ```bash
 $ sudo chmod 777 ./instasearch_1.0-1_amd64.deb
